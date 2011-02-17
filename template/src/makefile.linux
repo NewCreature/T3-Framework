@@ -1,0 +1,17 @@
+CC = gcc
+CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall
+LIBS = -lallegro_image -lallegro_font -lallegro_primitives -lallegro_audio -lallegro_acodec -lallegro
+
+#uses all available T3F modules, you can remove any modules you don't use
+TEMPLATE_OFILES = t3f/t3f.o template.o
+TEMPLATE_EXENAME = ../bin/template
+
+all : $(TEMPLATE_EXENAME)
+
+$(TEMPLATE_EXENAME) : $(TEMPLATE_OFILES)
+	gcc $(TEMPLATE_OFILES) $(CFLAGS) $(LIBS) -o $(TEMPLATE_EXENAME)
+
+clean:
+	@rm -f t3f/*.o
+	@rm -f *.o
+	@echo Cleanup complete!

@@ -1,0 +1,140 @@
+T3F To-Do List
+--------------
+
+
+0.95
+----
+
+[ ]Finish animation implementation.
+
+   [ ]See about allowing frames to be rotated (should be pretty easy).
+   
+   [ ]Make sure frame positioning and rotation works for t3f_draw_*_animation().
+
+[ ]Finish collision tilemap implementation.
+
+   [ ]Need to fix curved/sloped floors.
+   
+      [ ]Add functions to detect distance from point to solid collision tile.
+      
+         [ ]When programming a game with curved floors we can use these
+            functions to determine if we want the object to change from grounded
+            to airborn.
+
+[ ]Add support for joystick hotplugging.
+
+[ ]Add fixed point math collisions. Should have both float and ALLEGRO_FIXED
+   versions.
+
+[ ]Add demo games.
+
+[ ]Make HTML manual.
+
+[ ]Use primitives to draw vectors instead of lines. This should speed up the
+   vector engine dramatically.
+
+
+0.9
+---
+
+[X]Move 3D functionality into t3f.c.
+
+   [X]Change T3F_3D_STATE to T3F_VIEW.
+   
+   [X]Set default projection at t3f_initialize().
+   
+      [X]Provide t3f_default_view.
+      
+   [X]Rename functions to t3f_draw_*_bitmap to match Allegro 5's functions.
+
+[X]Move sprite sheet functionality into t3f.c.
+   
+[X]Add some basic colors like T3F_COLOR_WHITE so we don't always have to map
+   colors when drawing stuff.
+   
+[X]Prefix hyperlink functions with t3f_.
+
+[X]Add support for static layers and full image layers.
+
+[X]Finish implementing controllers.
+
+   [X]Make sure we can map axes properly.
+   
+   [X]Implement some configuration options such as dead zone.
+   
+[X]Create T3F_SPRITE_SHEET type and use that for creating sprite sheets instead
+   of the current begin/end style.
+   
+   [X]Might test new idea for sprite sheets using memory bitmaps and then swapping
+      out pointers when the sprite sheet is finalized. This would require passing
+      double pointers to the sprite sheet functions so when we finalize the original
+      bitmap pointers can be swapped with the new ones.
+
+[X]Add mouse mickeys functions.
+
+[X]Hyperlink menu items should be clickable by default. Remove T3F_HYPERLINK_FLAG_CLICKABLE
+   and add T3F_HYPERLINK_FLAG_STATIC.
+
+[X]Change t3f_initialize() parameters to put program name first.
+
+[X]Finish tilemap editor.
+
+   [X]Copy editor from Balloon Boy.
+   
+   [X]Add help.
+
+[X]Implement a flag to disable alpha channel in tilemap layers. This is so the
+   user can decide if they want to draw their own backdrop or use the tilemap
+   as the backdrop.
+
+[X]Clean up for release.
+
+   [X]Build tools with same makefile as examples.
+   
+   [X]Clean up template program.
+   
+   [X]Proofread documentation.
+   
+   [X]Remove unused sources.
+
+[X]Simplify the tilemap rendering routines.
+
+   [X]Get rid of T3F_TILEMAP_CAMERA and use the current view instead. It doesn't
+      make sense to force a camera system on the user when they will probably
+      want to make their own with whatever features they want to use.
+   
+      [X]Pass camera coordinates to t3f_render_tilemap().
+   
+   [X]Get rid of option to render the full map as that is a game-specific thing
+      and should be done there instead (PP2 should implement its own rendering
+      function to generate previews).
+      
+[X]Add ability to pass a color to the tilemap rendering routines so we can do
+   some basic effects.
+
+[X]Document tilemap functions.
+
+[X]Add collision example.
+
+[X]Paper Paddle demo game should use the GUI system.
+   
+[X]Fix music player. Currently it is possible to play multiple music files
+   simultaneously if you play them too quickly.
+
+[X]Prepare license.
+
+[X]Document collision module.
+
+[X]Create a test tilemap for ex_tilemap.
+
+   [X]Add a cloud layer to the map so we can see some of the "3D" effects.
+
+[X]Put in demo games.
+
+   [X]Implement gameplay for Dot to Dot: Sweep.
+   
+      [X]Adjust amount of balls per level to correct difficulty curve.
+   
+   [X]Add intro screen to Anti-Virus.
+   
+      [X]Show game controls on intro screen.

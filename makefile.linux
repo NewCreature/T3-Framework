@@ -1,0 +1,126 @@
+CC = gcc
+CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall -It3f -I./
+LIBS = -lallegro_image -lallegro_font -lallegro_ttf -lallegro_primitives -lallegro_audio -lallegro_acodec -lallegro_dialog -lallegro
+
+EX_BASIC_OFILES = t3f/t3f.o examples/ex_basic.o
+EX_BASIC_EXENAME = examples/ex_basic
+
+EX_MUSIC_OFILES = t3f/t3f.o t3f/music.o examples/ex_music.o
+EX_MUSIC_EXENAME = examples/ex_music
+
+EX_SOUND_OFILES = t3f/t3f.o t3f/sound.o examples/ex_sound.o
+EX_SOUND_EXENAME = examples/ex_sound
+
+EX_3D_OFILES = t3f/t3f.o examples/ex_3d.o
+EX_3D_EXENAME = examples/ex_3d
+
+EX_ATLAS_OFILES = t3f/t3f.o  examples/ex_atlas.o
+EX_ATLAS_EXENAME = examples/ex_atlas
+
+EX_CONTROLLER_OFILES = t3f/t3f.o t3f/controller.o examples/ex_controller.o
+EX_CONTROLLER_EXENAME = examples/ex_controller
+
+EX_ANIMATION_OFILES = t3f/t3f.o t3f/animation.o examples/ex_animation.o
+EX_ANIMATION_EXENAME = examples/ex_animation
+
+EX_GUI_OFILES = t3f/t3f.o t3f/gui.o examples/ex_gui.o
+EX_GUI_EXENAME = examples/ex_gui
+
+EX_TILEMAP_OFILES = t3f/t3f.o t3f/animation.o t3f/tilemap.o examples/ex_tilemap.o
+EX_TILEMAP_EXENAME = examples/ex_tilemap
+
+EX_COLLISION_OFILES = t3f/t3f.o t3f/collision.o examples/ex_collision.o
+EX_COLLISION_EXENAME = examples/ex_collision
+
+PADDLE_OFILES = t3f/t3f.o t3f/music.o t3f/gui.o t3f/collision.o games/paddle/paddle.o
+PADDLE_EXENAME = games/paddle/paddle
+
+DOT2DOT_OFILES = t3f/t3f.o t3f/music.o t3f/gui.o t3f/sound.o games/dot2dot/main.o games/dot2dot/game.o games/dot2dot/intro.o
+DOT2DOT_EXENAME = games/dot2dot/dot2dot
+
+AV_OFILES = t3f/t3f.o t3f/animation.o t3f/controller.o t3f/music.o games/av/board.o games/av/control.o games/av/pill.o games/av/game.o games/av/main.o 
+AV_EXENAME = games/av/av
+
+ANIMATOR_OFILES = t3f/t3f.o t3f/animation.o tools/animator.o
+ANIMATOR_EXENAME = tools/animator
+
+MAPPER_OFILES = t3f/t3f.o t3f/animation.o t3f/tilemap.o tools/mapper.o
+MAPPER_EXENAME = tools/mapper
+
+VECTOR_EDITOR_OFILES = t3f/t3f.o t3f/vector.o tools/vector_editor.o
+VECTOR_EDITOR_EXENAME = tools/vector_editor
+
+FONT_EDITOR_OFILES = t3f/t3f.o t3f/vector.o tools/font_editor.o
+FONT_EDITOR_EXENAME = tools/font_editor
+
+all : $(TEMPLATE_EXENAME) $(EX_BASIC_EXENAME) $(EX_MUSIC_EXENAME) $(EX_SOUND_EXENAME) $(EX_3D_EXENAME) $(EX_ATLAS_EXENAME) $(EX_CONTROLLER_EXENAME) $(EX_ANIMATION_EXENAME) $(EX_GUI_EXENAME) $(EX_TILEMAP_EXENAME) $(EX_COLLISION_EXENAME) $(PADDLE_EXENAME) $(DOT2DOT_EXENAME) $(AV_EXENAME) $(ANIMATOR_EXENAME) $(MAPPER_EXENAME) $(VECTOR_EDITOR_EXENAME) $(FONT_EDITOR_EXENAME)
+
+$(TEMPLATE_EXENAME) : $(TEMPLATE_OFILES)
+	gcc $(TEMPLATE_OFILES) $(CFLAGS) $(LIBS) -o $(TEMPLATE_EXENAME)
+
+$(EX_BASIC_EXENAME) : $(EX_BASIC_OFILES)
+	gcc $(EX_BASIC_OFILES) $(CFLAGS) $(LIBS) -o $(EX_BASIC_EXENAME)
+
+$(EX_MUSIC_EXENAME) : $(EX_MUSIC_OFILES)
+	gcc $(EX_MUSIC_OFILES) $(CFLAGS) $(LIBS) -o $(EX_MUSIC_EXENAME)
+
+$(EX_SOUND_EXENAME) : $(EX_SOUND_OFILES)
+	gcc $(EX_SOUND_OFILES) $(CFLAGS) $(LIBS) -o $(EX_SOUND_EXENAME)
+
+$(EX_3D_EXENAME) : $(EX_3D_OFILES)
+	gcc $(EX_3D_OFILES) $(CFLAGS) $(LIBS) -o $(EX_3D_EXENAME)
+
+$(EX_ATLAS_EXENAME) : $(EX_ATLAS_OFILES)
+	gcc $(EX_ATLAS_OFILES) $(CFLAGS) $(LIBS) -o $(EX_ATLAS_EXENAME)
+
+$(EX_DUMB_EXENAME) : $(EX_DUMB_OFILES)
+	gcc $(EX_DUMB_OFILES) $(CFLAGS) $(LIBS) -o $(EX_DUMB_EXENAME)
+
+$(EX_CONTROLLER_EXENAME) : $(EX_CONTROLLER_OFILES)
+	gcc $(EX_CONTROLLER_OFILES) $(CFLAGS) $(LIBS) -o $(EX_CONTROLLER_EXENAME)
+
+$(EX_ANIMATION_EXENAME) : $(EX_ANIMATION_OFILES)
+	gcc $(EX_ANIMATION_OFILES) $(CFLAGS) $(LIBS) -o $(EX_ANIMATION_EXENAME)
+
+$(EX_GUI_EXENAME) : $(EX_GUI_OFILES)
+	gcc $(EX_GUI_OFILES) $(CFLAGS) $(LIBS) -o $(EX_GUI_EXENAME)
+
+$(EX_TILEMAP_EXENAME) : $(EX_TILEMAP_OFILES)
+	gcc $(EX_TILEMAP_OFILES) $(CFLAGS) $(LIBS) -o $(EX_TILEMAP_EXENAME)
+
+$(EX_COLLISION_EXENAME) : $(EX_COLLISION_OFILES)
+	gcc $(EX_COLLISION_OFILES) $(CFLAGS) $(LIBS) -o $(EX_COLLISION_EXENAME)
+
+$(ANIMATOR_EXENAME) : $(ANIMATOR_OFILES)
+	gcc $(ANIMATOR_OFILES) $(CFLAGS) $(LIBS) -o $(ANIMATOR_EXENAME)
+
+$(MAPPER_EXENAME) : $(MAPPER_OFILES)
+	gcc $(MAPPER_OFILES) $(CFLAGS) $(LIBS) -o $(MAPPER_EXENAME)
+
+$(VECTOR_EDITOR_EXENAME) : $(VECTOR_EDITOR_OFILES)
+	gcc $(VECTOR_EDITOR_OFILES) $(CFLAGS) $(LIBS) -o $(VECTOR_EDITOR_EXENAME)
+
+$(FONT_EDITOR_EXENAME) : $(FONT_EDITOR_OFILES)
+	gcc $(FONT_EDITOR_OFILES) $(CFLAGS) $(LIBS) -o $(FONT_EDITOR_EXENAME)
+
+$(PADDLE_EXENAME) : $(PADDLE_OFILES)
+	gcc $(PADDLE_OFILES) $(CFLAGS) $(LIBS) -o $(PADDLE_EXENAME)
+
+$(DOT2DOT_EXENAME) : $(DOT2DOT_OFILES)
+	gcc $(DOT2DOT_OFILES) $(CFLAGS) $(LIBS) -o $(DOT2DOT_EXENAME)
+
+$(AV_EXENAME) : $(AV_OFILES)
+	gcc $(AV_OFILES) $(CFLAGS) $(LIBS) -o $(AV_EXENAME)
+
+clean:
+	@rm -f t3f/*.o
+	@rm -f examples/*.o
+	@rm -f tools/*.o
+	@rm -f games/paddle/*.o
+	@rm -f games/dot2dot/*.o
+	@rm -f games/av/*.o
+	@echo Cleanup complete!
+
+extraclean: clean
+	@rm -f $(TEMPLATE_EXENAME) $(EX_BASIC_EXENAME) $(EX_MUSIC_EXENAME) $(EX_SOUND_EXENAME) $(EX_3D_EXENAME) $(EX_ATLAS_EXENAME) $(EX_CONTROLLER_EXENAME) $(EX_ANIMATION_EXENAME) $(EX_GUI_EXENAME) $(EX_TILEMAP_EXENAME) $(EX_COLLISION_EXENAME) $(PADDLE_EXENAME) $(DOT2DOT_EXENAME) $(AV_EXENAME) $(ANIMATOR_EXENAME) $(MAPPER_EXENAME) $(VECTOR_EDITOR_EXENAME) $(FONT_EDITOR_EXENAME)
+	@echo Executables removed!
