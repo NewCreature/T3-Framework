@@ -232,6 +232,24 @@ void frame_logic(void)
 			animation->frame[current_frame]->height = al_get_bitmap_height(animation->bitmap[animation->frame[current_frame]->bitmap]);
 			t3f_key[ALLEGRO_KEY_PAD_ASTERISK] = 0;
 		}
+		if(t3f_key[ALLEGRO_KEY_PGUP])
+		{
+			animation->frame[current_frame]->bitmap--;
+			if(animation->frame[current_frame]->bitmap < 0)
+			{
+				animation->frame[current_frame]->bitmap = animation->bitmaps - 1;
+			}
+			t3f_key[ALLEGRO_KEY_PGUP] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_PGDN])
+		{
+			animation->frame[current_frame]->bitmap++;
+			if(animation->frame[current_frame]->bitmap >= animation->bitmaps)
+			{
+				animation->frame[current_frame]->bitmap = 0;
+			}
+			t3f_key[ALLEGRO_KEY_PGDN] = 0;
+		}
 		
 		if(t3f_mouse_button[0])
 		{

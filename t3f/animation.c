@@ -357,9 +357,19 @@ T3F_ANIMATION_FRAME * t3f_animation_get_frame(T3F_ANIMATION * ap, int tick)
 void t3f_draw_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tick, float x, float y, float z, int flags)
 {
 	T3F_ANIMATION_FRAME * fp = t3f_animation_get_frame(ap, tick);
+	float fox = 0.0;
+	float foy = 0.0;
 	if(fp)
 	{
-		t3f_draw_scaled_bitmap(ap->bitmap[fp->bitmap], color, x + fp->x, y + fp->y, z + fp->z, fp->width, fp->height, flags);
+		if(flags & ALLEGRO_FLIP_HORIZONTAL)
+		{
+			fox = -((fp->x + fp->width) - (ap->frame[0]->x + ap->frame[0]->width)) - (fp->x - ap->frame[0]->x);
+		}
+		if(flags & ALLEGRO_FLIP_VERTICAL)
+		{
+			foy = -((fp->y + fp->height) - (ap->frame[0]->y + ap->frame[0]->height)) - (fp->y - ap->frame[0]->y);
+		}		
+		t3f_draw_scaled_bitmap(ap->bitmap[fp->bitmap], color, x + fp->x + fox, y + fp->y + foy, z + fp->z, fp->width, fp->height, flags);
 	}
 }
 
@@ -376,11 +386,21 @@ void t3f_draw_rotated_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tic
 {
 	float scale_x, scale_y;
 	T3F_ANIMATION_FRAME * fp = t3f_animation_get_frame(ap, tick);
+	float fox = 0.0;
+	float foy = 0.0;
 	if(fp)
 	{
+		if(flags & ALLEGRO_FLIP_HORIZONTAL)
+		{
+			fox = -((fp->x + fp->width) - (ap->frame[0]->x + ap->frame[0]->width)) - (fp->x - ap->frame[0]->x);
+		}
+		if(flags & ALLEGRO_FLIP_VERTICAL)
+		{
+			foy = -((fp->y + fp->height) - (ap->frame[0]->y + ap->frame[0]->height)) - (fp->y - ap->frame[0]->y);
+		}		
 		scale_x = fp->width / al_get_bitmap_width(ap->bitmap[fp->bitmap]);
 		scale_y = fp->height / al_get_bitmap_height(ap->bitmap[fp->bitmap]);
-		t3f_draw_scaled_rotated_bitmap(ap->bitmap[fp->bitmap], color, cx * scale_x - fp->x, cy * scale_y - fp->y, x, y, z + fp->z, angle, scale_x, scale_y, flags);
+		t3f_draw_scaled_rotated_bitmap(ap->bitmap[fp->bitmap], color, cx * scale_x - fp->x, cy * scale_y - fp->y, x + fox, y + foy, z + fp->z, angle, scale_x, scale_y, flags);
 	}
 }
 
@@ -388,10 +408,20 @@ void t3f_draw_rotated_scaled_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, 
 {
 	float scale_x, scale_y;
 	T3F_ANIMATION_FRAME * fp = t3f_animation_get_frame(ap, tick);
+	float fox = 0.0;
+	float foy = 0.0;
 	if(fp)
 	{
+		if(flags & ALLEGRO_FLIP_HORIZONTAL)
+		{
+			fox = -((fp->x + fp->width) - (ap->frame[0]->x + ap->frame[0]->width)) - (fp->x - ap->frame[0]->x);
+		}
+		if(flags & ALLEGRO_FLIP_VERTICAL)
+		{
+			foy = -((fp->y + fp->height) - (ap->frame[0]->y + ap->frame[0]->height)) - (fp->y - ap->frame[0]->y);
+		}		
 		scale_x = fp->width / al_get_bitmap_width(ap->bitmap[fp->bitmap]);
 		scale_y = fp->height / al_get_bitmap_height(ap->bitmap[fp->bitmap]);
-		t3f_draw_scaled_rotated_bitmap(ap->bitmap[fp->bitmap], color, cx * scale_x - fp->x, cy * scale_y - fp->y, x, y, z + fp->z, angle, scale, scale, flags);
+		t3f_draw_scaled_rotated_bitmap(ap->bitmap[fp->bitmap], color, cx * scale_x - fp->x, cy * scale_y - fp->y, x + fox, y + foy, z + fp->z, angle, scale, scale, flags);
 	}
 }
