@@ -972,8 +972,8 @@ T3F_ATLAS * t3f_create_atlas(int type, int w, int h)
 		return NULL;
 	}
 	ap->type = type;
-	ap->x = 0;
-	ap->y = 0;
+	ap->x = 1; // start at 1 so we get consistency with filtered bitmaps
+	ap->y = 1;
 	ap->line_height = 0;
 	
 	return ap;
@@ -1011,7 +1011,7 @@ ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp)
 			/* go to next line if it doesn't fit */
 			if(ap->x + al_get_bitmap_width(bp) + 2 >= al_get_bitmap_width(ap->bitmap))
 			{
-				ap->x = 0;
+				ap->x = 1; // start at 1 so we get consistency with filtered bitmaps
 				ap->y += ap->line_height;
 				
 				/* if it still doesn't fit, fail */
