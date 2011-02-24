@@ -294,7 +294,6 @@ static void t3f_get_base_transform(void)
 			t3f_display_height = al_get_display_height(t3f_display);
 		}
 		al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, (float)t3f_display_width / (float)t3f_virtual_display_width, (float)t3f_display_height / (float)t3f_virtual_display_height, 0.0);
-		printf("(%d, %d) (%d, %d)\n", t3f_display_offset_x, t3f_display_offset_y, t3f_display_width, t3f_display_height);
 	}
 	else
 	{
