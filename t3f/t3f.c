@@ -294,6 +294,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 //			printf("Failed to create display!\n");
 //			return 0;
 //		}
+		al_resize_display(t3f_display, w, h);
 		sprintf(val, "%d", w);
 		al_set_config_value(t3f_config, "T3F", "display_width", val);
 		sprintf(val, "%d", h);
@@ -370,9 +371,33 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	return 1;
 }
 
+/* set clipping rectangle, taking the current view into effect */
 void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 {
-	al_set_clipping_rectangle((float)x * t3f_mouse_scale_x, (float)y * t3f_mouse_scale_y, (float)w * t3f_mouse_scale_x, (float)h * t3f_mouse_scale_y);
+	float tx, ty;
+	float twx, twy;
+	
+	/* convert virtual screen coordinates to real display coordinates */
+	if(w != 0 && h != 0)
+	{
+		tx = x;
+		ty = y;
+		twx = x + w;
+		twy = y + h;
+		al_transform_coordinates(&t3f_current_transform, &tx, &ty);
+		al_transform_coordinates(&t3f_current_transform, &twx, &twy);
+		al_set_clipping_rectangle(tx, ty, twx - tx, twy - ty);
+	}
+	else
+	{
+		tx = 0;
+		ty = 0;
+		twx = t3f_current_view->width;
+		twy = t3f_current_view->height;
+		al_transform_coordinates(&t3f_current_transform, &tx, &ty);
+		al_transform_coordinates(&t3f_current_transform, &twx, &twy);
+		al_set_clipping_rectangle(tx, ty, twx - tx, twy - ty);
+	}
 }
 
 void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event))
