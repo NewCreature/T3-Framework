@@ -403,7 +403,7 @@ int t3f_save_tilemap(T3F_TILEMAP * tmp, const char * fn)
 	return 1;
 }
 
-float t3f_get_speed(T3F_TILEMAP * tmp, int layer, float oz)
+static float t3f_get_speed(T3F_TILEMAP * tmp, int layer, float oz)
 {
 	return (t3f_project_x(1.0, tmp->layer[layer]->z - oz) - t3f_project_x(0.0, tmp->layer[layer]->z - oz));
 }
@@ -412,21 +412,19 @@ static void t3f_render_static_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 {
 	ALLEGRO_STATE old_blender;
 	int i, j;
-	int revert = 0;
+	bool held;
 	
+	held = al_is_bitmap_drawing_held();
 	al_store_state(&old_blender, ALLEGRO_STATE_BLENDER);
 	if(tmp->layer[layer]->flags & T3F_TILEMAP_LAYER_SOLID)
 	{
+		if(held)
+		{
+			al_hold_bitmap_drawing(false);
+		}
 		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 	}
-	if(al_is_bitmap_drawing_held())
-	{
-		revert = 1;
-	}
-	else
-	{
-		al_hold_bitmap_drawing(true);
-	}
+	al_hold_bitmap_drawing(true);
 	for(i = 0; i < (t3f_virtual_display_height / tsp->height) + 1; i++)
 	{
 		for(j = 0; j < (t3f_virtual_display_width / tsp->width) + 1; j++)
@@ -434,10 +432,11 @@ static void t3f_render_static_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 			t3f_draw_scaled_animation(tsp->tile[t3f_get_tile(tsp, tmp->layer[layer]->data[i][j], tick)]->ap, color, tick, (float)(j * tsp->width) * tmp->layer[layer]->scale, (float)(i * tsp->height) * tmp->layer[layer]->scale, 0, tmp->layer[layer]->scale, 0);
 		}
 	}
-	if(!revert)
+	if(tmp->layer[layer]->flags & T3F_TILEMAP_LAYER_SOLID)
 	{
 		al_hold_bitmap_drawing(false);
 	}
+	al_hold_bitmap_drawing(held);
 	al_restore_state(&old_blender);
 }
 
@@ -460,7 +459,7 @@ static void t3f_render_normal_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 	float cx = (ox * tmp->layer[layer]->speed_x) - tmp->layer[layer]->x;
 	float cy = (oy * tmp->layer[layer]->speed_y) - tmp->layer[layer]->y;
 	ALLEGRO_STATE old_blender;
-	int revert = 0;
+	bool held;
 	
 	sw = t3f_virtual_display_width;
 	sh = t3f_virtual_display_height;
@@ -509,19 +508,17 @@ static void t3f_render_normal_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 	ty = ostarty;
 	py = starty;
 	
+	held = al_is_bitmap_drawing_held();
 	al_store_state(&old_blender, ALLEGRO_STATE_BLENDER);
 	if(tmp->layer[layer]->flags & T3F_TILEMAP_LAYER_SOLID)
 	{
+		if(held)
+		{
+			al_hold_bitmap_drawing(false);
+		}
 		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 	}
-	if(al_is_bitmap_drawing_held())
-	{
-		revert = 1;
-	}
-	else
-	{
-		al_hold_bitmap_drawing(true);
-	}
+	al_hold_bitmap_drawing(true);
 	while(ty < ostarty + (int)th + 3)
 	{
 		tx = ostartx;
@@ -546,10 +543,11 @@ static void t3f_render_normal_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 			py = 0;
 		}
 	}
-	if(!revert)
+	if(tmp->layer[layer]->flags & T3F_TILEMAP_LAYER_SOLID)
 	{
 		al_hold_bitmap_drawing(false);
 	}
+	al_hold_bitmap_drawing(held);
 	al_restore_state(&old_blender);
 }
 

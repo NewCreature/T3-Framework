@@ -311,30 +311,21 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	if(t3f_display)
 	{
 		/* if we are switching from window to full screen, create new display */
-//		al_destroy_display(t3f_display);
 		if(flags & T3F_USE_FULLSCREEN)
 		{
-			al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN, true);
-//			al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
+			al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, true);
 		}
 		else
 		{
-			al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN, false);
-//			al_set_new_display_flags(ALLEGRO_WINDOWED);
+			al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false);
+			t3f_flags ^= T3F_USE_FULLSCREEN;
+			al_resize_display(t3f_display, w, h);
 		}
-//		t3f_display = al_create_display(w, h);
-//		if(!t3f_display)
-//		{
-//			printf("Failed to create display!\n");
-//			return 0;
-//		}
-		al_resize_display(t3f_display, w, h);
 		sprintf(val, "%d", w);
 		al_set_config_value(t3f_config, "T3F", "display_width", val);
 		sprintf(val, "%d", h);
 		al_set_config_value(t3f_config, "T3F", "display_height", val);
 		t3f_get_base_transform();
-//		al_build_transform(&t3f_base_transform, 0.0, 0.0, (float)al_get_display_width(t3f_display) / (float)t3f_virtual_display_width, (float)al_get_display_height(t3f_display) / (float)t3f_virtual_display_height, 0.0);
 		t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)al_get_display_width(t3f_display);
 		t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)al_get_display_height(t3f_display);
 		al_set_window_title(t3f_display, t3f_window_title);
