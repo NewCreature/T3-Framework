@@ -3,6 +3,7 @@
 #include "controller.h"
 
 static char t3f_binding_return_name[256] = {0};
+static char t3f_controller_return_name[256] = {0};
 static float t3f_controller_axis_threshold = 0.3;
 
 T3F_CONTROLLER * t3f_create_controller(int bindings)
@@ -24,6 +25,33 @@ void t3f_destroy_controller(T3F_CONTROLLER * cp)
 	free(cp);
 }
 
+const char * t3f_get_controller_name(T3F_CONTROLLER * cp, int binding)
+{
+	switch(cp->binding[binding].type)
+	{
+		case T3F_CONTROLLER_BINDING_KEY:
+		{
+			sprintf(t3f_controller_return_name, "Keyboard");
+			return t3f_controller_return_name;
+		}
+		case T3F_CONTROLLER_BINDING_JOYSTICK_BUTTON:
+		case T3F_CONTROLLER_BINDING_JOYSTICK_AXIS:
+		{
+			if(t3f_joystick[cp->binding[binding].joystick])
+			{
+				sprintf(t3f_controller_return_name, "%s (%d)", al_get_joystick_name(t3f_joystick[cp->binding[binding].joystick]), cp->binding[binding].joystick);
+			}
+			else
+			{
+				sprintf(t3f_controller_return_name, "N/A");
+			}
+			return t3f_controller_return_name;
+		}
+	}
+	t3f_controller_return_name[0] = 0;
+	return t3f_controller_return_name;
+}
+
 const char * t3f_get_controller_binding_name(T3F_CONTROLLER * cp, int binding)
 {
 	const char * name;
@@ -31,7 +59,7 @@ const char * t3f_get_controller_binding_name(T3F_CONTROLLER * cp, int binding)
 	{
 		case T3F_CONTROLLER_BINDING_KEY:
 		{
-			sprintf(t3f_binding_return_name, "Keyboard: %s", al_keycode_to_name(cp->binding[binding].button));
+			sprintf(t3f_binding_return_name, "%s", al_keycode_to_name(cp->binding[binding].button));
 			return t3f_binding_return_name;
 		}
 		case T3F_CONTROLLER_BINDING_JOYSTICK_BUTTON:
@@ -39,7 +67,7 @@ const char * t3f_get_controller_binding_name(T3F_CONTROLLER * cp, int binding)
 			if(t3f_joystick[cp->binding[binding].joystick])
 			{
 				name = al_get_joystick_button_name(t3f_joystick[cp->binding[binding].joystick], cp->binding[binding].button);
-				sprintf(t3f_binding_return_name, "%s (%d): Button %s", al_get_joystick_name(t3f_joystick[cp->binding[binding].joystick]), cp->binding[binding].joystick, name ? name : "???");
+				sprintf(t3f_binding_return_name, "Button %s", name ? name : "???");
 			}
 			else
 			{
@@ -52,7 +80,7 @@ const char * t3f_get_controller_binding_name(T3F_CONTROLLER * cp, int binding)
 			if(t3f_joystick[cp->binding[binding].joystick])
 			{
 				name = al_get_joystick_axis_name(t3f_joystick[cp->binding[binding].joystick], cp->binding[binding].stick, cp->binding[binding].axis);
-				sprintf(t3f_binding_return_name, "%s %d: Stick %d %s%s%s", al_get_joystick_name(t3f_joystick[cp->binding[binding].joystick]), cp->binding[binding].joystick, cp->binding[binding].stick, name ? name : "???", (cp->binding[binding].flags & T3F_CONTROLLER_FLAG_AXIS_NEGATIVE) ? "-" : "+", (cp->binding[binding].flags & T3F_CONTROLLER_FLAG_AXIS_INVERT) ? "(I)" : "");
+				sprintf(t3f_binding_return_name, "Stick %d %s%s%s", cp->binding[binding].stick, name ? name : "???", (cp->binding[binding].flags & T3F_CONTROLLER_FLAG_AXIS_NEGATIVE) ? "-" : "+", (cp->binding[binding].flags & T3F_CONTROLLER_FLAG_AXIS_INVERT) ? "(I)" : "");
 			}
 			else
 			{

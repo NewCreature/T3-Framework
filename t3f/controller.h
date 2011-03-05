@@ -62,6 +62,7 @@ typedef struct
 T3F_CONTROLLER * t3f_create_controller(int bindings);
 void t3f_destroy_controller(T3F_CONTROLLER * cp);
 bool t3f_bind_controller(T3F_CONTROLLER * cp, int binding);
+const char * t3f_get_controller_name(T3F_CONTROLLER * cp, int binding);
 const char * t3f_get_controller_binding_name(T3F_CONTROLLER * cp, int binding);
 void t3f_write_controller_config(ALLEGRO_CONFIG * acp, const char * section, T3F_CONTROLLER * cp);
 bool t3f_read_controller_config(ALLEGRO_CONFIG * acp, const char * section, T3F_CONTROLLER * cp);
