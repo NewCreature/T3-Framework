@@ -113,6 +113,7 @@ char t3f_read_key(int flags);
 
 /* mouse */
 void t3f_get_mouse_mickeys(int * x, int * y, int * z);
+void t3f_set_mouse_xy(float x, float y);
 
 bool t3f_push_state(int flags);
 bool t3f_pop_state(void);

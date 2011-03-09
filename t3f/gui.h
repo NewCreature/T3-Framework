@@ -69,6 +69,9 @@ int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *), void * bp,
 int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(int, void *), char * text, void * fp, int ox, int oy, ALLEGRO_COLOR color, int flags);
 void t3f_center_gui(T3F_GUI * pp, float oy, float my);
 
+void t3f_select_previous_gui_element(T3F_GUI * pp);
+void t3f_select_next_gui_element(T3F_GUI * pp);
+void t3f_activate_selected_gui_element(T3F_GUI * pp);
 void t3f_process_gui(T3F_GUI * pp);
 void t3f_render_gui(T3F_GUI * pp);
 

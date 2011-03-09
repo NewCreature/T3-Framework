@@ -888,12 +888,14 @@ float t3f_get_tilemap_collision_x(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TILEM
 {
 	int tw = tmp->tile_width;
 	float rx;
+	float tx;
 	
     /* if sprite was moving left */
     if(cp->x < cp->ox)
     {
-	    rx = (((int)(cp->x + cp->map.left.point[0].x) / tw) * tw) + tw - (int)(cp->map.left.point[0].x);
-	    if(rx < 0)
+		tx = (((int)(cp->x + cp->map.left.point[0].x) / tw) * tw) + tw;
+	    rx =  tx- (int)(cp->map.left.point[0].x);
+	    if(tx < 0)
 	    {
 		    rx -= tw;
 	    }
@@ -922,11 +924,19 @@ float t3f_get_tilemap_collision_x(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TILEM
 float t3f_get_tilemap_collision_y(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TILEMAP * tmp)
 {
 	int th = tmp->tile_height;
+	float ry;
+	float ty;
 
     /* if sprite was moving up */
     if(cp->y < cp->oy)
     {
-        return (((int)(cp->y + cp->map.top.point[0].y) / th) * th) + th - (int)(cp->map.top.point[0].y);
+		ty = (((int)(cp->y + cp->map.top.point[0].y) / th) * th) + th;
+	    ry =  ty - (int)(cp->map.top.point[0].y);
+	    if(ty < 0)
+	    {
+		    ry -= th;
+	    }
+        return ry;
     }
 
     /* if sprite was moving down */

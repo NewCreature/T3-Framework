@@ -516,6 +516,11 @@ void t3f_get_mouse_mickeys(int * x, int * y, int * z)
 	}
 }
 
+void t3f_set_mouse_xy(float x, float y)
+{
+	al_set_mouse_xy(t3f_display, t3f_mouse_x / t3f_mouse_scale_x, t3f_mouse_y / t3f_mouse_scale_y);
+}
+
 bool t3f_push_state(int flags)
 {
 	if(t3f_state_stack_size < T3F_MAX_STACK)
