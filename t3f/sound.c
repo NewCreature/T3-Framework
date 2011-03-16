@@ -27,7 +27,7 @@ bool t3f_play_sample(ALLEGRO_SAMPLE * sp, float vol, float pan, float speed)
 
 bool t3f_queue_sample(ALLEGRO_SAMPLE * sp)
 {
-	if(t3f_queued_samples < T3F_MAX_QUEUED_SAMPLES)
+	if(t3f_queued_samples < T3F_MAX_QUEUED_SAMPLES && sp)
 	{
 		t3f_sample_queue[t3f_queued_samples] = sp;
 		t3f_queued_samples++;

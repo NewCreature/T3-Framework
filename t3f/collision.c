@@ -491,7 +491,7 @@ int t3f_get_collision_tile_x(T3F_COLLISION_TILEMAP * tmp, float x)
 	}
 	
 	/* figure out tile index */
-	ctx = tx / tmp->tile_width;
+	ctx = (int)tx / tmp->tile_width;
 	
 	return ctx;
 }
@@ -513,7 +513,7 @@ int t3f_get_collision_tile_y(T3F_COLLISION_TILEMAP * tmp, float y)
 	}
 	
 	/* figure out tile index */
-	cty = ty / tmp->tile_height;
+	cty = (int)ty / tmp->tile_height;
 	
 	return cty;
 }
