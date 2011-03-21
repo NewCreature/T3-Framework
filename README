@@ -1,0 +1,5 @@
+T^3 Framework (T3F) is a framework which simplifies the process of making games
+with Allegro 5. It handles event processing for you and provides you with easy
+access to input, sound, and graphics. Several modules are included in addition
+to the core framework. These provide functions for input binding, animation,
+collision detection, menu handling, sprite atlasing, and more.
