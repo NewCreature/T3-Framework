@@ -78,6 +78,13 @@ ALLEGRO_COLOR t3f_color_black;
 static bool t3f_need_redraw = false;
 static void (*t3f_event_handler_proc)(ALLEGRO_EVENT * event) = NULL;
 
+/* used to locate resources */
+#ifdef T3F_PACKAGE_NAME
+	static const char * t3f_package_name = T3F_PACKAGE_NAME;
+#else
+	static const char * t3f_package_name = NULL;
+#endif
+
 static bool t3f_is_path_present(ALLEGRO_PATH * pp)
 {
 	return al_filename_exists(al_path_cstr(pp, '/'));
@@ -269,6 +276,80 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	t3f_render_proc = render_proc;
 	
 	return 1;
+}
+
+/* function to ease the burden of having resources located in different places
+ * on different platforms, changes to the directory where it finds the specified
+ * resource */
+bool t3f_locate_resource(const char * filename)
+{
+	ALLEGRO_PATH * path;
+	ALLEGRO_PATH * file_path;
+	bool found = false;
+	
+	/* if we are already in the correct directory */
+	if(al_filename_exists(filename))
+	{
+		return true;
+	}
+	
+	/* look in resources path */
+	file_path = al_create_path(filename);
+	if(!file_path)
+	{
+		return false;
+	}
+	path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+	if(path)
+	{
+		al_join_paths(path, file_path);
+		if(al_filename_exists(al_path_cstr(path, '/')))
+		{
+			found = true;
+		}
+		printf("%s\n", al_path_cstr(path, '/'));
+		al_destroy_path(path);
+	}
+	al_destroy_path(file_path);
+	if(found)
+	{
+		path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+		al_change_directory(al_path_cstr(path, '/'));
+		al_destroy_path(path);
+		return true;
+	}
+
+	/* look in "/usr/share" if a package name is defined */
+	if(t3f_package_name)
+	{
+		file_path = al_create_path(filename);
+		if(!file_path)
+		{
+			return false;
+		}
+		path = al_create_path("/usr/share/");
+		if(path)
+		{
+			al_append_path_component(path, t3f_package_name);
+			al_join_paths(path, file_path);
+			if(al_filename_exists(al_path_cstr(path, '/')))
+			{
+				al_change_directory(al_path_cstr(path, '/'));
+				found = true;
+			}
+			printf("%s\n", al_path_cstr(path, '/'));
+			al_destroy_path(path);
+		}
+		al_destroy_path(file_path);
+	}
+	if(found)
+	{
+		path = al_create_path("/usr/share/");
+		al_change_directory(al_path_cstr(path, '/'));
+		al_destroy_path(path);
+		return true;
+	}
+	return false;
 }
 
 static void t3f_get_base_transform(void)

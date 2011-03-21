@@ -135,6 +135,24 @@ void bitmap_logic(void)
 		}
 		t3f_key[ALLEGRO_KEY_DELETE] = 0;
 	}
+	if(t3f_key[ALLEGRO_KEY_ENTER])
+	{
+		fn = select_file(last_filename, "Open Image", "*.*;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+		if(fn)
+		{
+			bp = al_load_bitmap(fn);
+			if(bp)
+			{
+				if(animation->bitmap[current_bitmap])
+				{
+					al_destroy_bitmap(animation->bitmap[current_bitmap]);
+				}
+				animation->bitmap[current_bitmap] = bp;
+			}
+			strcpy(last_filename, fn);
+		}
+		t3f_key[ALLEGRO_KEY_ENTER] = 0;
+	}
 	if(animation->bitmaps > 0)
 	{
 		if(t3f_key[ALLEGRO_KEY_LEFT])
