@@ -307,7 +307,7 @@ bool t3f_locate_resource(const char * filename)
 		{
 			found = true;
 		}
-		printf("%s\n", al_path_cstr(path, '/'));
+//		printf("%s\n", al_path_cstr(path, '/'));
 		al_destroy_path(path);
 	}
 	al_destroy_path(file_path);
@@ -337,7 +337,7 @@ bool t3f_locate_resource(const char * filename)
 				al_change_directory(al_path_cstr(path, '/'));
 				found = true;
 			}
-			printf("%s\n", al_path_cstr(path, '/'));
+//			printf("%s\n", al_path_cstr(path, '/'));
 			al_destroy_path(path);
 		}
 		al_destroy_path(file_path);
@@ -345,9 +345,13 @@ bool t3f_locate_resource(const char * filename)
 	if(found)
 	{
 		path = al_create_path("/usr/share/");
-		al_change_directory(al_path_cstr(path, '/'));
-		al_destroy_path(path);
-		return true;
+		if(path)
+		{
+			al_append_path_component(path, t3f_package_name);
+			al_change_directory(al_path_cstr(path, '/'));
+			al_destroy_path(path);
+			return true;
+		}
 	}
 	return false;
 }
@@ -688,12 +692,12 @@ static void t3f_convert_grey_to_alpha(ALLEGRO_BITMAP * bitmap)
 			al_unmap_rgba(pixel, &ir, &ig, &ib, &ia);
 			if(ir == 255 && ig == 0 && ib == 255)
 			{
-				pixel = al_map_rgba(255, 255, 255, 0);
+				pixel = al_map_rgba(0, 0, 0, 0);
 				al_put_pixel(x, y, pixel);
 			}
 			else if(ia > 0 && !(ir == 255 && ig == 255 && ib == 0))
 			{
-				pixel = al_map_rgba(255, 255, 255, ir);
+				pixel = al_map_rgba(ir, ir, ir, ir);
 				al_put_pixel(x, y, pixel);
 			}
 		}

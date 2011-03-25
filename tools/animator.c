@@ -248,7 +248,7 @@ void frame_logic(void)
 		{
 			animation->frame[current_frame]->width = al_get_bitmap_width(animation->bitmap[animation->frame[current_frame]->bitmap]);
 			animation->frame[current_frame]->height = al_get_bitmap_height(animation->bitmap[animation->frame[current_frame]->bitmap]);
-			t3f_key[ALLEGRO_KEY_PAD_ASTERISK] = 0;
+			t3f_key[ALLEGRO_KEY_PAD_ENTER] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_PGUP])
 		{
