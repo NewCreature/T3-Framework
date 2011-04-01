@@ -104,12 +104,21 @@ T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp)
 					return NULL;
 				}
 				tsp->tile[i]->flags = al_fread32le(fp);
+				
+				/* read user data */
 				if(tsp->tile[i]->flags & T3F_TILE_FLAG_USER_DATA)
 				{
 					for(j = 0; j < T3F_TILE_MAX_DATA; j++)
 					{
 						tsp->tile[i]->user_data[j] = al_fread32le(fp);
 					}
+				}
+				
+				/* read animation frames */
+				tsp->tile[i]->frame_list_total = al_fread32le(fp);
+				for(j = 0; j < tsp->tile[i]->frame_list_total; j++)
+				{
+					tsp->tile[i]->frame_list[j] = al_fread16le(fp);
 				}
 			}
 			
@@ -154,12 +163,21 @@ int t3f_save_tileset_f(T3F_TILESET * tsp, ALLEGRO_FILE * fp)
 	{
 		t3f_save_animation_f(tsp->tile[i]->ap, fp);
 		al_fwrite32le(fp, tsp->tile[i]->flags);
+		
+		/* write user data */
 		if(tsp->tile[i]->flags & T3F_TILE_FLAG_USER_DATA)
 		{
 			for(j = 0; j < T3F_TILE_MAX_DATA; j++)
 			{
 				al_fwrite32le(fp, tsp->tile[i]->user_data[j]);
 			}
+		}
+		
+		/* write animation frames */
+		al_fwrite32le(fp, tsp->tile[i]->frame_list_total);
+		for(j = 0; j < tsp->tile[i]->frame_list_total; j++)
+		{
+			al_fwrite16le(fp, tsp->tile[i]->frame_list[j]);
 		}
 	}
 	
