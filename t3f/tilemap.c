@@ -73,7 +73,7 @@ void t3f_destroy_tileset(T3F_TILESET * tsp)
 
 T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp)
 {
-	int i;
+	int i, j;
 	T3F_TILESET * tsp;
 	char header[16];
 	
@@ -104,6 +104,13 @@ T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp)
 					return NULL;
 				}
 				tsp->tile[i]->flags = al_fread32le(fp);
+				if(tsp->tile[i]->flags & T3F_TILE_FLAG_USER_DATA)
+				{
+					for(j = 0; j < T3F_TILE_MAX_DATA; j++)
+					{
+						tsp->tile[i]->user_data[j] = al_fread32le(fp);
+					}
+				}
 			}
 			
 			/* read tileset data */
@@ -134,7 +141,7 @@ T3F_TILESET * t3f_load_tileset(const char * fn)
 
 int t3f_save_tileset_f(T3F_TILESET * tsp, ALLEGRO_FILE * fp)
 {
-	int i;
+	int i, j;
 	char header[16] = {0};
 	strcpy(header, "T3F_TILESET");
 	header[15] = 0;
@@ -147,6 +154,13 @@ int t3f_save_tileset_f(T3F_TILESET * tsp, ALLEGRO_FILE * fp)
 	{
 		t3f_save_animation_f(tsp->tile[i]->ap, fp);
 		al_fwrite32le(fp, tsp->tile[i]->flags);
+		if(tsp->tile[i]->flags & T3F_TILE_FLAG_USER_DATA)
+		{
+			for(j = 0; j < T3F_TILE_MAX_DATA; j++)
+			{
+				al_fwrite32le(fp, tsp->tile[i]->user_data[j]);
+			}
+		}
 	}
 	
 	/* write tileset data */
@@ -525,7 +539,7 @@ static void t3f_render_normal_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 		px = startx;
 		while(tx < ostartx + (int)tw + 3)
 		{
-			if(layer == 0 || tmp->layer[layer]->data[py][px] != 0)
+			if(tmp->layer[layer]->data[py][px] != 0 || (tmp->layer[layer]->flags & T3F_TILEMAP_LAYER_SOLID))
 			{
 				t3f_draw_scaled_animation(tsp->tile[t3f_get_tile(tsp, tmp->layer[layer]->data[py][px], tick)]->ap, color, tick, tmp->layer[layer]->x + (float)tx * ziw - ox * tmp->layer[layer]->speed_x, tmp->layer[layer]->y + (float)ty * zih - oy * tmp->layer[layer]->speed_y, tmp->layer[layer]->z - oz, tmp->layer[layer]->scale, 0);
 			}

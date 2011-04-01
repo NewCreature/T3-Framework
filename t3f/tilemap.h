@@ -17,6 +17,7 @@
 
 #define T3F_TILE_FLAG_ANIMATED   1
 #define T3F_TILE_FLAG_ONCE       2
+#define T3F_TILE_FLAG_USER_DATA  4
 
 /* layer flags */
 #define T3F_TILEMAP_LAYER_STATIC      1

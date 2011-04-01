@@ -220,6 +220,7 @@ T3F_COLLISION_TILEMAP * t3f_create_collision_tilemap(int w, int h, int tw, int t
 	tmp->height = h;
 	tmp->tile_width = tw;
 	tmp->tile_height = th;
+	tmp->flags = 0;
 	for(i = 0; i < h; i++)
 	{
 		tmp->data[i] = malloc(w * sizeof(T3F_COLLISION_TILE));
@@ -232,8 +233,8 @@ T3F_COLLISION_TILEMAP * t3f_create_collision_tilemap(int w, int h, int tw, int t
 	{
 		for(j = 0; j < w; j++)
 		{
-			memset(tmp->data[i][j].user_data, 0, sizeof(int) * T3F_COLLISION_TILE_MAX_DATA);
 			tmp->data[i][j].slope = NULL;
+			tmp->data[i][j].user_data = NULL;
 			tmp->data[i][j].flags = 0;
 		}
 	}
@@ -242,7 +243,21 @@ T3F_COLLISION_TILEMAP * t3f_create_collision_tilemap(int w, int h, int tw, int t
 
 void t3f_destroy_collision_tilemap(T3F_COLLISION_TILEMAP * tmp)
 {
-	int i;
+	int i, j;
+	for(i = 0; i < tmp->height; i++)
+	{
+		for(j = 0; j < tmp->width; j++)
+		{
+			if(tmp->data[i][j].slope)
+			{
+				free(tmp->data[i][j].slope);
+			}
+			if(tmp->data[i][j].user_data)
+			{
+				free(tmp->data[i][j].user_data);
+			}
+		}
+	}
 	for(i = 0; i < tmp->height; i++)
 	{
 		free(tmp->data[i]);
@@ -275,28 +290,44 @@ T3F_COLLISION_TILEMAP * t3f_load_collision_tilemap_f(ALLEGRO_FILE * fp)
 			int tw = al_fread16le(fp);
 			int th = al_fread16le(fp);
 			char c;
+			printf("break 0\n");
 			tmp = t3f_create_collision_tilemap(w, h, tw, th);
+			printf("break 1\n");
+			tmp->flags = al_fread32le(fp);
+			printf("break 2\n");
 			for(j = 0; j < tmp->height; j++)
 			{
 				for(k = 0; k < tmp->width; k++)
 				{
-					for(l = 0; l < T3F_COLLISION_TILE_MAX_DATA; l++)
+					if(tmp->flags & T3F_COLLISION_TILEMAP_FLAG_USER_DATA)
 					{
-						tmp->data[j][k].user_data[l] = al_fread32le(fp);
-					}
-					c = al_fgetc(fp);
-					if(c)
-					{
-						tmp->data[j][k].slope = malloc(tmp->tile_height > tmp->tile_width ? tmp->tile_height : tmp->tile_width);
-						for(l = 0; l < (tmp->tile_height > tmp->tile_width ? tmp->tile_height : tmp->tile_width); l++)
+						printf("user data\n");
+						c = al_fgetc(fp);
+						if(c > 0)
 						{
-							tmp->data[j][k].slope[l] = al_fgetc(fp);
+							tmp->data[j][k].user_data = malloc(sizeof(int) * c);
+							for(l = 0; l < c; l++)
+							{
+								tmp->data[j][k].user_data[l] = al_fread32le(fp);
+							}
+						}
+					}
+					if(tmp->flags & T3F_COLLISION_TILEMAP_FLAG_SLOPES)
+					{
+						printf("slopes\n");
+						c = al_fgetc(fp);
+						if(c)
+						{
+							tmp->data[j][k].slope = malloc(tmp->tile_height > tmp->tile_width ? tmp->tile_height : tmp->tile_width);
+							for(l = 0; l < (tmp->tile_height > tmp->tile_width ? tmp->tile_height : tmp->tile_width); l++)
+							{
+								tmp->data[j][k].slope[l] = al_fgetc(fp);
+							}
 						}
 					}
 					tmp->data[j][k].flags = al_fread32le(fp);
 				}
 			}
-			tmp->flags = al_fread32le(fp);
 			break;
 		}
 	}
@@ -329,30 +360,37 @@ bool t3f_save_collision_tilemap_f(T3F_COLLISION_TILEMAP * tmp, ALLEGRO_FILE * fp
 	al_fwrite16le(fp, tmp->height);
 	al_fwrite16le(fp, tmp->tile_width);
 	al_fwrite16le(fp, tmp->tile_height);
+	al_fwrite32le(fp, tmp->flags);
 	for(j = 0; j < tmp->height; j++)
 	{
 		for(k = 0; k < tmp->width; k++)
 		{
-			for(l = 0; l < T3F_COLLISION_TILE_MAX_DATA; l++)
+			if(tmp->flags & T3F_COLLISION_TILEMAP_FLAG_USER_DATA)
 			{
-				al_fwrite32le(fp, tmp->data[j][k].user_data[l]);
-			}
-			if(tmp->data[j][k].slope)
-			{
-				al_fputc(fp, 1);
-				for(l = 0; l < (tmp->tile_height > tmp->tile_width ? tmp->tile_height : tmp->tile_width); l++)
+				al_fputc(fp, sizeof(tmp->data[j][k].user_data) / sizeof(int));
+				for(l = 0; l < sizeof(tmp->data[j][k].user_data) / sizeof(int); l++)
 				{
-					tmp->data[j][k].slope[l] = al_fgetc(fp);
+					al_fwrite32le(fp, tmp->data[j][k].user_data[l]);
 				}
 			}
-			else
+			if(tmp->flags & T3F_COLLISION_TILEMAP_FLAG_SLOPES)
 			{
-				al_fputc(fp, 0);
+				if(tmp->data[j][k].slope)
+				{
+					al_fputc(fp, 1);
+					for(l = 0; l < (tmp->tile_height > tmp->tile_width ? tmp->tile_height : tmp->tile_width); l++)
+					{
+						tmp->data[j][k].slope[l] = al_fgetc(fp);
+					}
+				}
+				else
+				{
+					al_fputc(fp, 0);
+				}
 			}
 			al_fwrite32le(fp, tmp->data[j][k].flags);
 		}
 	}
-	al_fwrite32le(fp, tmp->flags);
 	return 1;
 }
 

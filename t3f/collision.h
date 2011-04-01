@@ -12,15 +12,18 @@
 #define T3F_MAX_COLLISION_POINTS    32
 #define T3F_COLLISION_TILE_MAX_DATA 16
 
-#define T3F_COLLISION_FLAG_SOLID_TOP      1
-#define T3F_COLLISION_FLAG_SOLID_BOTTOM   2
-#define T3F_COLLISION_FLAG_SOLID_LEFT     4
-#define T3F_COLLISION_FLAG_SOLID_RIGHT    8
-#define T3F_COLLISION_FLAG_SLOPE_TOP     16
-#define T3F_COLLISION_FLAG_SLOPE_BOTTOM  32
-#define T3F_COLLISION_FLAG_SLOPE_LEFT    64
-#define T3F_COLLISION_FLAG_SLOPE_RIGHT  128
-#define T3F_COLLISION_FLAG_USER         256
+#define T3F_COLLISION_TILEMAP_FLAG_USER_DATA 1
+#define T3F_COLLISION_TILEMAP_FLAG_SLOPES    2
+
+#define T3F_COLLISION_FLAG_SOLID_TOP         1
+#define T3F_COLLISION_FLAG_SOLID_BOTTOM      2
+#define T3F_COLLISION_FLAG_SOLID_LEFT        4
+#define T3F_COLLISION_FLAG_SOLID_RIGHT       8
+#define T3F_COLLISION_FLAG_SLOPE_TOP        16
+#define T3F_COLLISION_FLAG_SLOPE_BOTTOM     32
+#define T3F_COLLISION_FLAG_SLOPE_LEFT       64
+#define T3F_COLLISION_FLAG_SLOPE_RIGHT     128
+#define T3F_COLLISION_FLAG_USER            256
 
 typedef struct
 {
@@ -68,7 +71,7 @@ typedef struct
 typedef struct
 {
 	
-	int user_data[T3F_COLLISION_TILE_MAX_DATA]; // user data
+	int * user_data; // user data
 	char * slope; // allocate this when using slope
 	int flags;
 	

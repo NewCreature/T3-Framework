@@ -200,6 +200,29 @@ void mapper_tileset_logic(void)
 			}
 			t3f_key[ALLEGRO_KEY_INSERT] = 0;
 		}
+		if(t3f_key[ALLEGRO_KEY_ENTER])
+		{
+			fn = select_file(mapper_last_filename, "Open Animation", "*.*;*.ani;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+			if(fn)
+			{
+				ext = mapper_get_extension(fn);
+				if(!strcmp(ext, "ani"))
+				{
+					ap = t3f_load_animation(fn);
+				}
+				else
+				{
+					ap = t3f_load_animation_from_bitmap(fn);
+				}
+				if(ap)
+				{
+					t3f_destroy_animation(mapper_tileset->tile[mapper_current_tile]->ap);
+					mapper_tileset->tile[mapper_current_tile]->ap = ap;
+				}
+				strcpy(mapper_last_filename, fn);
+			}
+			t3f_key[ALLEGRO_KEY_ENTER] = 0;
+		}
 		if(t3f_key[ALLEGRO_KEY_DELETE])
 		{
 			if(mapper_current_tile < mapper_tileset->tiles)
@@ -595,7 +618,6 @@ bool mapper_initialize(void)
 	{
 		return false;
 	}
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
 	mapper_font = al_load_bitmap_font("fonts/basic_font.png");
 	if(!mapper_font)
 	{
