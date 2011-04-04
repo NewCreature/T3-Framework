@@ -42,7 +42,7 @@ bool mapper_tilemap_hover_fail = false;
 int mapper_current_layer = 0;
 int mapper_map_width = 100;
 int mapper_map_height = 100;
-int mapper_map_layers = 5;
+int mapper_map_layers = 1;
 
 char * select_file(const char * initial, const char * title, const char * types, int flags)
 {
