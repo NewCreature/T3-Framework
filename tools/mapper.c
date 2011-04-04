@@ -290,6 +290,9 @@ float mapper_get_offset_y(float z)
 
 void mapper_tilemap_move_logic(void)
 {
+	int i;
+	T3F_TILEMAP_LAYER * new_layer = NULL;
+	
 	if(t3f_key[ALLEGRO_KEY_LEFT])
 	{
 		if(t3f_key[ALLEGRO_KEY_LSHIFT])
@@ -341,6 +344,33 @@ void mapper_tilemap_move_logic(void)
 		{
 			mapper_camera.y += 1.0;
 		}
+	}
+	if(t3f_key[ALLEGRO_KEY_INSERT])
+	{
+		if(mapper_tilemap->layers < 32)
+		{
+			new_layer = t3f_create_tilemap_layer(mapper_tilemap->layer[mapper_current_layer]->width, mapper_tilemap->layer[mapper_current_layer]->height);
+			if(new_layer)
+			{
+				new_layer->x = mapper_tilemap->layer[mapper_current_layer]->x;
+				new_layer->y = mapper_tilemap->layer[mapper_current_layer]->y;
+				new_layer->z = mapper_tilemap->layer[mapper_current_layer]->z;
+				new_layer->scale = mapper_tilemap->layer[mapper_current_layer]->scale;
+				new_layer->speed_x = mapper_tilemap->layer[mapper_current_layer]->speed_x;
+				new_layer->speed_y = mapper_tilemap->layer[mapper_current_layer]->speed_y;
+				for(i = mapper_current_layer; i < mapper_tilemap->layers; i++)
+				{
+					mapper_tilemap->layer[i + i] = mapper_tilemap->layer[i];
+				}
+				mapper_tilemap->layer[mapper_current_layer] = new_layer;
+				mapper_tilemap->layers++;
+			}
+		}
+		t3f_key[ALLEGRO_KEY_INSERT] = 0;
+	}
+	if(t3f_key[ALLEGRO_KEY_DELETE])
+	{
+		t3f_key[ALLEGRO_KEY_DELETE] = 0;
 	}
 }
 
