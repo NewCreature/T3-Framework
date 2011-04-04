@@ -290,18 +290,14 @@ T3F_COLLISION_TILEMAP * t3f_load_collision_tilemap_f(ALLEGRO_FILE * fp)
 			int tw = al_fread16le(fp);
 			int th = al_fread16le(fp);
 			char c;
-			printf("break 0\n");
 			tmp = t3f_create_collision_tilemap(w, h, tw, th);
-			printf("break 1\n");
 			tmp->flags = al_fread32le(fp);
-			printf("break 2\n");
 			for(j = 0; j < tmp->height; j++)
 			{
 				for(k = 0; k < tmp->width; k++)
 				{
 					if(tmp->flags & T3F_COLLISION_TILEMAP_FLAG_USER_DATA)
 					{
-						printf("user data\n");
 						c = al_fgetc(fp);
 						if(c > 0)
 						{
@@ -314,7 +310,6 @@ T3F_COLLISION_TILEMAP * t3f_load_collision_tilemap_f(ALLEGRO_FILE * fp)
 					}
 					if(tmp->flags & T3F_COLLISION_TILEMAP_FLAG_SLOPES)
 					{
-						printf("slopes\n");
 						c = al_fgetc(fp);
 						if(c)
 						{

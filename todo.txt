@@ -5,6 +5,20 @@ T3F To-Do List
 0.95
 ----
 
+[ ]Finish mapper.
+
+   [ ]Add ability to insert an empty layer.
+   
+      [ ]Inserted layer should have same properties as the selected layer.
+   
+   [ ]Add ability to change a layer's x/y offset.
+   
+   [X]Deleting a tile should fix the tilemap's references to it and subsequent
+      tiles. References to the deleted tile should be set to 0. The rest should
+      be changed to reflect the new location of the tiles in the tileset.
+      
+   [ ]Need a way to define animated tiles.
+
 [ ]Finish animation implementation.
 
    [ ]See about allowing frames to be rotated (should be pretty easy).

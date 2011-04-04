@@ -129,6 +129,28 @@ void mapper_global_logic(void)
 	}
 }
 
+void mapper_tilemap_replace_tile(int tile, int new_tile)
+{
+	int i, j, k;
+	
+	if(mapper_tilemap)
+	{
+		for(i = 0; i < mapper_tilemap->layers; i++)
+		{
+			for(j = 0; j < mapper_tilemap->layer[i]->height; j++)
+			{
+				for(k = 0; k < mapper_tilemap->layer[i]->width; k++)
+				{
+					if(mapper_tilemap->layer[i]->data[j][k] == tile)
+					{
+						mapper_tilemap->layer[i]->data[j][k] = new_tile;
+					}
+				}
+			}
+		}
+	}
+}
+
 void mapper_tileset_logic(void)
 {
 	const char * fn = NULL;
@@ -231,7 +253,9 @@ void mapper_tileset_logic(void)
 				for(i = mapper_current_tile; i < mapper_tileset->tiles - 1; i++)
 				{
 					mapper_tileset->tile[i] = mapper_tileset->tile[i + 1];
+					mapper_tilemap_replace_tile(i + 1, i);
 				}
+				mapper_tilemap_replace_tile(mapper_current_tile, 0);
 				mapper_tileset->tiles--;
 			}
 			t3f_key[ALLEGRO_KEY_DELETE] = 0;
