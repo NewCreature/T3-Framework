@@ -660,6 +660,8 @@ void mapper_help_render(void)
 	al_draw_textf(mapper_font, t3f_color_white, 0, 368, 0, "*: Reset layer Z-position");
 	al_draw_textf(mapper_font, t3f_color_white, 0, 384, 0, "S: Toggle layer solid flag");
 	al_draw_textf(mapper_font, t3f_color_white, 0, 400, 0, "Ctrl+S: Toggle layer static flag");
+	al_draw_textf(mapper_font, t3f_color_white, 0, 416, 0, "Insert: Insert layer");
+	al_draw_textf(mapper_font, t3f_color_white, 0, 432, 0, "Delete: Delete layer");
 }
 
 void mapper_render(void)

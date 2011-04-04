@@ -11,7 +11,7 @@ T3F To-Do List
    
       [ ]Inserted layer should have same properties as the selected layer.
    
-   [ ]Add ability to change a layer's x/y offset.
+   [X]Add ability to change a layer's x/y offset.
    
    [X]Deleting a tile should fix the tilemap's references to it and subsequent
       tiles. References to the deleted tile should be set to 0. The rest should
