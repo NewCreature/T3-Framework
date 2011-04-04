@@ -509,6 +509,12 @@ void mapper_tilemap_logic(void)
 			}
 			t3f_key[ALLEGRO_KEY_DELETE] = 0;
 		}
+		if(t3f_key[ALLEGRO_KEY_1])
+		{
+			mapper_tilemap->layer[mapper_current_layer]->speed_x = 1.0;
+			mapper_tilemap->layer[mapper_current_layer]->speed_y = 1.0;
+			t3f_key[ALLEGRO_KEY_1] = 0;
+		}
 		mapper_tilemap_hover_x = (int)(t3f_mouse_x + mapper_camera.x - mapper_tilemap->layer[mapper_current_layer]->x) / (mapper_tileset->width * mapper_tilemap->layer[mapper_current_layer]->scale);
 		mapper_tilemap_hover_y = (int)(t3f_mouse_y + mapper_camera.y - mapper_tilemap->layer[mapper_current_layer]->y) / (mapper_tileset->height * mapper_tilemap->layer[mapper_current_layer]->scale);
 		t3f_get_mouse_mickeys(&mx, &my, NULL);
