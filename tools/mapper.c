@@ -349,6 +349,7 @@ void mapper_tilemap_logic(void)
 	int i;
 	T3F_TILEMAP_LAYER * new_layer = NULL;
 	const char * fn = NULL;
+	int mx, my;
 	
 	if(t3f_key[ALLEGRO_KEY_F3])
 	{
@@ -510,6 +511,7 @@ void mapper_tilemap_logic(void)
 		}
 		mapper_tilemap_hover_x = (int)(t3f_mouse_x + mapper_camera.x - mapper_tilemap->layer[mapper_current_layer]->x) / (mapper_tileset->width * mapper_tilemap->layer[mapper_current_layer]->scale);
 		mapper_tilemap_hover_y = (int)(t3f_mouse_y + mapper_camera.y - mapper_tilemap->layer[mapper_current_layer]->y) / (mapper_tileset->height * mapper_tilemap->layer[mapper_current_layer]->scale);
+		t3f_get_mouse_mickeys(&mx, &my, NULL);
 		if(mapper_tilemap_hover_x < 0 || mapper_tilemap_hover_x >= mapper_tilemap->layer[mapper_current_layer]->width || mapper_tilemap_hover_y < 0 || mapper_tilemap_hover_y >= mapper_tilemap->layer[mapper_current_layer]->height)
 		{
 			mapper_tilemap_hover_fail = true;
@@ -519,7 +521,15 @@ void mapper_tilemap_logic(void)
 			mapper_tilemap_hover_fail = false;
 			if(t3f_mouse_button[0])
 			{
-				mapper_tilemap->layer[mapper_current_layer]->data[mapper_tilemap_hover_y][mapper_tilemap_hover_x] = mapper_current_tile;
+				if(t3f_key[ALLEGRO_KEY_LCTRL])
+				{
+					mapper_tilemap->layer[mapper_current_layer]->x -= mx;
+					mapper_tilemap->layer[mapper_current_layer]->y -= my;
+				}
+				else
+				{
+					mapper_tilemap->layer[mapper_current_layer]->data[mapper_tilemap_hover_y][mapper_tilemap_hover_x] = mapper_current_tile;
+				}
 			}
 		}
 		mapper_camera.z = mapper_tilemap->layer[mapper_current_layer]->z;
