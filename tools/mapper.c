@@ -290,9 +290,6 @@ float mapper_get_offset_y(float z)
 
 void mapper_tilemap_move_logic(void)
 {
-	int i;
-	T3F_TILEMAP_LAYER * new_layer = NULL;
-	
 	if(t3f_key[ALLEGRO_KEY_LEFT])
 	{
 		if(t3f_key[ALLEGRO_KEY_LSHIFT])
@@ -349,6 +346,8 @@ void mapper_tilemap_move_logic(void)
 
 void mapper_tilemap_logic(void)
 {
+	int i;
+	T3F_TILEMAP_LAYER * new_layer = NULL;
 	const char * fn = NULL;
 	
 	if(t3f_key[ALLEGRO_KEY_F3])
@@ -494,6 +493,19 @@ void mapper_tilemap_logic(void)
 		}
 		if(t3f_key[ALLEGRO_KEY_DELETE])
 		{
+			if(mapper_tilemap->layers > 1)
+			{
+				t3f_destroy_tilemap_layer(mapper_tilemap->layer[mapper_current_layer]);
+				for(i = mapper_current_layer; i < mapper_tilemap->layers - 1; i++)
+				{
+					mapper_tilemap->layer[i] = mapper_tilemap->layer[i + 1];
+				}
+				mapper_tilemap->layers--;
+				if(mapper_current_layer >= mapper_tilemap->layers)
+				{
+					mapper_current_layer = mapper_tilemap->layers - 1;
+				}
+			}
 			t3f_key[ALLEGRO_KEY_DELETE] = 0;
 		}
 		mapper_tilemap_hover_x = (int)(t3f_mouse_x + mapper_camera.x - mapper_tilemap->layer[mapper_current_layer]->x) / (mapper_tileset->width * mapper_tilemap->layer[mapper_current_layer]->scale);

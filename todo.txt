@@ -7,7 +7,7 @@ T3F To-Do List
 
 [ ]Finish mapper.
 
-   [ ]Add ability to insert an empty layer.
+   [X]Add ability to insert an empty layer.
    
       [ ]Inserted layer should have same properties as the selected layer.
    
