@@ -346,7 +346,7 @@ void mapper_tilemap_move_logic(void)
 
 void mapper_tilemap_logic(void)
 {
-	int i;
+	int i, j;
 	T3F_TILEMAP_LAYER * new_layer = NULL;
 	const char * fn = NULL;
 	int mx, my;
@@ -407,6 +407,12 @@ void mapper_tilemap_logic(void)
 		}
 		if(t3f_key[ALLEGRO_KEY_PGUP])
 		{
+			if(t3f_key[ALLEGRO_KEY_LCTRL] && mapper_current_layer < mapper_tilemap->layers - 1)
+			{
+				new_layer = mapper_tilemap->layer[mapper_current_layer + 1];
+				mapper_tilemap->layer[mapper_current_layer + 1] = mapper_tilemap->layer[mapper_current_layer];
+				mapper_tilemap->layer[mapper_current_layer] = new_layer;
+			}
 			mapper_current_layer++;
 			if(mapper_current_layer >= mapper_tilemap->layers)
 			{
@@ -416,6 +422,12 @@ void mapper_tilemap_logic(void)
 		}
 		if(t3f_key[ALLEGRO_KEY_PGDN])
 		{
+			if(t3f_key[ALLEGRO_KEY_LCTRL] && mapper_current_layer > 0)
+			{
+				new_layer = mapper_tilemap->layer[mapper_current_layer - 1];
+				mapper_tilemap->layer[mapper_current_layer - 1] = mapper_tilemap->layer[mapper_current_layer];
+				mapper_tilemap->layer[mapper_current_layer] = new_layer;
+			}
 			mapper_current_layer--;
 			if(mapper_current_layer < 0)
 			{
@@ -482,9 +494,19 @@ void mapper_tilemap_logic(void)
 					new_layer->scale = mapper_tilemap->layer[mapper_current_layer]->scale;
 					new_layer->speed_x = mapper_tilemap->layer[mapper_current_layer]->speed_x;
 					new_layer->speed_y = mapper_tilemap->layer[mapper_current_layer]->speed_y;
-					for(i = mapper_current_layer; i < mapper_tilemap->layers; i++)
+					if(t3f_key[ALLEGRO_KEY_LCTRL])
 					{
-						mapper_tilemap->layer[i + i] = mapper_tilemap->layer[i];
+						for(i = 0; i < new_layer->height; i++)
+						{
+							for(j = 0; j < new_layer->width; j++)
+							{
+								new_layer->data[i][j] = mapper_tilemap->layer[mapper_current_layer]->data[i][j];
+							}
+						}
+					}
+					for(i = mapper_tilemap->layers; i > mapper_current_layer; i--)
+					{
+						mapper_tilemap->layer[i] = mapper_tilemap->layer[i - 1];
 					}
 					mapper_tilemap->layer[mapper_current_layer] = new_layer;
 					mapper_tilemap->layers++;
