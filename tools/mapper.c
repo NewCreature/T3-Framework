@@ -250,12 +250,12 @@ void mapper_tileset_logic(void)
 			if(mapper_current_tile < mapper_tileset->tiles)
 			{
 				t3f_destroy_tile(mapper_tileset->tile[mapper_current_tile]);
+				mapper_tilemap_replace_tile(mapper_current_tile, 0);
 				for(i = mapper_current_tile; i < mapper_tileset->tiles - 1; i++)
 				{
-					mapper_tilemap_replace_tile(i + 1, i);
 					mapper_tileset->tile[i] = mapper_tileset->tile[i + 1];
+					mapper_tilemap_replace_tile(i + 1, i);
 				}
-				mapper_tilemap_replace_tile(mapper_current_tile, 0);
 				mapper_tileset->tiles--;
 			}
 			t3f_key[ALLEGRO_KEY_DELETE] = 0;
