@@ -24,6 +24,7 @@ char mapper_last_level_filename[1024] = {0};
 char mapper_last_filename[1024] = {0};
 int mapper_view = MAPPER_VIEW_TILESET;
 unsigned long mapper_tick = 0;
+int mapper_bg_color = 0;
 
 /* tileset data */
 int mapper_current_tile = 0;
@@ -604,6 +605,11 @@ void mapper_tilemap_logic(void)
 			mapper_tilemap->layer[mapper_current_layer]->speed_y = 1.0;
 			t3f_key[ALLEGRO_KEY_1] = 0;
 		}
+		if(t3f_key[ALLEGRO_KEY_C])
+		{
+			mapper_bg_color = 1 - mapper_bg_color;
+			t3f_key[ALLEGRO_KEY_C] = 0;
+		}
 		mapper_tilemap_hover_x = (int)(t3f_mouse_x + mapper_camera.x - mapper_tilemap->layer[mapper_current_layer]->x) / (mapper_tileset->width * mapper_tilemap->layer[mapper_current_layer]->scale);
 		mapper_tilemap_hover_y = (int)(t3f_mouse_y + mapper_camera.y - mapper_tilemap->layer[mapper_current_layer]->y) / (mapper_tileset->height * mapper_tilemap->layer[mapper_current_layer]->scale);
 		t3f_get_mouse_mickeys(&mx, &my, NULL);
@@ -620,6 +626,16 @@ void mapper_tilemap_logic(void)
 				{
 					mapper_tilemap->layer[mapper_current_layer]->x -= mx;
 					mapper_tilemap->layer[mapper_current_layer]->y -= my;
+				}
+				else if(t3f_key[ALLEGRO_KEY_LSHIFT])
+				{
+					for(i = 0; i < mapper_tilemap->layer[mapper_current_layer]->height; i++)
+					{
+						for(j = 0; j < mapper_tilemap->layer[mapper_current_layer]->width; j++)
+						{
+							mapper_tilemap->layer[mapper_current_layer]->data[j][i] = mapper_current_tile;
+						}
+					}
 				}
 				else
 				{
@@ -793,7 +809,14 @@ void mapper_help_render(void)
 
 void mapper_render(void)
 {
-	al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.1));
+	if(mapper_bg_color == 0)
+	{
+		al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.1));
+	}
+	else
+	{
+		al_clear_to_color(al_map_rgb_f(0.25, 0.25, 1.0));
+	}
 	al_hold_bitmap_drawing(true);
 	switch(mapper_view)
 	{
