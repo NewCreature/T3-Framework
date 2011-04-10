@@ -94,7 +94,7 @@ void dot_game_setup_level(int level)
 void dot_game_initialize(void)
 {
 	al_hide_mouse_cursor(t3f_display);
-	dot_game_setup_level(9);
+	dot_game_setup_level(0);
 	dot_game.score = 0;
 	dot_game.combo = 0;
 	dot_game.lives = 3;
