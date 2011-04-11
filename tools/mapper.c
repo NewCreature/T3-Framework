@@ -356,6 +356,32 @@ float mapper_get_offset_y(float z)
 	return -t3f_project_y(0.0, z) / mapper_get_speed(z);
 }
 
+void mapper_tilemap_insert_row(int layer, int column)
+{
+	int i, j;
+	
+	for(i = mapper_tilemap->layer[layer]->height - 1; i > column; i--)
+	{
+		for(j = 0; j < mapper_tilemap->layer[layer]->width; j++)
+		{
+			mapper_tilemap->layer[layer]->data[i][j] = mapper_tilemap->layer[layer]->data[i - 1][j];
+		}
+	}
+}
+
+void mapper_tilemap_insert_column(int layer, int row)
+{
+	int i, j;
+	
+	for(i = mapper_tilemap->layer[layer]->width - 1; i > row; i--)
+	{
+		for(j = 0; j < mapper_tilemap->layer[layer]->height; j++)
+		{
+			mapper_tilemap->layer[layer]->data[j][i] = mapper_tilemap->layer[layer]->data[j][i - 1];
+		}
+	}
+}
+
 void mapper_tilemap_move_logic(void)
 {
 	if(t3f_key[ALLEGRO_KEY_LEFT])
@@ -612,6 +638,16 @@ void mapper_tilemap_logic(void)
 		}
 		mapper_tilemap_hover_x = (int)(t3f_mouse_x + mapper_camera.x - mapper_tilemap->layer[mapper_current_layer]->x) / (mapper_tileset->width * mapper_tilemap->layer[mapper_current_layer]->scale);
 		mapper_tilemap_hover_y = (int)(t3f_mouse_y + mapper_camera.y - mapper_tilemap->layer[mapper_current_layer]->y) / (mapper_tileset->height * mapper_tilemap->layer[mapper_current_layer]->scale);
+		if(t3f_key[ALLEGRO_KEY_H])
+		{
+			mapper_tilemap_insert_row(mapper_current_layer, mapper_tilemap_hover_y);
+			t3f_key[ALLEGRO_KEY_H] = 0;
+		}
+		if(t3f_key[ALLEGRO_KEY_V])
+		{
+			mapper_tilemap_insert_column(mapper_current_layer, mapper_tilemap_hover_x);
+			t3f_key[ALLEGRO_KEY_V] = 0;
+		}
 		t3f_get_mouse_mickeys(&mx, &my, NULL);
 		if(mapper_tilemap_hover_x < 0 || mapper_tilemap_hover_x >= mapper_tilemap->layer[mapper_current_layer]->width || mapper_tilemap_hover_y < 0 || mapper_tilemap_hover_y >= mapper_tilemap->layer[mapper_current_layer]->height)
 		{
