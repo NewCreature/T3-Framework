@@ -887,6 +887,8 @@ bool mapper_initialize(void)
 	{
 		return false;
 	}
+	al_set_new_bitmap_flags(ALLEGRO_NO_PREMULTIPLIED_ALPHA);
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
 	mapper_font = al_load_bitmap_font("fonts/basic_font.png");
 	if(!mapper_font)
 	{
