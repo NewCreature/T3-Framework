@@ -1008,9 +1008,11 @@ float t3f_project_x(float x, float z)
 {
 	float rx;
 	
-	if(z + t3f_current_view->width > 0)
+//	if(z + t3f_current_view->width > 0)
+	if(z + t3f_virtual_display_width > 0)
 	{
-		rx = (((x - t3f_current_view->vp_x) * t3f_current_view->width) / (z + t3f_current_view->width) + t3f_current_view->vp_x);
+//		rx = (((x - t3f_current_view->vp_x) * t3f_current_view->width) / (z + t3f_current_view->width) + t3f_current_view->vp_x);
+		rx = (((x - t3f_current_view->vp_x) * t3f_virtual_display_width) / (z + t3f_virtual_display_width) + t3f_current_view->vp_x);
 		return rx;
 	}
 	else
@@ -1025,9 +1027,11 @@ float t3f_project_y(float y, float z)
 {
 	float ry;
 	
-	if(z + t3f_current_view->height > 0)
+//	if(z + t3f_current_view->height > 0)
+	if(z + t3f_virtual_display_width > 0)
 	{
-		ry = (((y - t3f_current_view->vp_y) * t3f_current_view->width) / (z + t3f_current_view->width) + t3f_current_view->vp_y);
+//		ry = (((y - t3f_current_view->vp_y) * t3f_current_view->width) / (z + t3f_current_view->width) + t3f_current_view->vp_y);
+		ry = (((y - t3f_current_view->vp_y) * t3f_virtual_display_width) / (z + t3f_virtual_display_width) + t3f_current_view->vp_y);
 		return ry;
 	}
 	else
