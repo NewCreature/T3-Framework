@@ -241,7 +241,7 @@ void mapper_tileset_logic(void)
 			if(fn)
 			{
 				ext = mapper_get_extension(fn);
-				if(!strcmp(ext, "ani"))
+				if(!strcmp(ext, "t3a"))
 				{
 					ap = t3f_load_animation(fn);
 				}
