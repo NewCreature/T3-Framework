@@ -133,6 +133,19 @@ void mapper_tilemap_replace_tile(int tile, int new_tile)
 {
 	int i, j, k;
 	
+	/* replace tiles in tile animations */
+	for(i = 0; i < mapper_tileset->tiles; i++)
+	{
+		for(j = 0; j < mapper_tileset->tile[i]->frame_list_total; j++)
+		{
+			if(mapper_tileset->tile[i]->frame_list[j] == tile)
+			{
+				mapper_tileset->tile[i]->frame_list[j] = new_tile;
+			}
+		}
+	}
+	
+	/* replace tiles in tilemap */
 	if(mapper_tilemap)
 	{
 		for(i = 0; i < mapper_tilemap->layers; i++)
