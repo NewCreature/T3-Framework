@@ -82,6 +82,63 @@ const char * mapper_get_extension(const char * fn)
 	return NULL;
 }
 
+void mapper_replace_tiles(ALLEGRO_BITMAP * bp)
+{
+	int i, j;
+	T3F_ANIMATION * ap = NULL;
+	ALLEGRO_BITMAP * newbp = NULL;
+	ALLEGRO_STATE old_state;
+	ALLEGRO_TRANSFORM identity;
+	int current_tile = mapper_current_tile;
+	
+	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TRANSFORM);
+	al_identity_transform(&identity);
+	al_use_transform(&identity);
+	for(i = 0; i < al_get_bitmap_height(bp) / mapper_tile_height; i++)
+	{
+		for(j = 0; j < al_get_bitmap_width(bp) / mapper_tile_width; j++)
+		{
+			if(current_tile < mapper_tileset->tiles)
+			{
+				ap = t3f_create_animation();
+				if(ap)
+				{
+					newbp = al_create_bitmap(mapper_tile_width, mapper_tile_height);
+					if(newbp)
+					{
+						al_set_target_bitmap(newbp);
+						al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+						al_draw_bitmap(bp, -j * mapper_tile_width, -i * mapper_tile_height, 0);
+						t3f_animation_add_bitmap(ap, newbp);
+						t3f_animation_add_frame(ap, 0, 0, 0, 0, mapper_tile_width, mapper_tile_height, 0, 1);
+						t3f_destroy_animation(mapper_tileset->tile[current_tile]->ap);
+						mapper_tileset->tile[current_tile]->ap = ap;
+					}
+				}
+				current_tile++;
+			}
+			else
+			{
+				ap = t3f_create_animation();
+				if(ap)
+				{
+					newbp = al_create_bitmap(mapper_tile_width, mapper_tile_height);
+					if(newbp)
+					{
+						al_set_target_bitmap(newbp);
+						al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+						al_draw_bitmap(bp, -j * mapper_tile_width, -i * mapper_tile_height, 0);
+						t3f_animation_add_bitmap(ap, newbp);
+						t3f_animation_add_frame(ap, 0, 0, 0, 0, mapper_tile_width, mapper_tile_height, 0, 1);
+						t3f_add_tile(mapper_tileset, ap);
+					}
+				}
+			}
+		}
+	}
+	al_restore_state(&old_state);
+}
+
 void mapper_import_tiles(ALLEGRO_BITMAP * bp)
 {
 	int i, j;
@@ -223,6 +280,11 @@ void mapper_tileset_logic(void)
 				if(!strcmp(ext, "ani"))
 				{
 					ap = t3f_load_animation(fn);
+					if(ap)
+					{
+						t3f_add_tile(mapper_tileset, ap);
+						mapper_current_tile = mapper_tileset->tiles - 1;
+					}
 				}
 				else
 				{
@@ -232,11 +294,6 @@ void mapper_tileset_logic(void)
 						mapper_import_tiles(bp);
 					}
 					al_destroy_bitmap(bp);
-				}
-				if(ap)
-				{
-					t3f_add_tile(mapper_tileset, ap);
-					mapper_current_tile = mapper_tileset->tiles - 1;
 				}
 				strcpy(mapper_last_filename, fn);
 			}
@@ -251,15 +308,20 @@ void mapper_tileset_logic(void)
 				if(!strcmp(ext, "t3a"))
 				{
 					ap = t3f_load_animation(fn);
+					if(ap)
+					{
+						t3f_destroy_animation(mapper_tileset->tile[mapper_current_tile]->ap);
+						mapper_tileset->tile[mapper_current_tile]->ap = ap;
+					}
 				}
 				else
 				{
-					ap = t3f_load_animation_from_bitmap(fn);
-				}
-				if(ap)
-				{
-					t3f_destroy_animation(mapper_tileset->tile[mapper_current_tile]->ap);
-					mapper_tileset->tile[mapper_current_tile]->ap = ap;
+					bp = al_load_bitmap(fn);
+					if(bp)
+					{
+						mapper_replace_tiles(bp);
+					}
+					al_destroy_bitmap(bp);
 				}
 				strcpy(mapper_last_filename, fn);
 			}
