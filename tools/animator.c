@@ -49,6 +49,7 @@ char * select_file(const char * initial, const char * title, const char * types,
 void global_logic(void)
 {
 	const char * fn = NULL;
+	ALLEGRO_PATH * temp_path = NULL;
 	
 	if(t3f_key[ALLEGRO_KEY_F3])
 	{
@@ -76,8 +77,14 @@ void global_logic(void)
 			fn = select_file(last_animation_filename, "Save Animation", "ani", ALLEGRO_FILECHOOSER_SAVE);
 			if(fn)
 			{
-				t3f_save_animation(animation, fn);
-				strcpy(last_animation_filename, fn);
+				temp_path = al_create_path(fn);
+				if(temp_path)
+				{
+					al_set_path_extension(temp_path, ".t3a");
+					t3f_save_animation(animation, al_path_cstr(temp_path, '/'));
+					strcpy(last_animation_filename, al_path_cstr(temp_path, '/'));
+					al_destroy_path(temp_path);
+				}
 			}
 			t3f_key[ALLEGRO_KEY_F2] = 0;
 		}

@@ -170,6 +170,7 @@ void mapper_tileset_logic(void)
 	const char * ext = NULL;
 	T3F_ANIMATION * ap = NULL;
 	ALLEGRO_BITMAP * bp = NULL;
+	ALLEGRO_PATH * temp_path = NULL;
 	int i;
 	
 	if(t3f_key[ALLEGRO_KEY_F3])
@@ -202,8 +203,14 @@ void mapper_tileset_logic(void)
 			fn = select_file(mapper_last_level_filename, "Save Tileset", "*.*;*.t3t", ALLEGRO_FILECHOOSER_SAVE);
 			if(fn)
 			{
-				t3f_save_tileset(mapper_tileset, fn);
-				strcpy(mapper_last_level_filename, fn);
+				temp_path = al_create_path(fn);
+				if(temp_path)
+				{
+					al_set_path_extension(temp_path, ".t3t");
+					t3f_save_tileset(mapper_tileset, al_path_cstr(temp_path, '/'));
+					strcpy(mapper_last_level_filename, al_path_cstr(temp_path, '/'));
+					al_destroy_path(temp_path);
+				}
 			}
 			t3f_key[ALLEGRO_KEY_F2] = 0;
 		}
@@ -455,6 +462,7 @@ void mapper_tilemap_logic(void)
 {
 	int i, j;
 	T3F_TILEMAP_LAYER * new_layer = NULL;
+	ALLEGRO_PATH * temp_path = NULL;
 	const char * fn = NULL;
 	int mx, my;
 	
@@ -488,8 +496,14 @@ void mapper_tilemap_logic(void)
 			fn = select_file(mapper_last_level_filename, "Save Tilemap", "*.*;*.t3m", ALLEGRO_FILECHOOSER_SAVE);
 			if(fn)
 			{
-				t3f_save_tilemap(mapper_tilemap, fn);
-				strcpy(mapper_last_level_filename, fn);
+				temp_path = al_create_path(fn);
+				if(temp_path)
+				{
+					al_set_path_extension(temp_path, ".t3m");
+					t3f_save_tilemap(mapper_tilemap, al_path_cstr(temp_path, '/'));
+					strcpy(mapper_last_level_filename, al_path_cstr(temp_path, '/'));
+					al_destroy_path(temp_path);
+				}
 			}
 			t3f_key[ALLEGRO_KEY_F2] = 0;
 		}
