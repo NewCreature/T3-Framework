@@ -438,11 +438,11 @@ float mapper_get_offset_y(float z)
 	return -t3f_project_y(0.0, z) / mapper_get_speed(z);
 }
 
-void mapper_tilemap_insert_row(int layer, int column)
+void mapper_tilemap_insert_row(int layer, int row)
 {
 	int i, j;
 	
-	for(i = mapper_tilemap->layer[layer]->height - 1; i > column; i--)
+	for(i = mapper_tilemap->layer[layer]->height - 1; i > row; i--)
 	{
 		for(j = 0; j < mapper_tilemap->layer[layer]->width; j++)
 		{
@@ -451,15 +451,41 @@ void mapper_tilemap_insert_row(int layer, int column)
 	}
 }
 
-void mapper_tilemap_insert_column(int layer, int row)
+void mapper_tilemap_insert_column(int layer, int column)
 {
 	int i, j;
 	
-	for(i = mapper_tilemap->layer[layer]->width - 1; i > row; i--)
+	for(i = mapper_tilemap->layer[layer]->width - 1; i > column; i--)
 	{
 		for(j = 0; j < mapper_tilemap->layer[layer]->height; j++)
 		{
 			mapper_tilemap->layer[layer]->data[j][i] = mapper_tilemap->layer[layer]->data[j][i - 1];
+		}
+	}
+}
+
+void mapper_tilemap_delete_row(int layer, int row)
+{
+	int i, j;
+	
+	for(i = row + 1; i < mapper_tilemap->layer[layer]->height - 1; i++)
+	{
+		for(j = 0; j < mapper_tilemap->layer[layer]->width; j++)
+		{
+			mapper_tilemap->layer[layer]->data[i][j] = mapper_tilemap->layer[layer]->data[i + 1][j];
+		}
+	}
+}
+
+void mapper_tilemap_delete_column(int layer, int column)
+{
+	int i, j;
+	
+	for(i = column; i < mapper_tilemap->layer[layer]->width - 1; i++)
+	{
+		for(j = 0; j < mapper_tilemap->layer[layer]->height; j++)
+		{
+			mapper_tilemap->layer[layer]->data[j][i] = mapper_tilemap->layer[layer]->data[j][i + 1];
 		}
 	}
 }
@@ -729,12 +755,26 @@ void mapper_tilemap_logic(void)
 		mapper_tilemap_hover_y = (int)(t3f_mouse_y + mapper_camera.y - mapper_tilemap->layer[mapper_current_layer]->y) / (mapper_tileset->height * mapper_tilemap->layer[mapper_current_layer]->scale);
 		if(t3f_key[ALLEGRO_KEY_H])
 		{
-			mapper_tilemap_insert_row(mapper_current_layer, mapper_tilemap_hover_y);
+			if(t3f_key[ALLEGRO_KEY_LSHIFT])
+			{
+				mapper_tilemap_delete_row(mapper_current_layer, mapper_tilemap_hover_y);
+			}
+			else
+			{
+				mapper_tilemap_insert_row(mapper_current_layer, mapper_tilemap_hover_y);
+			}
 			t3f_key[ALLEGRO_KEY_H] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_V])
 		{
-			mapper_tilemap_insert_column(mapper_current_layer, mapper_tilemap_hover_x);
+			if(t3f_key[ALLEGRO_KEY_LSHIFT])
+			{
+				mapper_tilemap_delete_column(mapper_current_layer, mapper_tilemap_hover_x);
+			}
+			else
+			{
+				mapper_tilemap_insert_column(mapper_current_layer, mapper_tilemap_hover_x);
+			}
 			t3f_key[ALLEGRO_KEY_V] = 0;
 		}
 		t3f_get_mouse_mickeys(&mx, &my, NULL);
