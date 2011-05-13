@@ -31,6 +31,7 @@ static void * t3f_play_music_thread(void * arg)
 	int loop_points = 0;
 	float loop_start = -1;
 	float loop_end = -1;
+	bool loop_disabled = false;
 	const char * val = NULL;
 	ALLEGRO_CONFIG * config = NULL;
 	
@@ -54,37 +55,52 @@ static void * t3f_play_music_thread(void * arg)
 		config = al_load_config_file(al_path_cstr(path, '/'));
 		if(config)
 		{
-			val = al_get_config_value(config, "loop", "start");
-			if(val)
+			val = al_get_config_value(config, "loop", "disabled");
+			if(val && !strcasecmp(val, "true"))
 			{
-				loop_start = atof(val);
-				loop_points++;
+				loop_disabled = true;
 			}
-			val = al_get_config_value(config, "loop", "end");
-			if(val)
+			if(!loop_disabled)
 			{
-				loop_end = atof(val);
-				loop_points++;
+				val = al_get_config_value(config, "loop", "start");
+				if(val)
+				{
+					loop_start = atof(val);
+					loop_points++;
+				}
+				val = al_get_config_value(config, "loop", "end");
+				if(val)
+				{
+					loop_end = atof(val);
+					loop_points++;
+				}
 			}
 			al_destroy_config(config);
 		}
 		al_destroy_path(path);
 	}
 	
-	if(loop_points != 2)
+	if(loop_disabled)
 	{
-		/* loop entire song unless audio is MOD music */
-		ext = t3f_get_music_extension(t3f_music_thread_fn);
-		if(strcmp(ext, ".xm") && strcmp(ext, ".it") && strcmp(ext, ".mod") && strcmp(ext, ".s3m"))
-		{
-			al_set_audio_stream_loop_secs(t3f_stream, 0.0, al_get_audio_stream_length_secs(t3f_stream));
-			al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_LOOP);
-		}
+		al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_ONCE);
 	}
 	else
 	{
-		al_set_audio_stream_loop_secs(t3f_stream, loop_start, loop_end);
-		al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_LOOP);
+		if(loop_points != 2)
+		{
+			/* loop entire song unless audio is MOD music */
+			ext = t3f_get_music_extension(t3f_music_thread_fn);
+			if(strcmp(ext, ".xm") && strcmp(ext, ".it") && strcmp(ext, ".mod") && strcmp(ext, ".s3m"))
+			{
+				al_set_audio_stream_loop_secs(t3f_stream, 0.0, al_get_audio_stream_length_secs(t3f_stream));
+				al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_LOOP);
+			}
+		}
+		else
+		{
+			al_set_audio_stream_loop_secs(t3f_stream, loop_start, loop_end);
+			al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_LOOP);
+		}
 	}
 	
 	al_set_audio_stream_gain(t3f_stream, t3f_music_volume);

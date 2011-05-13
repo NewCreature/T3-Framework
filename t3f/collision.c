@@ -1,5 +1,7 @@
 #include <allegro5/allegro5.h>
+#ifndef ALLEGRO_MACOSX
 #include <malloc.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
