@@ -999,7 +999,8 @@ void t3f_select_view(T3F_VIEW * sp)
 	al_use_transform(&t3f_current_transform);
 	
 	/* convert virtual screen coordinates to real display coordinates */
-	al_set_clipping_rectangle(ox, oy, t3f_current_view->width * dsx, t3f_current_view->height * dsy);
+	t3f_set_clipping_rectangle(t3f_current_view->offset_x, t3f_current_view->offset_y, t3f_current_view->width, t3f_current_view->height);
+//	al_set_clipping_rectangle(ox, oy, t3f_current_view->width * dsx, t3f_current_view->height * dsy);
 }
 
 /* get the x coordinate of the pixel at the given (x, z) coordinate
