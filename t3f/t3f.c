@@ -844,7 +844,6 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
-			printf("(%f, %f)\n", t3f_mouse_scale_x, t3f_mouse_scale_y);
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_WARPED:
