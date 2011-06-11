@@ -826,30 +826,30 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
 		{
 			t3f_mouse_button[event->mouse.button - 1] = 1;
-			t3f_mouse_x = (float)event->mouse.x * t3f_mouse_scale_x - t3f_display_offset_x;
-			t3f_mouse_y = (float)event->mouse.y * t3f_mouse_scale_y - t3f_display_offset_y;
+			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
+			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
 		{
 			t3f_mouse_button[event->mouse.button - 1] = 0;
-			t3f_mouse_x = (float)event->mouse.x * t3f_mouse_scale_x - t3f_display_offset_x;
-			t3f_mouse_y = (float)event->mouse.y * t3f_mouse_scale_y - t3f_display_offset_y;
+			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
+			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_AXES:
 		{
-			t3f_mouse_x = (float)event->mouse.x * t3f_mouse_scale_x - t3f_display_offset_x;
-			t3f_mouse_y = (float)event->mouse.y * t3f_mouse_scale_y - t3f_display_offset_y;
+			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
+			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_WARPED:
 		{
-			t3f_mouse_x = (float)event->mouse.x * t3f_mouse_scale_x;
-			t3f_mouse_y = (float)event->mouse.y * t3f_mouse_scale_y;
+			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
+			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY:
