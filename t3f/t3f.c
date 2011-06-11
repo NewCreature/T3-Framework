@@ -483,7 +483,9 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	return 1;
 }
 
-/* set clipping rectangle, taking the current view into effect */
+/* set the clipping rectangle, taking the current transformation into account,
+ * used in conjunction with the view system you will pass virtual screen 
+ * coordinates */
 void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 {
 	float tx, ty;
@@ -494,22 +496,19 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 	{
 		tx = x;
 		ty = y;
-		twx = x + w;
-		twy = y + h;
-		al_transform_coordinates(&t3f_current_transform, &tx, &ty);
-		al_transform_coordinates(&t3f_current_transform, &twx, &twy);
-		al_set_clipping_rectangle(tx, ty, twx - tx, twy - ty);
+		twx = w;
+		twy = h;
 	}
 	else
 	{
 		tx = 0;
 		ty = 0;
-		twx = t3f_current_view->width;
-		twy = t3f_current_view->height;
-		al_transform_coordinates(&t3f_current_transform, &tx, &ty);
-		al_transform_coordinates(&t3f_current_transform, &twx, &twy);
-		al_set_clipping_rectangle(tx, ty, twx - tx, twy - ty);
+		twx = t3f_virtual_display_width;
+		twy = t3f_virtual_display_height;
 	}
+	al_transform_coordinates(&t3f_current_transform, &tx, &ty);
+	al_transform_coordinates(&t3f_current_transform, &twx, &twy);
+	al_set_clipping_rectangle(tx, ty, twx, twy);
 }
 
 void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event))
@@ -999,7 +998,7 @@ void t3f_select_view(T3F_VIEW * sp)
 	al_use_transform(&t3f_current_transform);
 	
 	/* convert virtual screen coordinates to real display coordinates */
-	t3f_set_clipping_rectangle(t3f_current_view->offset_x, t3f_current_view->offset_y, t3f_current_view->width, t3f_current_view->height);
+	t3f_set_clipping_rectangle(0, 0, 0, 0);
 //	al_set_clipping_rectangle(ox, oy, t3f_current_view->width * dsx, t3f_current_view->height * dsy);
 }
 
