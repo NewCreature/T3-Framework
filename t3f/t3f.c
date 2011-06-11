@@ -495,10 +495,8 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 		twy = t3f_virtual_display_height;
 	}
 	al_transform_coordinates(&t3f_current_transform, &tx, &ty);
-	printf("bclipping (%f, %f) (%f, %f)\n", tx, ty, twx, twy);
 	al_transform_coordinates(&t3f_current_transform, &twx, &twy);
 	al_set_clipping_rectangle(tx, ty, twx - ox, twy - oy);
-	printf("clipping (%f, %f) (%f, %f)\n", tx, ty, twx, twy);
 }
 
 void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event))
