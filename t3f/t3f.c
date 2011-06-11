@@ -476,8 +476,10 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 {
 	float tx, ty;
 	float twx, twy;
+	float ox, oy;
 	
 	/* convert virtual screen coordinates to real display coordinates */
+	al_transform_coordinates(&t3f_current_transform, &ox, &oy);
 	if(w != 0 && h != 0)
 	{
 		tx = x;
@@ -493,8 +495,10 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 		twy = t3f_virtual_display_height;
 	}
 	al_transform_coordinates(&t3f_current_transform, &tx, &ty);
+	printf("bclipping (%f, %f) (%f, %f)\n", tx, ty, twx, twy);
 	al_transform_coordinates(&t3f_current_transform, &twx, &twy);
-	al_set_clipping_rectangle(tx, ty, twx, twy);
+	al_set_clipping_rectangle(tx, ty, twx - ox, twy - oy);
+	printf("clipping (%f, %f) (%f, %f)\n", tx, ty, twx, twy);
 }
 
 void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event))
@@ -985,7 +989,6 @@ void t3f_select_view(T3F_VIEW * sp)
 	
 	/* convert virtual screen coordinates to real display coordinates */
 	t3f_set_clipping_rectangle(0, 0, 0, 0);
-//	al_set_clipping_rectangle(ox, oy, t3f_current_view->width * dsx, t3f_current_view->height * dsy);
 }
 
 /* get the x coordinate of the pixel at the given (x, z) coordinate
