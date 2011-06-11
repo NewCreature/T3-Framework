@@ -411,8 +411,8 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		sprintf(val, "%d", h);
 		al_set_config_value(t3f_config, "T3F", "display_height", val);
 		t3f_get_base_transform();
-		t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)t3f_display_width;
-		t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)t3f_display_height;
+		t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)al_get_display_width(t3f_display);
+		t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)al_get_display_height(t3f_display);
 		al_set_window_title(t3f_display, t3f_window_title);
 	}
 	
@@ -461,8 +461,8 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			t3f_virtual_display_width = w;
 			t3f_virtual_display_height = h;
 			t3f_get_base_transform();
-			t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)t3f_display_width;
-			t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)t3f_display_height;
+			t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)al_get_display_width(t3f_display);
+			t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)al_get_display_height(t3f_display);
 			al_set_window_title(t3f_display, t3f_window_title);
 		}
 	}
@@ -844,6 +844,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
+			printf("(%f, %f)\n", t3f_mouse_scale_x, t3f_mouse_scale_y);
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_WARPED:
