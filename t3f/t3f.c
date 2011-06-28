@@ -386,6 +386,7 @@ static void t3f_get_base_transform(void)
 	}
 }
 
+/* returns 1 on success, 0 on failure, 2 if toggling fullscreen/window failed */
 int t3f_set_gfx_mode(int w, int h, int flags)
 {
 	const char * cvalue = NULL;
@@ -393,16 +394,22 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	char val[128] = {0};
 	int dflags = 0;
 	int dw, dh;
+	int ret = 1;
 	if(t3f_display)
 	{
-		/* if we are switching from window to full screen, create new display */
 		if(flags & T3F_USE_FULLSCREEN)
 		{
-			al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, true);
+			if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, true))
+			{
+				ret = 2;
+			}
 		}
 		else
 		{
-			al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false);
+			if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false))
+			{
+				ret = 2;
+			}
 			t3f_flags ^= T3F_USE_FULLSCREEN;
 			al_resize_display(t3f_display, w, h);
 		}
@@ -430,7 +437,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			cvalue2 = al_get_config_value(t3f_config, "T3F", "force_window");
 			if((flags & T3F_USE_FULLSCREEN || (cvalue && !strcmp(cvalue, "true"))) && !(cvalue2 && !strcmp(cvalue2, "true")))
 			{
-				dflags |= ALLEGRO_FULLSCREEN;
+				dflags |= ALLEGRO_FULLSCREEN_WINDOW;
 				t3f_flags |= T3F_USE_FULLSCREEN;
 			}
 			if(flags & T3F_RESIZABLE)
@@ -466,7 +473,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			al_set_window_title(t3f_display, t3f_window_title);
 		}
 	}
-	return 1;
+	return ret;
 }
 
 /* set the clipping rectangle, taking the current transformation into account,
