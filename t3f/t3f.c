@@ -382,8 +382,8 @@ static void t3f_get_base_transform(void)
 	}
 	else
 	{
-		t3f_display_width = t3f_virtual_display_width;
-		t3f_display_height = t3f_virtual_display_height;
+		t3f_display_width = al_get_display_width(t3f_display);
+		t3f_display_height = al_get_display_height(t3f_display);
 		al_build_transform(&t3f_base_transform, 0.0, 0.0, (float)al_get_display_width(t3f_display) / (float)t3f_virtual_display_width, (float)al_get_display_height(t3f_display) / (float)t3f_virtual_display_height, 0.0);
 	}
 	t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)t3f_display_width;
@@ -449,6 +449,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				t3f_flags |= (flags & T3F_FORCE_ASPECT);
 			}
 			al_set_new_display_flags(dflags);
+			al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
 			cvalue = al_get_config_value(t3f_config, "T3F", "display_width");
 			cvalue2 = al_get_config_value(t3f_config, "T3F", "display_height");
 			if(cvalue && cvalue2)
