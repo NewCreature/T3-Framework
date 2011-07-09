@@ -382,8 +382,12 @@ static void t3f_get_base_transform(void)
 	}
 	else
 	{
+		t3f_display_width = t3f_virtual_display_width;
+		t3f_display_height = t3f_virtual_display_height;
 		al_build_transform(&t3f_base_transform, 0.0, 0.0, (float)al_get_display_width(t3f_display) / (float)t3f_virtual_display_width, (float)al_get_display_height(t3f_display) / (float)t3f_virtual_display_height, 0.0);
 	}
+	t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)t3f_display_width;
+	t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)t3f_display_height;
 }
 
 /* returns 1 on success, 0 on failure, 2 if toggling fullscreen/window failed */
@@ -418,8 +422,6 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		sprintf(val, "%d", h);
 		al_set_config_value(t3f_config, "T3F", "display_height", val);
 		t3f_get_base_transform();
-		t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)al_get_display_width(t3f_display);
-		t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)al_get_display_height(t3f_display);
 		al_set_window_title(t3f_display, t3f_window_title);
 	}
 	
@@ -468,8 +470,6 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			t3f_virtual_display_width = w;
 			t3f_virtual_display_height = h;
 			t3f_get_base_transform();
-			t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)al_get_display_width(t3f_display);
-			t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)al_get_display_height(t3f_display);
 			al_set_window_title(t3f_display, t3f_window_title);
 		}
 	}
