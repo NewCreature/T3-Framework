@@ -221,6 +221,7 @@ int t3f_animation_delete_bitmap(T3F_ANIMATION * ap, int bitmap)
 	{
 		return 0;
 	}
+	ap->bitmaps--;
 	for(i = bitmap; i < ap->bitmaps - 1; i++)
 	{
 		ap->bitmap[i] = ap->bitmap[i + 1];

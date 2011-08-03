@@ -115,7 +115,7 @@ void bitmap_logic(void)
 	const char * fn = NULL;
 	ALLEGRO_BITMAP * bp = NULL;
 	
-	if(t3f_key[ALLEGRO_KEY_INSERT])
+	if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
 	{
 		fn = select_file(last_filename, "Open Image", "*.*;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
 		if(fn)
@@ -129,6 +129,7 @@ void bitmap_logic(void)
 			strcpy(last_filename, fn);
 		}
 		t3f_key[ALLEGRO_KEY_INSERT] = 0;
+		t3f_key[ALLEGRO_KEY_I] = 0;
 	}
 	if(t3f_key[ALLEGRO_KEY_DELETE])
 	{
@@ -185,12 +186,13 @@ void bitmap_logic(void)
 
 void frame_logic(void)
 {
-	if(t3f_key[ALLEGRO_KEY_INSERT])
+	if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
 	{
 		t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmap[current_bitmap]), 0, 1);
 		current_frame = animation->frames - 1;
 		t3f_animation_build_frame_list(animation);
 		t3f_key[ALLEGRO_KEY_INSERT] = 0;
+		t3f_key[ALLEGRO_KEY_I] = 0;
 	}
 	if(t3f_key[ALLEGRO_KEY_DELETE])
 	{
