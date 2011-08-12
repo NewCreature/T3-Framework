@@ -979,7 +979,14 @@ void t3f_select_view(T3F_VIEW * sp)
 	float dsx, dsy;
 	float ox, oy;
 	
-	t3f_current_view = sp;
+	if(sp != NULL)
+	{
+		t3f_current_view = sp;
+	}
+	else
+	{
+		t3f_current_view = t3f_default_view;
+	}
 	sx = t3f_current_view->width / (float)t3f_virtual_display_width;
 	sy = t3f_current_view->height / (float)t3f_virtual_display_height;
 	dsx = (float)al_get_display_width(t3f_display) / t3f_virtual_display_width;
