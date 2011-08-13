@@ -484,7 +484,7 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 {
 	float tx, ty;
 	float twx, twy;
-	float ox, oy;
+	float ox = 0.0, oy = 0.0;
 	
 	/* convert virtual screen coordinates to real display coordinates */
 	al_transform_coordinates(&t3f_current_transform, &ox, &oy);
