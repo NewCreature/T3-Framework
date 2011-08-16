@@ -32,6 +32,7 @@ static void * t3f_play_music_thread(void * arg)
 	float loop_start = -1;
 	float loop_end = -1;
 	bool loop_disabled = false;
+	float gain = 1.0;
 	const char * val = NULL;
 	ALLEGRO_CONFIG * config = NULL;
 	
@@ -75,6 +76,19 @@ static void * t3f_play_music_thread(void * arg)
 					loop_points++;
 				}
 			}
+			val = al_get_config_value(config, "settings", "gain");
+			if(val)
+			{
+				gain = atof(val);
+				if(gain < 0.0)
+				{
+					gain = 0;
+				}
+				if(gain > 10.0)
+				{
+					gain = 10.0;
+				}
+			}
 			al_destroy_config(config);
 		}
 		al_destroy_path(path);
@@ -103,7 +117,7 @@ static void * t3f_play_music_thread(void * arg)
 		}
 	}
 	
-	al_set_audio_stream_gain(t3f_stream, t3f_music_volume);
+	al_set_audio_stream_gain(t3f_stream, t3f_music_volume * gain);
 	al_attach_audio_stream_to_mixer(t3f_stream, al_get_default_mixer());
 	al_unlock_mutex(t3f_music_mutex);
 	return NULL;
