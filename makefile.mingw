@@ -2,56 +2,32 @@ CC = gcc
 CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall -It3f -I./ -mwindows
 LIBS = -lallegro_image-5.0.0.dll -lallegro_font-5.0.0.dll  -lallegro_ttf-5.0.0.dll -lallegro_primitives-5.0.0.dll -lallegro_audio-5.0.0.dll -lallegro_vorbis-5.0.0.dll -lallegro-5.0.0.dll
 
-EX_BASIC_OFILES = t3f/t3f.o examples/ex_basic.o
+include makefile.common
+
+#examples
 EX_BASIC_EXENAME = examples/ex_basic
-
-EX_MUSIC_OFILES = t3f/t3f.o t3f/music.o examples/ex_music.o
 EX_MUSIC_EXENAME = examples/ex_music
-
-EX_SOUND_OFILES = t3f/t3f.o t3f/sound.o examples/ex_sound.o
 EX_SOUND_EXENAME = examples/ex_sound
-
-EX_3D_OFILES = t3f/t3f.o examples/ex_3d.o
 EX_3D_EXENAME = examples/ex_3d
-
-EX_ATLAS_OFILES = t3f/t3f.o  examples/ex_atlas.o
 EX_ATLAS_EXENAME = examples/ex_atlas
-
-EX_CONTROLLER_OFILES = t3f/t3f.o t3f/controller.o examples/ex_controller.o
 EX_CONTROLLER_EXENAME = examples/ex_controller
-
-EX_ANIMATION_OFILES = t3f/t3f.o t3f/animation.o examples/ex_animation.o
 EX_ANIMATION_EXENAME = examples/ex_animation
-
-EX_GUI_OFILES = t3f/t3f.o t3f/gui.o examples/ex_gui.o
 EX_GUI_EXENAME = examples/ex_gui
-
-EX_TILEMAP_OFILES = t3f/t3f.o t3f/animation.o t3f/tilemap.o examples/ex_tilemap.o
 EX_TILEMAP_EXENAME = examples/ex_tilemap
-
-EX_COLLISION_OFILES = t3f/t3f.o t3f/collision.o examples/ex_collision.o
 EX_COLLISION_EXENAME = examples/ex_collision
 
-PADDLE_OFILES = t3f/t3f.o t3f/music.o t3f/gui.o t3f/collision.o games/paddle/paddle.o
+#games
 PADDLE_EXENAME = games/paddle/paddle
-
-DOT2DOT_OFILES = t3f/t3f.o t3f/music.o t3f/gui.o t3f/sound.o games/dot2dot/main.o games/dot2dot/game.o games/dot2dot/intro.o
 DOT2DOT_EXENAME = games/dot2dot/dot2dot
-
-AV_OFILES = t3f/t3f.o t3f/animation.o t3f/controller.o t3f/music.o games/av/board.o games/av/control.o games/av/pill.o games/av/game.o games/av/main.o 
 AV_EXENAME = games/av/av
 
-ANIMATOR_OFILES = t3f/t3f.o t3f/animation.o tools/animator.o
+#tools
 ANIMATOR_EXENAME = tools/animator
-
-MAPPER_OFILES = t3f/t3f.o t3f/animation.o t3f/tilemap.o tools/mapper.o
 MAPPER_EXENAME = tools/mapper
-
-VECTOR_EDITOR_OFILES = t3f/t3f.o t3f/vector.o tools/vector_editor.o
 VECTOR_EDITOR_EXENAME = tools/vector_editor
-
-FONT_EDITOR_OFILES = t3f/t3f.o t3f/vector.o tools/font_editor.o
 FONT_EDITOR_EXENAME = tools/font_editor
+LOOP_EDITOR_EXENAME = tools/loop_editor
+GAIN_EDITOR_EXENAME = tools/gain_editor
 
 all : $(TEMPLATE_EXENAME) $(EX_BASIC_EXENAME) $(EX_MUSIC_EXENAME) $(EX_SOUND_EXENAME) $(EX_3D_EXENAME) $(EX_ATLAS_EXENAME) $(EX_CONTROLLER_EXENAME) $(EX_ANIMATION_EXENAME) $(EX_GUI_EXENAME) $(EX_TILEMAP_EXENAME) $(EX_COLLISION_EXENAME) $(PADDLE_EXENAME) $(DOT2DOT_EXENAME) $(AV_EXENAME) $(ANIMATOR_EXENAME) $(MAPPER_EXENAME) $(VECTOR_EDITOR_EXENAME) $(FONT_EDITOR_EXENAME)
 
@@ -103,6 +79,12 @@ $(VECTOR_EDITOR_EXENAME) : $(VECTOR_EDITOR_OFILES)
 $(FONT_EDITOR_EXENAME) : $(FONT_EDITOR_OFILES)
 	gcc $(FONT_EDITOR_OFILES) $(CFLAGS) $(LIBS) -o $(FONT_EDITOR_EXENAME)
 
+$(LOOP_EDITOR_EXENAME) : $(LOOP_EDITOR_OFILES)
+	gcc $(LOOP_EDITOR_OFILES) $(CFLAGS) $(LIBS) -o $(LOOP_EDITOR_EXENAME)
+
+$(GAIN_EDITOR_EXENAME) : $(GAIN_EDITOR_OFILES)
+	gcc $(GAIN_EDITOR_OFILES) $(CFLAGS) $(LIBS) -o $(GAIN_EDITOR_EXENAME)
+
 $(PADDLE_EXENAME) : $(PADDLE_OFILES)
 	gcc $(PADDLE_OFILES) $(CFLAGS) $(LIBS) -o $(PADDLE_EXENAME)
 
@@ -122,5 +104,5 @@ clean:
 	@echo Cleanup complete!
 
 extraclean: clean
-	@del $(TEMPLATE_EXENAME) $(EX_BASIC_EXENAME) $(EX_MUSIC_EXENAME) $(EX_SOUND_EXENAME) $(EX_3D_EXENAME) $(EX_ATLAS_EXENAME) $(EX_CONTROLLER_EXENAME) $(EX_ANIMATION_EXENAME) $(EX_GUI_EXENAME) $(EX_TILEMAP_EXENAME) $(EX_COLLISION_EXENAME) $(PADDLE_EXENAME) $(DOT2DOT_EXENAME) $(AV_EXENAME) $(ANIMATOR_EXENAME) $(MAPPER_EXENAME) $(VECTOR_EDITOR_EXENAME) $(FONT_EDITOR_EXENAME)
+	@del $(TEMPLATE_EXENAME) $(EX_BASIC_EXENAME) $(EX_MUSIC_EXENAME) $(EX_SOUND_EXENAME) $(EX_3D_EXENAME) $(EX_ATLAS_EXENAME) $(EX_CONTROLLER_EXENAME) $(EX_ANIMATION_EXENAME) $(EX_GUI_EXENAME) $(EX_TILEMAP_EXENAME) $(EX_COLLISION_EXENAME) $(PADDLE_EXENAME) $(DOT2DOT_EXENAME) $(AV_EXENAME) $(ANIMATOR_EXENAME) $(MAPPER_EXENAME) $(VECTOR_EDITOR_EXENAME) $(FONT_EDITOR_EXENAME) $(LOOP_EDITOR_EXENAME) $(GAIN_EDITOR_EXENAME)
 	@echo Executables removed!
