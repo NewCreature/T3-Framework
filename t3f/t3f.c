@@ -1046,6 +1046,7 @@ float t3f_project_y(float y, float z)
 T3F_ATLAS * t3f_create_atlas(int type, int w, int h)
 {
 	T3F_ATLAS * ap;
+	ALLEGRO_STATE old_state;
 	
 	ap = malloc(sizeof(T3F_ATLAS));
 	if(!ap)
@@ -1062,6 +1063,12 @@ T3F_ATLAS * t3f_create_atlas(int type, int w, int h)
 	ap->x = 1; // start at 1 so we get consistency with filtered bitmaps
 	ap->y = 1;
 	ap->line_height = 0;
+	
+	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
+	al_set_target_bitmap(ap->bitmap);
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 0.0));
+	al_restore_state(&old_state);
 	
 	return ap;
 }
