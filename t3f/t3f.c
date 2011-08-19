@@ -201,6 +201,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	}
 	if(flags & T3F_USE_JOYSTICK)
 	{
+		printf("joy init\n");
 		if(!al_install_joystick())
 		{
 			printf("Failed to initialize joystick!\n");
@@ -209,6 +210,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		{
 			t3f_flags |= T3F_USE_JOYSTICK;
 		}
+		printf("joy init done\n");
 	}
 	al_init_primitives_addon();
 	
@@ -399,6 +401,16 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	int dflags = 0;
 	int dw, dh;
 	int ret = 1;
+	
+	/* Disable full screen window attempt on Mac OS X because it will not give
+	 * the correct results on 10.5 (my deployment target. This should really be
+	 * fixed in Allegro but it is not on their to-do list */
+	#ifndef ALLEGRO_MACOSX
+		bool fsw_supported = true; // is full screen window supported?
+	#else
+		bool fsw_supported = false; // is full screen window supported?
+	#endif 
+	
 	if(t3f_display)
 	{
 		if(flags & T3F_USE_FULLSCREEN)
@@ -439,7 +451,13 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			cvalue2 = al_get_config_value(t3f_config, "T3F", "force_window");
 			if((flags & T3F_USE_FULLSCREEN || (cvalue && !strcmp(cvalue, "true"))) && !(cvalue2 && !strcmp(cvalue2, "true")))
 			{
-				dflags |= ALLEGRO_FULLSCREEN_WINDOW;
+				if(fsw_supported)
+					dflags |= ALLEGRO_FULLSCREEN_WINDOW;
+				}
+				else
+				{
+					dflags |= ALLEGRO_FULLSCREEN;
+				}
 				t3f_flags |= T3F_USE_FULLSCREEN;
 			}
 			if(flags & T3F_RESIZABLE)
