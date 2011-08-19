@@ -465,7 +465,10 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			{
 				dflags |= ALLEGRO_RESIZABLE;
 				t3f_flags |= T3F_RESIZABLE;
-				t3f_flags |= (flags & T3F_FORCE_ASPECT);
+			}
+			if(flags & T3F_FORCE_ASPECT)
+			{
+				t3f_flags |= T3F_FORCE_ASPECT;
 			}
 			al_set_new_display_flags(dflags);
 			al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
@@ -484,7 +487,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			t3f_display = al_create_display(dw, dh);
 			if(!t3f_display)
 			{
-/*				printf("Failed to create display! Trying safe mode.\n");
+				printf("Failed to create display! Trying safe mode.\n");
 				dflags = 0;
 				if(flags & T3F_RESIZABLE)
 				{
@@ -496,7 +499,8 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				{
 					return 0;
 				}
-				ret = 3; */
+				t3f_flags = t3f_flags & ~T3F_USE_FULLSCREEN;
+				ret = 3;
 			}
 			t3f_virtual_display_width = w;
 			t3f_virtual_display_height = h;
