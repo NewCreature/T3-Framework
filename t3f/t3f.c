@@ -452,6 +452,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			if((flags & T3F_USE_FULLSCREEN || (cvalue && !strcmp(cvalue, "true"))) && !(cvalue2 && !strcmp(cvalue2, "true")))
 			{
 				if(fsw_supported)
+				{
 					dflags |= ALLEGRO_FULLSCREEN_WINDOW;
 				}
 				else
@@ -483,8 +484,8 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			t3f_display = al_create_display(dw, dh);
 			if(!t3f_display)
 			{
-				printf("Failed to create display! Trying safe mode.\n");
-				dflags = ALLEGRO_WINDOW;
+/*				printf("Failed to create display! Trying safe mode.\n");
+				dflags = 0;
 				if(flags & T3F_RESIZABLE)
 				{
 					dflags |= ALLEGRO_RESIZABLE;
@@ -495,7 +496,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				{
 					return 0;
 				}
-				ret = 3;
+				ret = 3; */
 			}
 			t3f_virtual_display_width = w;
 			t3f_virtual_display_height = h;
