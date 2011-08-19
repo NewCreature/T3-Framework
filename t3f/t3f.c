@@ -483,8 +483,19 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			t3f_display = al_create_display(dw, dh);
 			if(!t3f_display)
 			{
-				printf("Failed to create display!\n");
-				return 0;
+				printf("Failed to create display! Trying safe mode.\n");
+				dflags = ALLEGRO_WINDOW;
+				if(flags & T3F_RESIZABLE)
+				{
+					dflags |= ALLEGRO_RESIZABLE;
+				}
+				al_set_new_display_flags(dflags);
+				t3f_display = al_create_display(dw, dh);
+				if(!t3f_display)
+				{
+					return 0;
+				}
+				ret = 3;
 			}
 			t3f_virtual_display_width = w;
 			t3f_virtual_display_height = h;
