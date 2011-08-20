@@ -413,19 +413,29 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	{
 		if(flags & T3F_USE_FULLSCREEN)
 		{
-			if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, true))
+			/* toggle flag if going from window to full screen */
+			if(!(t3f_flags & T3F_USE_FULLSCREEN))
 			{
-				ret = 2;
+				if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, true))
+				{
+					ret = 2;
+				}
 			}
 		}
 		else
 		{
-			if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false))
+			/* if we are switching from full screen to window */
+			if(t3f_flags & T3F_USE_FULLSCREEN)
 			{
-				ret = 2;
+				if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false))
+				{
+					ret = 2;
+				}
 			}
-			t3f_flags ^= T3F_USE_FULLSCREEN;
-			al_resize_display(t3f_display, w, h);
+			else
+			{
+				al_resize_display(t3f_display, w, h);
+			}
 		}
 		sprintf(val, "%d", w);
 		al_set_config_value(t3f_config, "T3F", "display_width", val);
@@ -1009,7 +1019,6 @@ void t3f_select_view(T3F_VIEW * sp)
 {
 	float sx, sy;
 	float dsx, dsy;
-	float ox, oy;
 	
 	if(sp != NULL)
 	{
