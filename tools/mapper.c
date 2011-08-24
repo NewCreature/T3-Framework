@@ -319,7 +319,15 @@ void mapper_tileset_logic(void)
 					bp = al_load_bitmap(fn);
 					if(bp)
 					{
-						mapper_replace_tiles(bp);
+						if(al_get_bitmap_width(bp) < mapper_tile_width)
+						{
+							al_destroy_bitmap(mapper_tileset->tile[mapper_current_tile]->ap->bitmap[0]);
+							mapper_tileset->tile[mapper_current_tile]->ap->bitmap[0] = bp;
+						}
+						else
+						{
+							mapper_replace_tiles(bp);
+						}
 					}
 					al_destroy_bitmap(bp);
 				}

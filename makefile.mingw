@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall -It3f -I./ -mwindows
-LIBS = -lallegro_image-5.0.0.dll -lallegro_font-5.0.0.dll  -lallegro_ttf-5.0.0.dll -lallegro_primitives-5.0.0.dll -lallegro_audio-5.0.0.dll -lallegro_vorbis-5.0.0.dll -lallegro-5.0.0.dll
+LIBS = -lallegro_image-5.0.0.dll -lallegro_font-5.0.0.dll  -lallegro_ttf-5.0.0.dll -lallegro_primitives-5.0.0.dll -lallegro_audio-5.0.0.dll -lallegro_vorbis-5.0.0.dll -lallegro_memfile-5.0.0.dll -lallegro-5.0.0.dll
 
 include makefile.common
 

@@ -5,6 +5,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_memfile.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -119,6 +120,60 @@ void t3f_setup_directories(ALLEGRO_PATH * final)
 	{
 		al_destroy_path(working_path[i]);
 	}
+}
+
+bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp)
+{
+	ALLEGRO_FILE * tfp = NULL;;
+	ALLEGRO_PATH * path = NULL;
+	int i, size;
+	bool ret = false;
+	
+	path = al_get_standard_path(ALLEGRO_TEMP_PATH);
+	if(path)
+	{
+		al_set_path_filename(path, "t3saver.png");
+		if(al_save_bitmap(al_path_cstr(path, '/'), bp))
+		{
+			tfp = al_fopen(al_path_cstr(path, '/'), "rb");
+			if(tfp)
+			{
+				size = al_fsize(tfp);
+				al_fwrite32le(fp, 0);
+				for(i = 0; i < size; i++)
+				{
+					al_fputc(fp, al_fgetc(tfp));
+				}
+				ret = true;
+			}
+		}
+		al_destroy_path(path);
+		if(ret != true)
+		{
+			al_fwrite32le(fp, 0); // size of 0 means image did not save
+		}
+	}
+	return ret;
+}
+
+ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp)
+{
+	ALLEGRO_BITMAP * bp = NULL;
+	ALLEGRO_FILE * tfp = NULL;
+	int size = al_fread32le(fp);
+	char * buffer = al_malloc(size);
+	if(buffer)
+	{
+		al_fread(fp, buffer, size);
+		tfp = al_open_memfile(buffer, size, "rb");
+		if(tfp)
+		{
+			bp = al_load_bitmap_f(tfp, ".png");
+			al_fclose(tfp);
+		}
+		free(buffer);
+	}
+	return bp;
 }
 
 /* this gets Allegro ready */

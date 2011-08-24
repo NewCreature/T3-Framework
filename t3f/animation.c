@@ -66,18 +66,19 @@ void t3f_destroy_animation(T3F_ANIMATION * ap)
 	free(ap);
 }
 
+/* see if header matches and return the version number, -1 is no match */
 static int check_header(char * h)
 {
 	int i;
 	
-	for(i = 0; i < 12; i++)
+	for(i = 0; i < 11; i++)
 	{
 		if(h[i] != ani_header[i])
 		{
-			return 0;
+			return -1;
 		}
 	}
-	return 1;
+	return h[11];
 }
 
 T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp)
@@ -85,9 +86,11 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp)
 	T3F_ANIMATION * ap;
 	int i;
 	char header[12]	= {0};
+	int ver;
 	
 	al_fread(fp, header, 12);
-	if(!check_header(header))
+	ver = check_header(header);
+	if(ver < 0)
 	{
 		return NULL;
 	}
@@ -95,30 +98,37 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp)
 	ap = t3f_create_animation();
 	if(ap)
 	{
-		ap->bitmaps = al_fread16le(fp);
-		for(i = 0; i < ap->bitmaps; i++)
+		switch(ver)
 		{
-			ap->bitmap[i] = al_load_bitmap_f(fp, ".png");
-		}
-		ap->frames = al_fread16le(fp);
-		for(i = 0; i < ap->frames; i++)
-		{
-			ap->frame[i] = malloc(sizeof(T3F_ANIMATION_FRAME));
-			if(!ap->frame[i])
+			case 0:
 			{
-				return NULL;
+				ap->bitmaps = al_fread16le(fp);
+				for(i = 0; i < ap->bitmaps; i++)
+				{
+					ap->bitmap[i] = al_load_bitmap_f(fp, ".png");
+				}
+				ap->frames = al_fread16le(fp);
+				for(i = 0; i < ap->frames; i++)
+				{
+					ap->frame[i] = malloc(sizeof(T3F_ANIMATION_FRAME));
+					if(!ap->frame[i])
+					{
+						return NULL;
+					}
+					ap->frame[i]->bitmap = al_fread16le(fp);
+					ap->frame[i]->x = t3f_fread_float(fp);
+					ap->frame[i]->y = t3f_fread_float(fp);
+					ap->frame[i]->z = t3f_fread_float(fp);
+					ap->frame[i]->width = t3f_fread_float(fp);
+					ap->frame[i]->height = t3f_fread_float(fp);
+					ap->frame[i]->angle = t3f_fread_float(fp);
+					ap->frame[i]->ticks = al_fread32le(fp);
+					ap->frame[i]->flags = al_fread32le(fp);
+				}
+				ap->flags = al_fread32le(fp);
+				break;
 			}
-			ap->frame[i]->bitmap = al_fread16le(fp);
-			ap->frame[i]->x = t3f_fread_float(fp);
-			ap->frame[i]->y = t3f_fread_float(fp);
-			ap->frame[i]->z = t3f_fread_float(fp);
-			ap->frame[i]->width = t3f_fread_float(fp);
-			ap->frame[i]->height = t3f_fread_float(fp);
-			ap->frame[i]->angle = t3f_fread_float(fp);
-			ap->frame[i]->ticks = al_fread32le(fp);
-			ap->frame[i]->flags = al_fread32le(fp);
 		}
-		ap->flags = al_fread32le(fp);
 	}
 	t3f_animation_build_frame_list(ap);
 	return ap;
@@ -164,6 +174,7 @@ int t3f_save_animation_f(T3F_ANIMATION * ap, ALLEGRO_FILE * fp)
 {
 	int i;
 	
+	ani_header[11] = T3F_ANIMATION_REVISION; // put the version number in
 	al_fwrite(fp, ani_header, 12);
 	al_fwrite16le(fp, ap->bitmaps);
 	for(i = 0; i < ap->bitmaps; i++)

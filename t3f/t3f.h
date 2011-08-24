@@ -129,6 +129,8 @@ unsigned long t3f_checksum_file(const char * fn);
 bool t3f_copy_file(const char * src, const char * dest);
 void t3f_setup_directories(ALLEGRO_PATH * final);
 const char * t3f_get_filename(ALLEGRO_PATH * path, const char * fn);
+bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp);
+ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp);
 
 /* 3D projection */
 T3F_VIEW * t3f_create_view(float ox, float oy, float w, float h, float vpx, float vpy);

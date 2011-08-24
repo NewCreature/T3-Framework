@@ -10,6 +10,7 @@
 
 #define T3F_ANIMATION_MAX_BITMAPS  256
 #define T3F_ANIMATION_MAX_FRAMES  1024
+#define T3F_ANIMATION_REVISION       0 // change to 1 after we fix image loading to use memfiles
 
 #define T3F_ANIMATION_FLAG_ONCE      1
 
