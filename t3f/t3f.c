@@ -414,7 +414,45 @@ bool t3f_locate_resource(const char * filename)
 static void t3f_get_base_transform(void)
 {
 	float r, vr;
-	if(t3f_flags & T3F_FORCE_ASPECT)
+	const char * value;
+	bool override_setup = false;
+	
+	/* reset internal display dimensions */
+	t3f_display_offset_x = 0;
+	t3f_display_offset_y = 0;
+	t3f_display_width = al_get_display_width(t3f_display);
+	t3f_display_height = al_get_display_height(t3f_display);
+	value = al_get_config_value(t3f_config, "T3F", "display_offset_x");
+	if(value)
+	{
+		override_setup = true;
+		t3f_display_offset_x = atoi(value);
+	}
+	value = al_get_config_value(t3f_config, "T3F", "display_offset_y");
+	if(value)
+	{
+		override_setup = true;
+		t3f_display_offset_y = atoi(value);
+	}
+	value = al_get_config_value(t3f_config, "T3F", "display_width");
+	if(value)
+	{
+		override_setup = true;
+		t3f_display_width = atoi(value);
+	}
+	value = al_get_config_value(t3f_config, "T3F", "display_height");
+	if(value)
+	{
+		override_setup = true;
+		t3f_display_height = atoi(value);
+	}
+	
+	/* if we encounter any overrides in the config file, switch to manual mode */
+	if(override_setup)
+	{
+		al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, (float)t3f_display_width / (float)t3f_virtual_display_width, (float)t3f_display_height / (float)t3f_virtual_display_height, 0.0);
+	}
+	else if(t3f_flags & T3F_FORCE_ASPECT)
 	{
 		r = (float)al_get_display_height(t3f_display) / (float)al_get_display_width(t3f_display);
 		vr = (float)t3f_virtual_display_height / (float)t3f_virtual_display_width;
@@ -886,7 +924,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			char val[8] = {0};
 			al_acknowledge_resize(t3f_display);
 			t3f_get_base_transform();
-			al_set_clipping_rectangle(0, 0, al_get_display_width(t3f_display), al_get_display_height(t3f_display));
+			al_set_clipping_rectangle(0, 0, 0, 0);
 			al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.0));
 			al_flip_display();
 			al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.0));
