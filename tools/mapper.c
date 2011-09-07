@@ -271,7 +271,7 @@ void mapper_tileset_logic(void)
 			}
 			t3f_key[ALLEGRO_KEY_F2] = 0;
 		}
-		if(t3f_key[ALLEGRO_KEY_INSERT])
+		if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
 		{
 			fn = select_file(mapper_last_filename, "Open Animation", "*.*;*.ani;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
 			if(fn)
@@ -298,6 +298,7 @@ void mapper_tileset_logic(void)
 				strcpy(mapper_last_filename, fn);
 			}
 			t3f_key[ALLEGRO_KEY_INSERT] = 0;
+			t3f_key[ALLEGRO_KEY_I] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_ENTER])
 		{
@@ -367,7 +368,7 @@ void mapper_tile_ani_logic(void)
 {
 	int i, hover_frame;
 	
-	if(t3f_key[ALLEGRO_KEY_INSERT])
+	if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
 	{
 		if(!(mapper_tileset->tile[mapper_current_tile]->flags & T3F_TILE_FLAG_ANIMATED))
 		{
@@ -378,6 +379,7 @@ void mapper_tile_ani_logic(void)
 		mapper_tileset->tile[mapper_current_tile]->frame_list_total++;
 		mapper_current_frame = mapper_tileset->tile[mapper_current_tile]->frame_list_total - 1;
 		t3f_key[ALLEGRO_KEY_INSERT] = 0;
+		t3f_key[ALLEGRO_KEY_I] = 0;
 	}
 	if(t3f_key[ALLEGRO_KEY_DELETE] && (mapper_tileset->tile[mapper_current_tile]->flags & T3F_TILE_FLAG_ANIMATED))
 	{
@@ -698,7 +700,7 @@ void mapper_tilemap_logic(void)
 			}
 			t3f_key[ALLEGRO_KEY_S] = 0;
 		}
-		if(t3f_key[ALLEGRO_KEY_INSERT])
+		if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
 		{
 			if(mapper_tilemap->layers < 32)
 			{
@@ -730,6 +732,7 @@ void mapper_tilemap_logic(void)
 				}
 			}
 			t3f_key[ALLEGRO_KEY_INSERT] = 0;
+			t3f_key[ALLEGRO_KEY_I] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_DELETE])
 		{
