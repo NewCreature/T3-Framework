@@ -317,12 +317,15 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	}
 	al_register_event_source(t3f_queue, al_get_timer_event_source(t3f_timer));
 	
-	t3f_default_view = t3f_create_view(0, 0, w, h, w / 2, h / 2);
-	if(!t3f_default_view)
+	if(!(flags & T3F_USE_CONSOLE))
 	{
-		return 0;
+		t3f_default_view = t3f_create_view(0, 0, w, h, w / 2, h / 2);
+		if(!t3f_default_view)
+		{
+			return 0;
+		}
+		t3f_select_view(t3f_default_view);
 	}
-	t3f_select_view(t3f_default_view);
 	t3f_color_white = al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
 	t3f_color_black = al_map_rgba_f(0.0, 0.0, 0.0, 1.0);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);

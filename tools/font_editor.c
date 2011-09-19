@@ -154,9 +154,10 @@ int main(int argc, char * argv[])
 {
 	if(!t3f_initialize("T3F Vector Object Editor", 640, 480, 60.0, vfe_logic, vfe_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
 	{
+		printf("failed to initialize\n");
 		return -1;
 	}
-	font = al_load_bitmap_font("studio_font.png");
+	font = al_load_bitmap_font("fonts/basic_font.png");
 	if(!font)
 	{
 		return -1;

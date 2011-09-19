@@ -28,7 +28,7 @@ void ve_logic(void)
 		ALLEGRO_PATH * save_path = NULL;
 		const char * rp = NULL;
 	
-		file_save_dialog = al_create_native_file_dialog(NULL, "Save Object", "*.t3v", 0);
+		file_save_dialog = al_create_native_file_dialog(NULL, "Save Object", "*.t3v", ALLEGRO_FILECHOOSER_SAVE);
 		if(file_save_dialog)
 		{
 			al_stop_timer(t3f_timer);
@@ -222,7 +222,7 @@ int main(int argc, char * argv[])
 	{
 		return -1;
 	}
-	font = al_load_bitmap_font("studio_font.png");
+	font = al_load_bitmap_font("fonts/basic_font.png");
 	if(!font)
 	{
 		return -1;
