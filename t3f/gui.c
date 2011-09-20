@@ -175,9 +175,21 @@ void t3f_destroy_gui(T3F_GUI * pp)
 	
 	for(i = 0; i < pp->elements; i++)
 	{
-		if(pp->element[i].type == T3F_GUI_ELEMENT_TEXT && pp->element[i].flags & T3F_GUI_ELEMENT_COPY)
+		if(pp->element[i].flags & T3F_GUI_ELEMENT_COPY)
 		{
-			free(pp->element[i].data);
+			switch(pp->element[i].type)
+			{
+				case T3F_GUI_ELEMENT_TEXT:
+				{
+					free(pp->element[i].data);
+					break;
+				}
+				case T3F_GUI_ELEMENT_IMAGE:
+				{
+					al_destroy_bitmap((ALLEGRO_BITMAP *)(pp->element[i].data));
+					break;
+				}
+			}
 		}
 	}
 	free(pp);
