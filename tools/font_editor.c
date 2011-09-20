@@ -15,7 +15,7 @@ void vfe_logic(void)
 		ALLEGRO_PATH * save_path = NULL;
 		const char * rp = NULL;
 	
-		file_save_dialog = al_create_native_file_dialog(NULL, "Save Font", "*.t3vf", 0);
+		file_save_dialog = al_create_native_file_dialog(NULL, "Save Font", "*.t3vf", ALLEGRO_FILECHOOSER_SAVE);
 		if(file_save_dialog)
 		{
 			al_stop_timer(t3f_timer);
@@ -146,7 +146,7 @@ void vfe_render(void)
 		al_draw_textf(font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 0, 0, 0, "Character: %c", character);
 		t3f_draw_vector_text(vector_font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 0, 300, 0, 1.0, "abcdefghijklmnop");
 		t3f_draw_vector_text(vector_font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 0, 350, 0, 1.0, "pqrstuvwxyzyx");
-		t3f_draw_vector_text(vector_font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 0, 400, 0, 1.0, "1234567890:01");
+		t3f_draw_vector_text(vector_font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 0, 400, 0, 1.0, "1234567890:<>01");
 	}
 }
 
