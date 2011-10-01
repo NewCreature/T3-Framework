@@ -440,13 +440,11 @@ static void t3f_get_base_transform(void)
 	value = al_get_config_value(t3f_config, "T3F", "display_width");
 	if(value)
 	{
-		override_setup = true;
 		t3f_display_width = atoi(value);
 	}
 	value = al_get_config_value(t3f_config, "T3F", "display_height");
 	if(value)
 	{
-		override_setup = true;
 		t3f_display_height = atoi(value);
 	}
 	
