@@ -247,9 +247,9 @@ void t3f_center_gui(T3F_GUI * pp, float oy, float my)
 			top = pp->element[i].oy;
 			top_i = i;
 		}
-		if(pp->element[i].oy + al_get_font_line_height((ALLEGRO_FONT *)pp->element[i].aux_data) > bottom)
+		if(pp->element[i].oy + t3f_gui_current_driver->get_element_height(&pp->element[i]) > bottom)
 		{
-			bottom = pp->element[i].oy + al_get_font_line_height((ALLEGRO_FONT *)pp->element[i].aux_data);
+			bottom = pp->element[i].oy + t3f_gui_current_driver->get_element_height(&pp->element[i]);
 			bottom_i = i;
 		}
 	}
