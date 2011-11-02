@@ -145,9 +145,12 @@ bool t3f_play_music(const char * fn)
 
 void t3f_stop_music(void)
 {
-	al_drain_audio_stream(t3f_stream);
-	al_destroy_audio_stream(t3f_stream);
-	t3f_stream = NULL;
+	if(t3f_stream)
+	{
+		al_drain_audio_stream(t3f_stream);
+		al_destroy_audio_stream(t3f_stream);
+		t3f_stream = NULL;
+	}
 }
 
 void t3f_pause_music(void)
