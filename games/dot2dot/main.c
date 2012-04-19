@@ -161,7 +161,7 @@ bool dot_initialize(int argc, char * argv[])
 	}
 	
 	/* build atlas */
-	dot_atlas = t3f_create_atlas(T3F_ATLAS_SPRITES, 1024, 1024);
+	dot_atlas = t3f_create_atlas(1024, 1024);
 	if(dot_atlas)
 	{
 		for(i = 0; i < DOT_MAX_BITMAPS; i++)
@@ -169,7 +169,7 @@ bool dot_initialize(int argc, char * argv[])
 			if(dot_bitmap[i])
 			{
 				temp_bitmap = dot_bitmap[i];
-				dot_bitmap[i] = t3f_add_bitmap_to_atlas(dot_atlas, dot_bitmap[i]);
+				dot_bitmap[i] = t3f_add_bitmap_to_atlas(dot_atlas, dot_bitmap[i], T3F_ATLAS_SPRITE);
 				if(dot_bitmap[i])
 				{
 					al_destroy_bitmap(temp_bitmap);

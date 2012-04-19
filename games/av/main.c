@@ -269,16 +269,16 @@ bool av_initialize(void)
 	al_restore_state(&old_state);
 	
 	/* create atlas so we can draw more efficiently */
-	av_atlas = t3f_create_atlas(T3F_ATLAS_SPRITES, 1024, 1024);
+	av_atlas = t3f_create_atlas(1024, 1024);
 	if(av_atlas)
 	{
 		for(i = 0; i < 16; i++)
 		{
-			t3f_add_bitmap_to_atlas(av_atlas, av_theme.block[i]);
+			t3f_add_bitmap_to_atlas(av_atlas, av_theme.block[i], T3F_ATLAS_SPRITE);
 		}
 		for(i = 0; i < 3; i++)
 		{
-			t3f_add_animation_to_atlas(av_atlas, av_theme.virus[i]);
+			t3f_add_animation_to_atlas(av_atlas, av_theme.virus[i], T3F_ATLAS_SPRITE);
 		}
 	}
 	

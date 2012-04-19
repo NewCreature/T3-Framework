@@ -62,7 +62,7 @@ int main(int argc, char * argv[])
 	}
 	
 	/* load bitmaps into sprite sheet */
-	atlas = t3f_create_atlas(T3F_ATLAS_SPRITES, 512, 512);
+	atlas = t3f_create_atlas(512, 512);
 	if(!atlas)
 	{
 		printf("Failed to create atlas!\n");
@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
 		{
 			return 1;
 		}
-		bitmap[i] = t3f_add_bitmap_to_atlas(atlas, bp);
+		bitmap[i] = t3f_add_bitmap_to_atlas(atlas, bp, T3F_ATLAS_SPRITE);
 		if(!bitmap[i])
 		{
 			return 1;

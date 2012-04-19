@@ -84,10 +84,10 @@ int main(int argc, char * argv[])
 		t3f_animation_add_frame(animation, i, 0, 0, 0, al_get_bitmap_width(bitmap[i]), al_get_bitmap_height(bitmap[i]), 0, 10);
 	}
 	
-	atlas = t3f_create_atlas(T3F_ATLAS_SPRITES, 512, 512);
+	atlas = t3f_create_atlas(512, 512);
 	if(atlas)
 	{
-		t3f_add_animation_to_atlas(atlas, animation);
+		t3f_add_animation_to_atlas(atlas, animation, T3F_ATLAS_SPRITE);
 	}
 	
 	for(i = 0; i < 1024; i++)
