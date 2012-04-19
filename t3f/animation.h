@@ -61,7 +61,7 @@ int t3f_animation_delete_bitmap(T3F_ANIMATION * ap, int bitmap);
 int t3f_animation_add_frame(T3F_ANIMATION * ap, int bitmap, float x, float y, float z, float w, float h, float angle, int ticks);
 int t3f_animation_delete_frame(T3F_ANIMATION * ap, int frame);
 int t3f_animation_build_frame_list(T3F_ANIMATION * ap);
-bool t3f_add_animation_to_atlas(T3F_ATLAS * sap, T3F_ANIMATION * ap);
+bool t3f_add_animation_to_atlas(T3F_ATLAS * sap, T3F_ANIMATION * ap, int type);
 
 /* in-game */
 ALLEGRO_BITMAP * t3f_animation_get_bitmap(T3F_ANIMATION * ap, int tick);

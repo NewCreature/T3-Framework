@@ -316,6 +316,14 @@ void logic(void)
 				break;
 			}
 		}
+		
+		/* toggle animation type */
+		if(t3f_key[ALLEGRO_KEY_O])
+		{
+			animation->flags ^= T3F_ANIMATION_FLAG_ONCE;
+			t3f_animation_build_frame_list(animation);
+			t3f_key[ALLEGRO_KEY_O] = 0;
+		}
 	}
 	tick++;
 }

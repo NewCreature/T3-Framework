@@ -7,6 +7,8 @@
 ALLEGRO_AUDIO_STREAM * t3f_stream = NULL;
 ALLEGRO_MUTEX * t3f_music_mutex = NULL;
 static float t3f_music_volume = 1.0;
+static float t3f_music_target_volume = 1.0;
+static float t3f_music_fade_speed = 0.0;
 
 static char t3f_music_thread_fn[4096] = {0};
 
@@ -123,6 +125,39 @@ static void * t3f_play_music_thread(void * arg)
 	return NULL;
 }
 
+static void * t3f_fade_music_thread(void * arg)
+{
+	ALLEGRO_TIMER * timer;
+	ALLEGRO_EVENT_QUEUE * queue;
+	bool done = false;
+	ALLEGRO_EVENT event;
+	float s = t3f_music_fade_speed / 50.0;
+	
+	timer = al_create_timer(1.0 / s);
+	if(!timer)
+	{
+		return NULL;
+	}
+	queue = al_create_event_queue();
+	if(!queue)
+	{
+		return NULL;
+	}
+	al_register_event_source(queue, al_get_timer_event_source(timer));
+	while(!done)
+	{
+		al_wait_for_event(queue, &event);
+		al_set_audio_stream_gain(t3f_stream, t3f_music_target_volume);
+		t3f_music_target_volume -= s;
+		if(t3f_music_target_volume <= 0.0)
+		{
+			t3f_stop_music();
+			done = true;
+		}
+	}
+	return NULL;
+}
+
 /* need to come up with a way to define loops for non-MOD audio,
  * see if there is a corresponding INI file and read loop data from that */
 bool t3f_play_music(const char * fn)
@@ -175,4 +210,13 @@ void t3f_set_music_volume(float volume)
 float t3f_get_music_volume(void)
 {
 	return t3f_music_volume;
+}
+
+void t3f_fade_out_music(float speed)
+{
+	if(t3f_stream)
+	{
+		t3f_music_fade_speed = speed;
+		al_run_detached_thread(t3f_fade_music_thread, NULL);
+	}
 }

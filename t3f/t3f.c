@@ -1179,7 +1179,7 @@ float t3f_project_y(float y, float z)
 }
 
 /* create an empty atlas of the specified type and size */
-T3F_ATLAS * t3f_create_atlas(int type, int w, int h)
+T3F_ATLAS * t3f_create_atlas(int w, int h)
 {
 	T3F_ATLAS * ap;
 	ALLEGRO_STATE old_state;
@@ -1195,7 +1195,6 @@ T3F_ATLAS * t3f_create_atlas(int type, int w, int h)
 		free(ap);
 		return NULL;
 	}
-	ap->type = type;
 	ap->x = 1; // start at 1 so we get consistency with filtered bitmaps
 	ap->y = 1;
 	ap->line_height = 0;
@@ -1217,7 +1216,7 @@ void t3f_destroy_atlas(T3F_ATLAS * ap)
 }
 
 /* fix for when you have exceeded the size of the sprite sheet */
-ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp)
+ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, int type)
 {
 	ALLEGRO_STATE old_state;
 	ALLEGRO_BITMAP * retbp = NULL;
@@ -1233,9 +1232,9 @@ ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp)
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 	al_identity_transform(&identity_transform);
 	al_use_transform(&identity_transform);
-	switch(ap->type)
+	switch(type)
 	{
-		case T3F_ATLAS_TILES:
+		case T3F_ATLAS_TILE:
 		{
 			
 			/* go to next line if it doesn't fit */
@@ -1273,30 +1272,30 @@ ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp)
 			}
 			break;
 		}
-		case T3F_ATLAS_SPRITES:
+		case T3F_ATLAS_SPRITE:
 		{
 			/* go to next line if it doesn't fit */
-			if(ap->x + al_get_bitmap_width(bp) + 1 >= al_get_bitmap_width(ap->bitmap))
+			if(ap->x + al_get_bitmap_width(bp) + 2 >= al_get_bitmap_width(ap->bitmap))
 			{
 				ap->x = 0;
 				ap->y += ap->line_height;
 				
 				/* if it still doesn't fit, fail */
-				if(ap->y + al_get_bitmap_height(bp) + 1 >= al_get_bitmap_height(ap->bitmap))
+				if(ap->y + al_get_bitmap_height(bp) + 2 >= al_get_bitmap_height(ap->bitmap))
 				{
 					al_restore_state(&old_state);
 					return NULL;
 				}
 			}
 //			retbp = _t3f_add_bitmap_to_region(t3f_ss_working_bitmap, bp, t3f_ss_working_pos_x, t3f_ss_working_pos_y);
-			al_draw_bitmap(bp, ap->x, ap->y, 0);
+			al_draw_bitmap(bp, ap->x + 1, ap->y + 1, 0);
 			
-			retbp = al_create_sub_bitmap(ap->bitmap, ap->x, ap->y, al_get_bitmap_width(bp), al_get_bitmap_height(bp));
+			retbp = al_create_sub_bitmap(ap->bitmap, ap->x + 1, ap->y + 1, al_get_bitmap_width(bp), al_get_bitmap_height(bp));
 			
-			ap->x += al_get_bitmap_width(bp) + 1;
+			ap->x += al_get_bitmap_width(bp) + 2;
 			if(al_get_bitmap_height(bp) + 1 > ap->line_height)
 			{
-				ap->line_height = al_get_bitmap_height(bp) + 1;
+				ap->line_height = al_get_bitmap_height(bp) + 2;
 			}
 			break;
 		}
@@ -1340,9 +1339,9 @@ void t3f_draw_rotated_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float cx,
 	float screen_w, screen_h;
 
 	obj_x[0] = t3f_project_x(x - cx, z);
-	obj_x[1] = t3f_project_x(x + cx, z);
+	obj_x[1] = t3f_project_x(x - cx + al_get_bitmap_width(bp), z);
 	obj_y[0] = t3f_project_y(y - cy, z);
-	obj_y[1] = t3f_project_y(y + cy, z);
+	obj_y[1] = t3f_project_y(y - cy + al_get_bitmap_height(bp), z);
 	obj_z[0] = z + t3f_current_view->width;
 	obj_z[1] = z + t3f_virtual_display_width;
 	obj_cx = t3f_project_x(x, z);

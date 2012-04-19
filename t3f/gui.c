@@ -190,6 +190,10 @@ void t3f_destroy_gui(T3F_GUI * pp)
 					break;
 				}
 			}
+			if(pp->element[i].description)
+			{
+				free(pp->element[i].description);
+			}
 		}
 	}
 	free(pp);
@@ -203,6 +207,7 @@ int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *), void * bp,
 	pp->element[pp->elements].ox = ox;
 	pp->element[pp->elements].oy = oy;
 	pp->element[pp->elements].flags = flags;
+	pp->element[pp->elements].description = NULL;
 	pp->elements++;
 	return 1;
 }
@@ -225,8 +230,27 @@ int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(int, void *), char * text
 	pp->element[pp->elements].oy = oy;
 	pp->element[pp->elements].color = color;
 	pp->element[pp->elements].flags = flags;
+	pp->element[pp->elements].description = NULL;
 	pp->elements++;
 	return 1;
+}
+
+int t3f_describe_last_gui_element(T3F_GUI * pp, char * text)
+{
+	if(pp->elements > 0)
+	{
+		if(pp->element[pp->elements - 1].flags & T3F_GUI_ELEMENT_COPY)
+		{
+			pp->element[pp->elements - 1].description = malloc(strlen(text) + 1);
+			strcpy(pp->element[pp->elements - 1].description, text);
+		}
+		else
+		{
+			pp->element[pp->elements - 1].description = text;
+		}
+		return 1;
+	}
+	return 0;
 }
 
 void t3f_center_gui(T3F_GUI * pp, float oy, float my)
@@ -387,7 +411,10 @@ void t3f_process_gui(T3F_GUI * pp)
 
 void t3f_render_gui_element(T3F_GUI * pp, int i, bool hover)
 {
-	t3f_gui_current_driver->render_element(pp, i, hover);
+	if(!(pp->element[i].flags & T3F_GUI_ELEMENT_AUTOHIDE) || t3f_gui_check_hover_y(pp, i))
+	{
+		t3f_gui_current_driver->render_element(pp, i, hover);
+	}
 }
 
 void t3f_render_gui(T3F_GUI * pp)

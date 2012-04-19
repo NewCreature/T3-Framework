@@ -33,8 +33,8 @@
 
 #define T3F_MAX_STACK     16
 
-#define T3F_ATLAS_TILES     0
-#define T3F_ATLAS_SPRITES   1
+#define T3F_ATLAS_TILE     0
+#define T3F_ATLAS_SPRITE   1
 
 /* structure holds information about a 3D viewport usually used to represent
    one player's screen, split screen games will have multiple viewports */
@@ -142,9 +142,9 @@ float t3f_project_x(float x, float z);
 float t3f_project_y(float y, float z);
 
 /* sprite atlas functions */
-T3F_ATLAS * t3f_create_atlas(int type, int w, int h);
+T3F_ATLAS * t3f_create_atlas(int w, int h);
 void t3f_destroy_atlas(T3F_ATLAS * ap);
-ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp);
+ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, int type);
 
 /* drawing functions */
 void t3f_draw_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float x, float y, float z, int flags);

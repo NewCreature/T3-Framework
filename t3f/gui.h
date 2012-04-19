@@ -33,6 +33,7 @@ typedef struct
 	ALLEGRO_COLOR color;
 	int flags;
 	int (*proc)(int, void *);
+	char * description;
 	
 	int ox, oy;
 	int d1, d2, d3;
@@ -67,6 +68,7 @@ void t3f_destroy_gui(T3F_GUI * pp);
 
 int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *), void * bp, int ox, int oy, int flags);
 int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(int, void *), char * text, void * fp, int ox, int oy, ALLEGRO_COLOR color, int flags);
+int t3f_describe_last_gui_element(T3F_GUI * pp, char * text);
 void t3f_center_gui(T3F_GUI * pp, float oy, float my);
 
 void t3f_select_previous_gui_element(T3F_GUI * pp);

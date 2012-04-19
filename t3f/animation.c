@@ -297,7 +297,7 @@ int t3f_animation_build_frame_list(T3F_ANIMATION * ap)
 	return 1;
 }
 
-bool t3f_add_animation_to_atlas(T3F_ATLAS * sap, T3F_ANIMATION * ap)
+bool t3f_add_animation_to_atlas(T3F_ATLAS * sap, T3F_ANIMATION * ap, int type)
 {
 	int i, failed = 0;
 	ALLEGRO_BITMAP * newbp[256] = {NULL};
@@ -305,7 +305,7 @@ bool t3f_add_animation_to_atlas(T3F_ATLAS * sap, T3F_ANIMATION * ap)
 	/* add bitmaps to sprite sheet */
 	for(i = 0; i < ap->bitmaps; i++)
 	{
-		newbp[i] = t3f_add_bitmap_to_atlas(sap, ap->bitmap[i]);
+		newbp[i] = t3f_add_bitmap_to_atlas(sap, ap->bitmap[i], type);
 		if(!newbp[i])
 		{
 			failed = 1;
