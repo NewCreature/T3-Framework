@@ -174,27 +174,23 @@ textures often can dramatically slow down your game. Use this in conjunction
 with Allegro's al_hold_bitmap_drawing() function and you can draw thousands of
 sprites without breaking a sweat. Here's a list of functions and what they do:
 
-T3F_ATLAS * t3f_create_atlas(int w, int h, int type)
+T3F_ATLAS * t3f_create_atlas(int w, int h)
 
-	Create an atlas of the specified width, height, and type. 'type' refers to
-	the kind of data this atlas will hold. 'T3F_ATLAS_TILES' sets up the atlas
-	as tiles for a tilemap. 'T3F_ATLAS_SPRITES' sets up the atlas as regular
-	sprites.
+	Create an atlas of the specified width, height, and type.
 	
 	Example usage:
 	
-		T3F_ATLAS * atlas = t3f_create_atlas(512, 512, T3F_ATLAS_SPRITES);
-		if(atlas)
-		{
-			/* code to add
-			t3f_start_sprite_sheet(sprite_sheet, T3F_SPRITE_SHEET_TYPE_SPRITES);
-		}
+		T3F_ATLAS * atlas = t3f_create_atlas(512, 512);
 
-ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp)
+ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, int type)
 
 	This function returns a pointer to an ALLEGRO_BITMAP that contains the
 	bitmap data from 'bp'. Returns NULL if there isn't room in the atlas to
-	store a copy of the passed ALLEGRO_BITMAP.
+	store a copy of the passed ALLEGRO_BITMAP.  'type' refers to how we want the
+	bitmap to be added to the atlas. Use 'T3F_ATLAS_TILE' if the bitmap is going
+	to be used as a tile for a tilemap. Tiles need to be added this way due to
+	the way linear filtering works. Use 'T3F_ATLAS_SPRITE' if the bitmap is just
+	a regular sprite.
 
 void t3f_destroy_atlas(T3F_ATLAS * ap)
 
