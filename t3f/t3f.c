@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "t3f.h"
+#include "memory.h"
 
 /* display data */
 int t3f_virtual_display_width = 0;
@@ -139,19 +140,19 @@ bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp)
 			if(tfp)
 			{
 				size = al_fsize(tfp);
-				al_fwrite32le(fp, 0);
+				al_fwrite32le(fp, size);
 				for(i = 0; i < size; i++)
 				{
 					al_fputc(fp, al_fgetc(tfp));
 				}
 				ret = true;
 			}
+			else
+			{
+				al_fwrite32le(fp, 0);
+			}
 		}
 		al_destroy_path(path);
-		if(ret != true)
-		{
-			al_fwrite32le(fp, 0); // size of 0 means image did not save
-		}
 	}
 	return ret;
 }
@@ -161,17 +162,21 @@ ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp)
 	ALLEGRO_BITMAP * bp = NULL;
 	ALLEGRO_FILE * tfp = NULL;
 	int size = al_fread32le(fp);
-	char * buffer = al_malloc(size);
-	if(buffer)
+	char * buffer = NULL;
+	if(size > 0)
 	{
-		al_fread(fp, buffer, size);
-		tfp = al_open_memfile(buffer, size, "rb");
-		if(tfp)
+		buffer = al_malloc(size);
+		if(buffer)
 		{
-			bp = al_load_bitmap_f(tfp, ".png");
-			al_fclose(tfp);
+			al_fread(fp, buffer, size);
+			tfp = al_open_memfile(buffer, size, "r");
+			if(tfp)
+			{
+				bp = al_load_bitmap_f(tfp, ".png");
+				al_fclose(tfp);
+			}
+			al_free(buffer);
 		}
-		free(buffer);
 	}
 	return bp;
 }
@@ -188,6 +193,12 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		printf("Allegro failed to initialize!\n");
 		return 0;
 	}
+	
+	/* setup memory debugger */
+	#ifdef T3F_DEBUG
+		t3f_setup_memory_interface();
+	#endif
+	
 	al_set_app_name(name);
 	#ifdef T3F_COMPANY
 		al_set_org_name(T3F_COMPANY);
@@ -807,65 +818,6 @@ int t3f_fwrite_float(ALLEGRO_FILE * fp, float f)
 	return 1;
 }
 
-static void t3f_convert_grey_to_alpha(ALLEGRO_BITMAP * bitmap)
-{
-	int x, y;
-	unsigned char ir, ig, ib, ia;
-	ALLEGRO_COLOR pixel;
-	ALLEGRO_STATE old_state;
-
-	if(!al_lock_bitmap(bitmap, al_get_bitmap_format(bitmap), 0))
-	{
-		return;
-	}
-
-	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP);
-	al_set_target_bitmap(bitmap);
-
-	for(y = 0; y < al_get_bitmap_height(bitmap); y++)
-	{
-		for(x = 0; x < al_get_bitmap_width(bitmap); x++)
-		{
-			pixel = al_get_pixel(bitmap, x, y);
-			al_unmap_rgba(pixel, &ir, &ig, &ib, &ia);
-			if(ir == 255 && ig == 0 && ib == 255)
-			{
-				pixel = al_map_rgba(0, 0, 0, 0);
-				al_put_pixel(x, y, pixel);
-			}
-			else if(ia > 0 && !(ir == 255 && ig == 255 && ib == 0))
-			{
-				pixel = al_map_rgba(ir, ir, ir, ir);
-				al_put_pixel(x, y, pixel);
-			}
-		}
-	}
-
-	al_restore_state(&old_state);
-	al_unlock_bitmap(bitmap);
-}
-
-ALLEGRO_FONT * t3f_load_font(const char * fn)
-{
-	ALLEGRO_BITMAP * fimage;
-	ALLEGRO_FONT * fp;
-	ALLEGRO_STATE old_state;
-	int ranges[] = {32, 126};
-	
-	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
-	fimage = al_load_bitmap(fn);
-	if(!fimage)
-	{
-		return NULL;
-	}
-	t3f_convert_grey_to_alpha(fimage);
-	al_restore_state(&old_state);
-	fp = al_grab_font_from_bitmap(fimage, 1, ranges);
-	al_destroy_bitmap(fimage);
-	return fp;
-}
-
 ALLEGRO_FILE * t3f_open_file(ALLEGRO_PATH * pp, const char * fn, const char * m)
 {
 	ALLEGRO_PATH * tpath = al_clone_path(pp);
@@ -1087,7 +1039,7 @@ const char * t3f_get_filename(ALLEGRO_PATH * path, const char * fn)
 
 T3F_VIEW * t3f_create_view(float ox, float oy, float w, float h, float vpx, float vpy)
 {
-	T3F_VIEW * vp = malloc(sizeof(T3F_VIEW));
+	T3F_VIEW * vp = al_malloc(sizeof(T3F_VIEW));
 	if(!vp)
 	{
 		return NULL;
@@ -1103,7 +1055,7 @@ T3F_VIEW * t3f_create_view(float ox, float oy, float w, float h, float vpx, floa
 
 void t3f_destroy_view(T3F_VIEW * vp)
 {
-	free(vp);
+	al_free(vp);
 }
 
 void t3f_store_state(T3F_VIEW * sp)
@@ -1184,7 +1136,7 @@ T3F_ATLAS * t3f_create_atlas(int w, int h)
 	T3F_ATLAS * ap;
 	ALLEGRO_STATE old_state;
 	
-	ap = malloc(sizeof(T3F_ATLAS));
+	ap = al_malloc(sizeof(T3F_ATLAS));
 	if(!ap)
 	{
 		return NULL;
@@ -1192,7 +1144,7 @@ T3F_ATLAS * t3f_create_atlas(int w, int h)
 	ap->bitmap = al_create_bitmap(w, h);
 	if(!ap->bitmap)
 	{
-		free(ap);
+		al_free(ap);
 		return NULL;
 	}
 	ap->x = 1; // start at 1 so we get consistency with filtered bitmaps
@@ -1212,7 +1164,7 @@ T3F_ATLAS * t3f_create_atlas(int w, int h)
 void t3f_destroy_atlas(T3F_ATLAS * ap)
 {
 	al_destroy_bitmap(ap->bitmap);
-	free(ap);
+	al_free(ap);
 }
 
 /* fix for when you have exceeded the size of the sprite sheet */

@@ -123,7 +123,6 @@ int t3f_get_joystick_number(ALLEGRO_JOYSTICK * jp);
 float t3f_fread_float(ALLEGRO_FILE * fp);
 int t3f_fwrite_float(ALLEGRO_FILE * fp, float f);
 
-ALLEGRO_FONT * t3f_load_font(const char * fn);
 ALLEGRO_FILE * t3f_open_file(ALLEGRO_PATH * pp, const char * fn, const char * m);
 unsigned long t3f_checksum_file(const char * fn);
 bool t3f_copy_file(const char * src, const char * dest);
