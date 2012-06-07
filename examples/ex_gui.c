@@ -61,7 +61,7 @@ int main(int argc, char * argv[])
 	{
 		return 1;
 	}
-	font = t3f_load_font("data/font.png");
+	font = al_load_bitmap_font("data/font.png");
 	if(!font)
 	{
 		return 1;

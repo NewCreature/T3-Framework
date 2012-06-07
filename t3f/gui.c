@@ -157,7 +157,7 @@ void t3f_set_gui_driver(T3F_GUI_DRIVER * dp)
 T3F_GUI * t3f_create_gui(int ox, int oy)
 {
 	T3F_GUI * lp;
-	lp = malloc(sizeof(T3F_GUI));
+	lp = al_malloc(sizeof(T3F_GUI));
 	if(!lp)
 	{
 		return NULL;
@@ -181,7 +181,7 @@ void t3f_destroy_gui(T3F_GUI * pp)
 			{
 				case T3F_GUI_ELEMENT_TEXT:
 				{
-					free(pp->element[i].data);
+					al_free(pp->element[i].data);
 					break;
 				}
 				case T3F_GUI_ELEMENT_IMAGE:
@@ -192,11 +192,11 @@ void t3f_destroy_gui(T3F_GUI * pp)
 			}
 			if(pp->element[i].description)
 			{
-				free(pp->element[i].description);
+				al_free(pp->element[i].description);
 			}
 		}
 	}
-	free(pp);
+	al_free(pp);
 }
 
 int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *), void * bp, int ox, int oy, int flags)
@@ -218,7 +218,7 @@ int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(int, void *), char * text
 	pp->element[pp->elements].proc = proc;
 	if(flags & T3F_GUI_ELEMENT_COPY)
 	{
-		pp->element[pp->elements].data = malloc(strlen(text) + 1);
+		pp->element[pp->elements].data = al_malloc(strlen(text) + 1);
 		memcpy(pp->element[pp->elements].data, text, strlen(text) + 1);
 	}
 	else
@@ -241,7 +241,7 @@ int t3f_describe_last_gui_element(T3F_GUI * pp, char * text)
 	{
 		if(pp->element[pp->elements - 1].flags & T3F_GUI_ELEMENT_COPY)
 		{
-			pp->element[pp->elements - 1].description = malloc(strlen(text) + 1);
+			pp->element[pp->elements - 1].description = al_malloc(strlen(text) + 1);
 			strcpy(pp->element[pp->elements - 1].description, text);
 		}
 		else
