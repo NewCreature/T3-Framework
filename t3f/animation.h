@@ -10,7 +10,7 @@
 
 #define T3F_ANIMATION_MAX_BITMAPS  256
 #define T3F_ANIMATION_MAX_FRAMES  1024
-#define T3F_ANIMATION_REVISION       0 // change to 1 after we fix image loading to use memfiles
+#define T3F_ANIMATION_REVISION       1 // change to 1 after we fix image loading to use memfiles
 
 #define T3F_ANIMATION_FLAG_ONCE      1
 
@@ -70,6 +70,7 @@ void t3f_draw_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tick, float
 void t3f_draw_scaled_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tick, float x, float y, float z, float scale, int flags);
 void t3f_draw_rotated_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tick, float cx, float cy, float x, float y, float z, float angle, int flags);
 void t3f_draw_rotated_scaled_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tick, float cx, float cy, float x, float y, float z, float angle, float scale, int flags);
+void t3f_draw_scaled_rotated_animation_region(T3F_ANIMATION * ap, float sx, float sy, float sw, float sh, ALLEGRO_COLOR color, int tick, float cx, float cy, float x, float y, float z, float scale, float angle, int flags);
 
 #ifdef __cplusplus
    }

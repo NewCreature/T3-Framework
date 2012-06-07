@@ -11,7 +11,7 @@ T3F_ANIMATION * t3f_create_animation(void)
 {
 	T3F_ANIMATION * ap;
 	
-	ap = malloc(sizeof(T3F_ANIMATION));
+	ap = al_malloc(sizeof(T3F_ANIMATION));
 	if(ap)
 	{
 		ap->bitmaps = 0;
@@ -57,13 +57,13 @@ void t3f_destroy_animation(T3F_ANIMATION * ap)
 	
 	for(i = 0; i < ap->frames; i++)
 	{
-		free(ap->frame[i]);
+		al_free(ap->frame[i]);
 	}
 	for(i = 0; i < ap->bitmaps; i++)
 	{
 		al_destroy_bitmap(ap->bitmap[i]);
 	}
-	free(ap);
+	al_free(ap);
 }
 
 /* see if header matches and return the version number, -1 is no match */
@@ -110,7 +110,35 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp)
 				ap->frames = al_fread16le(fp);
 				for(i = 0; i < ap->frames; i++)
 				{
-					ap->frame[i] = malloc(sizeof(T3F_ANIMATION_FRAME));
+					ap->frame[i] = al_malloc(sizeof(T3F_ANIMATION_FRAME));
+					if(!ap->frame[i])
+					{
+						return NULL;
+					}
+					ap->frame[i]->bitmap = al_fread16le(fp);
+					ap->frame[i]->x = t3f_fread_float(fp);
+					ap->frame[i]->y = t3f_fread_float(fp);
+					ap->frame[i]->z = t3f_fread_float(fp);
+					ap->frame[i]->width = t3f_fread_float(fp);
+					ap->frame[i]->height = t3f_fread_float(fp);
+					ap->frame[i]->angle = t3f_fread_float(fp);
+					ap->frame[i]->ticks = al_fread32le(fp);
+					ap->frame[i]->flags = al_fread32le(fp);
+				}
+				ap->flags = al_fread32le(fp);
+				break;
+			}
+			case 1:
+			{
+				ap->bitmaps = al_fread16le(fp);
+				for(i = 0; i < ap->bitmaps; i++)
+				{
+					ap->bitmap[i] = t3f_load_bitmap_f(fp);
+				}
+				ap->frames = al_fread16le(fp);
+				for(i = 0; i < ap->frames; i++)
+				{
+					ap->frame[i] = al_malloc(sizeof(T3F_ANIMATION_FRAME));
 					if(!ap->frame[i])
 					{
 						return NULL;
@@ -179,7 +207,7 @@ int t3f_save_animation_f(T3F_ANIMATION * ap, ALLEGRO_FILE * fp)
 	al_fwrite16le(fp, ap->bitmaps);
 	for(i = 0; i < ap->bitmaps; i++)
 	{
-		al_save_bitmap_f(fp, ".png", ap->bitmap[i]);
+		t3f_save_bitmap_f(fp, ap->bitmap[i]);
 	}
 	al_fwrite16le(fp, ap->frames);
 	for(i = 0; i < ap->frames; i++)
@@ -242,7 +270,7 @@ int t3f_animation_delete_bitmap(T3F_ANIMATION * ap, int bitmap)
 
 int t3f_animation_add_frame(T3F_ANIMATION * ap, int bitmap, float x, float y, float z, float w, float h, float angle, int ticks)
 {
-	ap->frame[ap->frames] = malloc(sizeof(T3F_ANIMATION_FRAME));
+	ap->frame[ap->frames] = al_malloc(sizeof(T3F_ANIMATION_FRAME));
 	if(ap->frame[ap->frames])
 	{
 		ap->frame[ap->frames]->bitmap = bitmap;
@@ -266,7 +294,7 @@ int t3f_animation_delete_frame(T3F_ANIMATION * ap, int frame)
 	
 	if(frame < ap->frames)
 	{
-		free(ap->frame[frame]);
+		al_free(ap->frame[frame]);
 	}
 	else
 	{
@@ -435,5 +463,24 @@ void t3f_draw_rotated_scaled_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, 
 		scale_x = fp->width / al_get_bitmap_width(ap->bitmap[fp->bitmap]);
 		scale_y = fp->height / al_get_bitmap_height(ap->bitmap[fp->bitmap]);
 		t3f_draw_scaled_rotated_bitmap(ap->bitmap[fp->bitmap], color, cx / scale_x - fp->x, cy / scale_y - fp->y, x + fox, y + foy, z + fp->z, angle, scale, scale, flags);
+	}
+}
+
+void t3f_draw_scaled_rotated_animation_region(T3F_ANIMATION * ap, float sx, float sy, float sw, float sh, ALLEGRO_COLOR color, int tick, float cx, float cy, float x, float y, float z, float scale, float angle, int flags)
+{
+	float sscale_x, sscale_y;
+	T3F_ANIMATION_FRAME * fp = t3f_animation_get_frame(ap, tick);
+	float fox = 0.0;
+	float foy = 0.0;
+	float fsx, fsy, fsw, fsh;
+	if(fp)
+	{
+		sscale_x = fp->width / (float)al_get_bitmap_width(ap->bitmap[fp->bitmap]);
+		sscale_y = fp->height / (float)al_get_bitmap_height(ap->bitmap[fp->bitmap]);
+		fsx = sx / sscale_x;
+		fsy = sy / sscale_y;
+		fsw = sw / sscale_x;
+		fsh = sh / sscale_y;
+		al_draw_tinted_scaled_rotated_bitmap_region(ap->bitmap[fp->bitmap], fsx, fsy, fsw, fsh, color, cx / sscale_x - fp->x, cy / sscale_y - fp->y, x + fox, y + foy, scale * sscale_x, scale * sscale_y, angle, flags);
 	}
 }
