@@ -223,14 +223,14 @@ bool t3f_atlas_tileset(T3F_TILESET * tsp)
 	int i;
 	bool fail = false;
 	
-	tsp->atlas = t3f_create_atlas(tile_sheet_size, tile_sheet_size);
+	tsp->atlas = t3f_create_atlas(T3F_ATLAS_TILES, tile_sheet_size, tile_sheet_size);
 	if(!tsp->atlas)
 	{
 		return false;
 	}
 	for(i = 0; i < tsp->tiles; i++)
 	{
-		if(!t3f_add_animation_to_atlas(tsp->atlas, tsp->tile[i]->ap, T3F_ATLAS_TILE))
+		if(!t3f_add_animation_to_atlas(tsp->atlas, tsp->tile[i]->ap))
 		{
 			printf("sprite sheet failed\n");
 			fail = true;
