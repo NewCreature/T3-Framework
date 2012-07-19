@@ -3,6 +3,7 @@
 #include <math.h>
 #include "t3f.h"
 #include "animation.h"
+#include "bitmap.h"
 
 static char ani_header[12] = {'O', 'C', 'D', 'A', 'S', 0};
 
@@ -87,6 +88,9 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp)
 	int i;
 	char header[12]	= {0};
 	int ver;
+	int fpos = 0;
+	ALLEGRO_STATE old_state;
+	ALLEGRO_BITMAP * bp;
 	
 	al_fread(fp, header, 12);
 	ver = check_header(header);
@@ -133,7 +137,25 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp)
 				ap->bitmaps = al_fread16le(fp);
 				for(i = 0; i < ap->bitmaps; i++)
 				{
+					fpos = al_ftell(fp);
 					ap->bitmap[i] = t3f_load_bitmap_f(fp);
+					if(!ap->bitmap[i])
+					{
+						al_fseek(fp, fpos, ALLEGRO_SEEK_SET);
+						al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+						al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
+						bp = t3f_load_bitmap_f(fp);
+						al_restore_state(&old_state);
+						if(bp)
+						{
+							ap->bitmap[i] = t3f_squeeze_bitmap(bp, NULL, NULL);
+							al_destroy_bitmap(bp);
+						}
+					}
+					if(!ap->bitmap[i])
+					{
+						return NULL;
+					}
 				}
 				ap->frames = al_fread16le(fp);
 				for(i = 0; i < ap->frames; i++)
