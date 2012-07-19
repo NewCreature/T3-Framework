@@ -2,6 +2,7 @@
 #include <allegro5/allegro_audio.h>
 #include <math.h>
 #include <stdio.h>
+#include "t3f.h"
 #include "sound.h"
 
 static float t3f_sound_volume = 1.0;
@@ -22,12 +23,16 @@ float t3f_get_sound_volume(void)
 
 bool t3f_play_sample(ALLEGRO_SAMPLE * sp, float vol, float pan, float speed)
 {
-	return al_play_sample(sp, t3f_sound_volume * vol, pan, speed, ALLEGRO_PLAYMODE_ONCE, &t3f_sample_id);
+	if(t3f_flags & T3F_USE_SOUND)
+	{
+		return al_play_sample(sp, t3f_sound_volume * vol, pan, speed, ALLEGRO_PLAYMODE_ONCE, &t3f_sample_id);
+	}
+	return false;
 }
 
 bool t3f_queue_sample(ALLEGRO_SAMPLE * sp)
 {
-	if(t3f_queued_samples < T3F_MAX_QUEUED_SAMPLES && sp)
+	if((t3f_flags & T3F_USE_SOUND) && t3f_queued_samples < T3F_MAX_QUEUED_SAMPLES && sp)
 	{
 		t3f_sample_queue[t3f_queued_samples] = sp;
 		t3f_queued_samples++;
@@ -40,16 +45,19 @@ void t3f_clear_sample_queue(void)
 {
 	int i;
 	
-	for(i = 0; i < T3F_MAX_QUEUED_SAMPLES; i++)
+	if(t3f_flags & T3F_USE_SOUND)
 	{
-		t3f_sample_queue[i] = NULL;
-	}
-	t3f_queued_samples = 0;
-	if(al_get_sample_instance_playing(t3f_queue_sample_instance))
-	{
-		al_stop_sample_instance(t3f_queue_sample_instance);
-		al_destroy_sample_instance(t3f_queue_sample_instance);
-		t3f_queue_sample_instance = NULL;
+		for(i = 0; i < T3F_MAX_QUEUED_SAMPLES; i++)
+		{
+			t3f_sample_queue[i] = NULL;
+		}
+		t3f_queued_samples = 0;
+		if(al_get_sample_instance_playing(t3f_queue_sample_instance))
+		{
+			al_stop_sample_instance(t3f_queue_sample_instance);
+			al_destroy_sample_instance(t3f_queue_sample_instance);
+			t3f_queue_sample_instance = NULL;
+		}
 	}
 }
 
@@ -82,18 +90,21 @@ static void t3f_play_queued_sample(void)
 
 void t3f_poll_sound_queue(void)
 {
-	/* a queued sample is playing */
-	if(t3f_queue_sample_instance)
+	if(t3f_flags & T3F_USE_SOUND)
 	{
-		if(!al_get_sample_instance_playing(t3f_queue_sample_instance))
+		/* a queued sample is playing */
+		if(t3f_queue_sample_instance)
 		{
-			al_destroy_sample_instance(t3f_queue_sample_instance);
-			t3f_queue_sample_instance = NULL;
+			if(!al_get_sample_instance_playing(t3f_queue_sample_instance))
+			{
+				al_destroy_sample_instance(t3f_queue_sample_instance);
+				t3f_queue_sample_instance = NULL;
+			}
 		}
-	}
-	if(!t3f_queue_sample_instance)
-	{
-		t3f_play_queued_sample();
+		if(!t3f_queue_sample_instance)
+		{
+			t3f_play_queued_sample();
+		}
 	}
 }
 
