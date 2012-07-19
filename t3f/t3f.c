@@ -64,6 +64,7 @@ char t3f_window_title[1024] = {0};
 ALLEGRO_CONFIG * t3f_config = NULL;
 ALLEGRO_PATH * t3f_data_path = NULL;
 ALLEGRO_PATH * t3f_config_path = NULL;
+ALLEGRO_PATH * t3f_temp_path = NULL;
 static char t3f_config_filename[1024] = {0};
 static char t3f_return_filename[1024] = {0};
 
@@ -207,6 +208,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	/* set up application path */
 	t3f_config_path = al_get_standard_path(ALLEGRO_USER_SETTINGS_PATH);
 	t3f_data_path = al_get_standard_path(ALLEGRO_USER_DATA_PATH);
+	t3f_temp_path = al_get_standard_path(ALLEGRO_TEMP_PATH);
 	t3f_setup_directories(t3f_config_path);
 	t3f_setup_directories(t3f_data_path);
 	
@@ -532,6 +534,10 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				{
 					ret = 2;
 				}
+				else
+				{
+					t3f_flags |= T3F_USE_FULLSCREEN;
+				}
 			}
 		}
 		else
@@ -542,6 +548,10 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false))
 				{
 					ret = 2;
+				}
+				else
+				{
+					t3f_flags &= ~T3F_USE_FULLSCREEN;
 				}
 			}
 			else
@@ -554,6 +564,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		sprintf(val, "%d", h);
 		al_set_config_value(t3f_config, "T3F", "display_height", val);
 		t3f_get_base_transform();
+		t3f_select_view(t3f_current_view);
 		al_set_window_title(t3f_display, t3f_window_title);
 	}
 	
