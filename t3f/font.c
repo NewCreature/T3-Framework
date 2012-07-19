@@ -97,7 +97,7 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 	
 	if(flags & T3F_FONT_OUTLINE)
 	{
-		space = 3;
+		space = 4;
 	}
 	else
 	{
@@ -109,7 +109,7 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 	{
 		if(t3f_font_file_is_true_type(fn))
 		{
-			al_load_ttf_font(fn, size, 0);
+			font = al_load_ttf_font(fn, size, 0);
 		}
 		else
 		{
@@ -143,9 +143,10 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 						al_draw_text(font, al_map_rgba_f(0.0, 0.0, 0.0, 1.0), ox + 2, oy + 1, 0, buf);
 					}
 					al_draw_text(font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), ox + 1, oy + 1, 0, buf);
-					fp->character[i] = al_create_sub_bitmap(fp->character_sheet, ox, oy, w - 1, h - 1);
+					fp->character[i] = al_create_sub_bitmap(fp->character_sheet, ox, oy, w - 2, h - 2);
 					if(!fp->character[i])
 					{
+						printf("could not create sub-bitmap\n");
 						return NULL;
 					}
 					ox += w;
@@ -160,16 +161,18 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 		}
 		else
 		{
+			printf("font did not load\n");
 			return NULL;
 		}
 		if(flags & T3F_FONT_OUTLINE)
 		{
-			fp->adjust = 2.0;
+			fp->adjust = 1.0;
 		}
 		else
 		{
 			fp->adjust = 0.0;
 		}
+		fp->scale = 1.0;
 	}
 	return fp;
 }
@@ -193,7 +196,7 @@ float t3f_get_text_width(T3F_FONT * fp, char * text)
 	
 	for(i = 0; i < strlen(text); i++)
 	{
-		w += (float)al_get_bitmap_width(fp->character[(int)text[i]]) - 2.0;
+		w += ((float)al_get_bitmap_width(fp->character[(int)text[i]]) - fp->adjust * 2.0) * fp->scale;
 	}
 	return w;
 }
@@ -202,7 +205,7 @@ float t3f_get_font_line_height(T3F_FONT * fp)
 {
 	float h = 0.0;
 	
-	h = (float)al_get_bitmap_height(fp->character[' ']) - 2.0;
+	h = ((float)al_get_bitmap_height(fp->character[' ']) - fp->adjust * 2.0) * fp->scale;
 	return h;
 }
 
@@ -288,6 +291,7 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 	T3F_TEXT_LINE_DATA line_data;
 	int i, j;
 	float pos = x - fp->adjust / 2.0;
+	float fw, fh;
 	bool held;
 
 	if(strlen(text) < 1)
@@ -306,18 +310,22 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 		{
 			for(i = 0; i < strlen(line_data.line[j].text); i++)
 			{
-				t3f_draw_bitmap(fp->character[(int)line_data.line[j].text[i]], color, pos, y, z, 0);
-				pos += (float)al_get_bitmap_width(fp->character[(int)line_data.line[j].text[i]]) - fp->adjust;
+				fw = (float)al_get_bitmap_width(fp->character[(int)line_data.line[j].text[i]]) * fp->scale;
+				fh = (float)al_get_bitmap_height(fp->character[(int)line_data.line[j].text[i]]) * fp->scale;
+				t3f_draw_scaled_bitmap(fp->character[(int)line_data.line[j].text[i]], color, pos, y, z, fw, fh, 0);
+				pos += fw - fp->adjust * fp->scale;
 			}
-			pos = x - fp->adjust / 2.0 + tab;
+			pos = x - fp->adjust + tab;
 		}
 	}
 	else
 	{
 		for(i = 0; i < strlen(text); i++)
 		{
-			t3f_draw_bitmap(fp->character[(int)text[i]], color, pos, y, z, 0);
-			pos += (float)al_get_bitmap_width(fp->character[(int)text[i]]) - fp->adjust;
+			fw = (float)al_get_bitmap_width(fp->character[(int)text[i]]) * fp->scale;
+			fh = (float)al_get_bitmap_height(fp->character[(int)text[i]]) * fp->scale;
+			t3f_draw_scaled_bitmap(fp->character[(int)text[i]], color, pos, y, z, fw, fh, 0);
+			pos += ((float)al_get_bitmap_width(fp->character[(int)text[i]]) - fp->adjust * 2.0) * fp->scale;
 		}
 	}
 	if(!held)

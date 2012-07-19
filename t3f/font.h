@@ -12,6 +12,7 @@ typedef struct
 	ALLEGRO_BITMAP * character_sheet;
 	ALLEGRO_BITMAP * character[T3F_FONT_MAX_CHARACTERS];
 	float adjust;
+	float scale;
 	
 } T3F_FONT;
 
