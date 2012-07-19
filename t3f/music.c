@@ -162,6 +162,10 @@ static void * t3f_fade_music_thread(void * arg)
  * see if there is a corresponding INI file and read loop data from that */
 bool t3f_play_music(const char * fn)
 {
+	if(!(t3f_flags & T3F_USE_SOUND))
+	{
+		return false;
+	}
 	if(!t3f_music_mutex)
 	{
 		t3f_music_mutex = al_create_mutex();
