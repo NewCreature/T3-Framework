@@ -7,7 +7,9 @@ else
 	mkdir $(DIR)/bin/data
 	mkdir $(DIR)/src
 	mkdir $(DIR)/src/t3f
+	mkdir $(DIR)/docs
 	cp include/t3f/*.h $(DIR)/src/t3f
 	cp src/*.c $(DIR)/src/t3f
-	cp template/* $(DIR)/src
+	cp template/src/* $(DIR)/src
+	cp template/docs/* $(DIR)/docs
 endif
