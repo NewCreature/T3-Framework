@@ -37,7 +37,7 @@ ALLEGRO_FONT * t3f_load_bitmap_font(const char * fn);
 
 T3F_FONT * t3f_load_font(const char * fn, int size, int flags);
 void t3f_destroy_font(T3F_FONT * fp);
-float t3f_get_text_width(T3F_FONT * fp, char * text);
+float t3f_get_text_width(T3F_FONT * fp, const char * text);
 float t3f_get_font_line_height(T3F_FONT * fp);
 void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * text);
 void t3f_draw_textf(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * format, ...);

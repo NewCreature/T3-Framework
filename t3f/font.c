@@ -189,15 +189,16 @@ void t3f_destroy_font(T3F_FONT * fp)
 	al_free(fp);
 }
 
-float t3f_get_text_width(T3F_FONT * fp, char * text)
+float t3f_get_text_width(T3F_FONT * fp, const char * text)
 {
 	float w = 0.0;
 	int i;
 	
 	for(i = 0; i < strlen(text); i++)
 	{
-		w += ((float)al_get_bitmap_width(fp->character[(int)text[i]]) - fp->adjust * 2.0) * fp->scale;
+		w += ((float)al_get_bitmap_width(fp->character[(int)text[i]]) - fp->adjust) * fp->scale;
 	}
+	w += 2.0; // include outline pixels
 	return w;
 }
 
@@ -209,6 +210,7 @@ float t3f_get_font_line_height(T3F_FONT * fp)
 	return h;
 }
 
+/* need to make this not rely on spaces, sometimes there might be long stretches with no space which need to be broken up 'mid-word' */
 void t3f_create_text_line_data(T3F_TEXT_LINE_DATA * lp, T3F_FONT * fp, float w, float tab, const char * text)
 {
 	char current_line[256];
@@ -290,7 +292,8 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 {
 	T3F_TEXT_LINE_DATA line_data;
 	int i, j;
-	float pos = x - fp->adjust / 2.0;
+	float pos = x - fp->adjust * fp->scale;
+	float posy = y - fp->adjust * fp->scale;
 	float fw, fh;
 	bool held;
 
@@ -312,7 +315,8 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 			{
 				fw = (float)al_get_bitmap_width(fp->character[(int)line_data.line[j].text[i]]) * fp->scale;
 				fh = (float)al_get_bitmap_height(fp->character[(int)line_data.line[j].text[i]]) * fp->scale;
-				t3f_draw_scaled_bitmap(fp->character[(int)line_data.line[j].text[i]], color, pos, y, z, fw, fh, 0);
+				t3f_draw_scaled_bitmap(fp->character[(int)line_data.line[j].text[i]], color, pos, posy, z, fw, fh, 0);
+//				pos += fw - ((fp->adjust * 2.0) * fp->scale);
 				pos += fw - fp->adjust * fp->scale;
 			}
 			pos = x - fp->adjust + tab;
@@ -324,8 +328,10 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 		{
 			fw = (float)al_get_bitmap_width(fp->character[(int)text[i]]) * fp->scale;
 			fh = (float)al_get_bitmap_height(fp->character[(int)text[i]]) * fp->scale;
-			t3f_draw_scaled_bitmap(fp->character[(int)text[i]], color, pos, y, z, fw, fh, 0);
-			pos += ((float)al_get_bitmap_width(fp->character[(int)text[i]]) - fp->adjust * 2.0) * fp->scale;
+			t3f_draw_scaled_bitmap(fp->character[(int)text[i]], color, pos, posy, z, fw, fh, 0);
+//			pos += fw - ((fp->adjust * 2.0) * fp->scale);
+			pos += fw - fp->adjust * fp->scale;
+//			pos += ((float)al_get_bitmap_width(fp->character[(int)text[i]]) - fp->adjust * 2.0) * fp->scale;
 		}
 	}
 	if(!held)
