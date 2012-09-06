@@ -1,5 +1,5 @@
-#include "t3f.h"
-#include "animation.h"
+#include "t3f/t3f.h"
+#include "t3f/animation.h"
 
 typedef struct
 {

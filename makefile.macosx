@@ -1,6 +1,7 @@
 CC = gcc
-CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -arch i386 -arch ppc -mmacosx-version-min=10.5 -Wall -I./t3f -I./ -DT3F_COMPANY="\"t3-i\""
+CFLAGS = -O2 -fomit-frame-pointer -funroll-loops $(CARCH) -mmacosx-version-min=10.5 -Wall -I./include -DT3F_COMPANY="\"t3-i\""
 LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_main-static -lallegro_image-static -lallegro_font-static -lallegro_ttf-static -lallegro_primitives-static -lallegro_audio-static -lallegro_acodec-static -lz -lpng -lvorbis -logg -lvorbisfile -ldumb -lallegro_dialog-static -lallegro_memfile-static -lallegro-static -lcurl-static -lldap -lgssapi_krb5 -lmxml -lfreetype
+CARCH = -arch i386 -arch ppc
 
 include makefile.common
 
@@ -30,6 +31,26 @@ LOOP_EDITOR_EXENAME = tools/loop_editor
 GAIN_EDITOR_EXENAME = tools/gain_editor
 
 all : $(TEMPLATE_EXENAME) $(EX_BASIC_EXENAME) $(EX_MUSIC_EXENAME) $(EX_SOUND_EXENAME) $(EX_3D_EXENAME) $(EX_ATLAS_EXENAME) $(EX_CONTROLLER_EXENAME) $(EX_ANIMATION_EXENAME) $(EX_GUI_EXENAME) $(EX_TILEMAP_EXENAME) $(EX_COLLISION_EXENAME) $(PADDLE_EXENAME) $(DOT2DOT_EXENAME) $(AV_EXENAME) $(ANIMATOR_EXENAME) $(MAPPER_EXENAME) $(VECTOR_EDITOR_EXENAME) $(FONT_EDITOR_EXENAME) $(LOOP_EDITOR_EXENAME) $(GAIN_EDITOR_EXENAME)
+
+library : $(T3F_LIBRARY)
+
+$(T3F_LIBRARY) : .ppc .i386
+	lipo $(T3F_LIBRARY_PPC) $(T3F_LIBRARY_I386) -create -output $(T3F_LIBRARY)
+	make -f makefile.macosx clean
+
+.ppc :
+	make -f makefile.macosx clean
+	make -f makefile.macosx $(T3F_LIBRARY_PPC) "CARCH=-arch ppc"
+
+.i386 :
+	make -f makefile.macosx clean
+	make -f makefile.macosx $(T3F_LIBRARY_I386) "CARCH=-arch i386"
+
+$(T3F_LIBRARY_PPC) : $(T3F_OBJECTS)
+	ar rs $(T3F_LIBRARY_PPC) $(T3F_OBJECTS)
+
+$(T3F_LIBRARY_I386) : $(T3F_OBJECTS)
+	ar rs $(T3F_LIBRARY_I386) $(T3F_OBJECTS)
 
 $(TEMPLATE_EXENAME) : $(TEMPLATE_OFILES)
 	gcc $(TEMPLATE_OFILES) $(CFLAGS) $(LIBS) -o $(TEMPLATE_EXENAME)
@@ -95,7 +116,7 @@ $(AV_EXENAME) : $(AV_OFILES)
 	gcc $(AV_OFILES) $(CFLAGS) $(LIBS) -o $(AV_EXENAME)
 
 clean:
-	@rm -f t3f/*.o
+	@rm -f $(T3F_OBJECTS)
 	@rm -f examples/*.o
 	@rm -f tools/*.o
 	@rm -f games/paddle/*.o

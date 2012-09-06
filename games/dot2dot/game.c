@@ -1,6 +1,6 @@
 #include <math.h>
-#include "t3f.h"
-#include "sound.h"
+#include "t3f/t3f.h"
+#include "t3f/sound.h"
 #include "main.h"
 #include "game.h"
 

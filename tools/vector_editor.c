@@ -1,6 +1,6 @@
 #include <allegro5/allegro_native_dialog.h>
-#include "../t3f/t3f.h"
-#include "../t3f/vector.h"
+#include "t3f/t3f.h"
+#include "t3f/vector.h"
 
 ALLEGRO_FONT * font = NULL;
 T3F_VECTOR_OBJECT * object = NULL;

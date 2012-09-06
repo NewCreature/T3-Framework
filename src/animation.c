@@ -1,9 +1,9 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
 #include <math.h>
-#include "t3f.h"
-#include "animation.h"
-#include "bitmap.h"
+#include "t3f/t3f.h"
+#include "t3f/animation.h"
+#include "t3f/bitmap.h"
 
 static char ani_header[12] = {'O', 'C', 'D', 'A', 'S', 0};
 

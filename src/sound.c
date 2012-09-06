@@ -2,8 +2,8 @@
 #include <allegro5/allegro_audio.h>
 #include <math.h>
 #include <stdio.h>
-#include "t3f.h"
-#include "sound.h"
+#include "t3f/t3f.h"
+#include "t3f/sound.h"
 
 static float t3f_sound_volume = 1.0;
 static ALLEGRO_SAMPLE * t3f_sample_queue[T3F_MAX_QUEUED_SAMPLES] = {NULL};

@@ -1,4 +1,4 @@
-#include "t3f.h"
+#include "t3f/t3f.h"
 
 ALLEGRO_BITMAP * bitmap = NULL;
 ALLEGRO_FONT * font = NULL;

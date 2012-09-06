@@ -1,6 +1,6 @@
-#include "t3f.h"
-#include "tilemap.h"
-#include "collision.h"
+#include "t3f/t3f.h"
+#include "t3f/tilemap.h"
+#include "t3f/collision.h"
 
 ALLEGRO_BITMAP * bitmap = NULL;
 ALLEGRO_FONT * font = NULL;

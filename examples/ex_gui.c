@@ -1,5 +1,5 @@
-#include "t3f.h"
-#include "gui.h"
+#include "t3f/t3f.h"
+#include "t3f/gui.h"
 
 ALLEGRO_BITMAP * bitmap = NULL;
 ALLEGRO_FONT * font = NULL;

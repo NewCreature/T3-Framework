@@ -1,5 +1,5 @@
-#include "t3f.h"
-#include "music.h"
+#include "t3f/t3f.h"
+#include "t3f/music.h"
 
 ALLEGRO_FONT * font = NULL;
 bool playing = false;

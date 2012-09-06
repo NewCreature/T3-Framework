@@ -1,5 +1,5 @@
-#include "t3f.h"
-#include "collision.h"
+#include "t3f/t3f.h"
+#include "t3f/collision.h"
 
 #define MAX_SPRITES 32
 

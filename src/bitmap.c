@@ -2,7 +2,7 @@
 #include <allegro5/allegro_image.h>
 #include <math.h>
 #include <stdio.h>
-#include "t3f.h"
+#include "t3f/t3f.h"
 
 ALLEGRO_COLOR interpolate(ALLEGRO_COLOR c1, ALLEGRO_COLOR c2, float frac)
 {

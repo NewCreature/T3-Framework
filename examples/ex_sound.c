@@ -1,5 +1,5 @@
-#include "t3f.h"
-#include "sound.h"
+#include "t3f/t3f.h"
+#include "t3f/sound.h"
 
 ALLEGRO_BITMAP * bitmap = NULL;
 ALLEGRO_SAMPLE * sample = NULL;

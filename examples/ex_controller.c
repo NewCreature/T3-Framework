@@ -1,5 +1,5 @@
-#include "t3f.h"
-#include "controller.h"
+#include "t3f/t3f.h"
+#include "t3f/controller.h"
 
 #define CONTROL_UP    0
 #define CONTROL_DOWN  1

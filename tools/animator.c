@@ -1,6 +1,6 @@
 #include <allegro5/allegro_native_dialog.h>
-#include "../t3f/t3f.h"
-#include "../t3f/animation.h"
+#include "t3f/t3f.h"
+#include "t3f/animation.h"
 
 #define ANIMATOR_VIEW_BITMAPS 0
 #define ANIMATOR_VIEW_FRAMES  1

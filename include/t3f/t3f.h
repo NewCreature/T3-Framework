@@ -86,7 +86,6 @@ extern ALLEGRO_TIMER * t3f_timer;
 extern ALLEGRO_CONFIG * t3f_config;
 extern ALLEGRO_PATH * t3f_data_path;
 extern ALLEGRO_PATH * t3f_config_path;
-extern ALLEGRO_PATH * t3f_temp_path;
 
 extern ALLEGRO_TRANSFORM t3f_base_transform;
 extern ALLEGRO_TRANSFORM t3f_current_transform;

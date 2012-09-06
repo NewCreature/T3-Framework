@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "t3f.h"
-#include "memory.h"
+#include "t3f/t3f.h"
+#include "t3f/memory.h"
 
 /* display data */
 int t3f_virtual_display_width = 0;

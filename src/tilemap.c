@@ -1,9 +1,9 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <math.h>
-#include "t3f.h"
-#include "animation.h"
-#include "tilemap.h"
+#include "t3f/t3f.h"
+#include "t3f/animation.h"
+#include "t3f/tilemap.h"
 
 T3F_TILE * t3f_create_tile(void)
 {
@@ -223,14 +223,14 @@ bool t3f_atlas_tileset(T3F_TILESET * tsp)
 	int i;
 	bool fail = false;
 	
-	tsp->atlas = t3f_create_atlas(T3F_ATLAS_TILES, tile_sheet_size, tile_sheet_size);
+	tsp->atlas = t3f_create_atlas(tile_sheet_size, tile_sheet_size);
 	if(!tsp->atlas)
 	{
 		return false;
 	}
 	for(i = 0; i < tsp->tiles; i++)
 	{
-		if(!t3f_add_animation_to_atlas(tsp->atlas, tsp->tile[i]->ap))
+		if(!t3f_add_animation_to_atlas(tsp->atlas, tsp->tile[i]->ap, T3F_ATLAS_TILE))
 		{
 			printf("sprite sheet failed\n");
 			fail = true;

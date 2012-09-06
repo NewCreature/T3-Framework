@@ -1,7 +1,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
-#include "t3f.h"
-#include "gui.h"
+#include "t3f/t3f.h"
+#include "t3f/gui.h"
 
 static bool t3f_gui_left_clicked = 0;
 T3F_GUI_DRIVER t3f_gui_allegro_driver;
