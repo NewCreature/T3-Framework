@@ -17,7 +17,7 @@ debian_package: $(APP_EXE_NAME) ../debian/control_gen
 	echo Generating files...
 	echo "!C menu-2\n?package("$(APP_NAME)"):\n	needs=\"X11\"\n	section=\"Games/Action\"\n	title=\""$(APP_BUNDLE_NAME)"\"\n	command=\"/usr/games/$(APP_NAME)\"\n	;" > ../debian/menu
 	echo "[Desktop Entry]\nName="$(APP_BUNDLE_NAME)"\nExec=/usr/games/$(APP_NAME)\nIcon=$(APP_NAME)\nTerminal=false\nType=Application\nCategories=Game;" > ../debian/app.desktop
-	../debian/control_gen ../debian $(APP_NAME) $(APP_VERSION) $(DEBIAN_SECTION) optional $(DEBIAN_ARCHITECTURE) $(DEBIAN_DEPENDS) $(DEBIAN_INSTALL_SIZE) $(DEBIAN_MAINTAINER) $(DEBIAN_DESCRIPTION) $(DEBIAN_LONG_DESCRIPTION)
+	../debian/control_gen ../debian $(APP_NAME) $(APP_VERSION) $(DEBIAN_SECTION) optional `dpkg-architecture -l -qDEB_BUILD_ARCH` $(DEBIAN_DEPENDS) $(DEBIAN_INSTALL_SIZE) $(DEBIAN_MAINTAINER) $(DEBIAN_DESCRIPTION) $(DEBIAN_LONG_DESCRIPTION)
 	echo Building directory structure...
 	mkdir -p ../temp
 	mkdir -p ../temp/debian_temp
