@@ -170,7 +170,7 @@ ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp)
 		if(buffer)
 		{
 			al_fread(fp, buffer, size);
-			tfp = al_open_memfile(buffer, size, "r");
+			tfp = al_open_memfile(buffer, size, "rb");
 			if(tfp)
 			{
 				bp = al_load_bitmap_f(tfp, ".png");
