@@ -34,6 +34,10 @@ all : $(TEMPLATE_EXENAME) $(EX_BASIC_EXENAME) $(EX_MUSIC_EXENAME) $(EX_SOUND_EXE
 
 library : $(T3F_LIBRARY)
 
+install : $(T3F_LIBRARY)
+	cp $(T3F_LIBRARY) /usr/local/lib
+	cp -a include/t3f /usr/local/include
+
 $(T3F_LIBRARY) : .ppc .i386
 	lipo $(T3F_LIBRARY_PPC) $(T3F_LIBRARY_I386) -create -output $(T3F_LIBRARY)
 	make -f makefile.macosx clean
