@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = $(GLOBAL_CFLAGS) -arch i386 -arch ppc -mmacosx-version-min=10.5 $(APP_CFLAGS) $(MACOSX_CFLAGS)
-PLATFORM_OFILES = $(MACOSX_PLATFORM_OFILES)
+PLATFORM_OBJECTS = $(MACOSX_PLATFORM_OBJECTS)
 PLATFORM_LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_main-static $(MACOSX_PLATFORM_LIBS)
-PLATFORM_TARGET = $(MACOSX_PLATFORM_TARGET)
+PLATFORM_TARGET = ../$(APP_BUNDLE_NAME).app $(MACOSX_PLATFORM_TARGET)
 LIB_SUFFIX = -static
 DEPEND_LIBS = -lz -lpng -lvorbis -logg -lvorbisfile -ldumb -lfreetype $(MACOSX_DEPEND_LIBS)
 DEL_COMMAND = rm -f
@@ -15,8 +15,8 @@ include makefile.common
 	@$(DEL_FOLDER_COMMAND) ../$(APP_BUNDLE_NAME).app
 	@cp $(APP_EXE_NAME) ../bin/$(APP_BUNDLE_NAME)
 	@fixbundle ../bin/$(APP_BUNDLE_NAME) -o ../$(APP_BUNDLE_NAME) icon.tga
-	@cp $(APP_BUNDLE_NAME).icns ../$(APP_BUNDLE_NAME).app/Contents/Resources
+	@cp icon.icns ../$(APP_BUNDLE_NAME).app/Contents/Resources/$(APP_BUNDLE_NAME).icns
 	@mkdir ../$(APP_BUNDLE_NAME).app/Contents/Resources/$(APP_BUNDLE_NAME)
 	@cp -a ../bin/data ../$(APP_BUNDLE_NAME).app/Contents/Resources/$(APP_BUNDLE_NAME)
 	@rm ../bin/$(APP_BUNDLE_NAME)
-	@echo Game Application bundle created!
+	@echo Application bundle created!
