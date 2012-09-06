@@ -81,12 +81,8 @@ ALLEGRO_COLOR t3f_color_black;
 static bool t3f_need_redraw = false;
 static void (*t3f_event_handler_proc)(ALLEGRO_EVENT * event) = NULL;
 
-/* used to locate resources */
-#ifdef T3F_PACKAGE_NAME
-	static const char * t3f_package_name = T3F_PACKAGE_NAME;
-#else
-	static const char * t3f_package_name = NULL;
-#endif
+static char * t3f_developer_name = NULL;
+static char * t3f_package_name = NULL; // used to locate resources
 
 static bool t3f_is_path_present(ALLEGRO_PATH * pp)
 {
@@ -182,6 +178,30 @@ ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp)
 	return bp;
 }
 
+void t3f_set_developer_name(const char * developer)
+{
+	if(developer)
+	{
+		t3f_developer_name = malloc(strlen(developer) + 1);
+		if(t3f_developer_name)
+		{
+			strcpy(t3f_developer_name, developer);
+		}
+	}
+}
+
+void t3f_set_package_name(const char * package)
+{
+	if(package)
+	{
+		t3f_package_name = malloc(strlen(package) + 1);
+		if(t3f_package_name)
+		{
+			strcpy(t3f_package_name, package);
+		}
+	}
+}
+
 /* this gets Allegro ready */
 int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(), void (*render_proc)(), int flags)
 {
@@ -201,9 +221,10 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	#endif
 	
 	al_set_app_name(name);
-	#ifdef T3F_COMPANY
-		al_set_org_name(T3F_COMPANY);
-	#endif
+	if(t3f_developer_name)
+	{
+		al_set_org_name(t3f_developer_name);
+	}
 	
 	/* set up application path */
 	t3f_config_path = al_get_standard_path(ALLEGRO_USER_SETTINGS_PATH);
@@ -1032,6 +1053,14 @@ void t3f_run(void)
 		{
 			t3f_render();
 		}
+	}
+	if(t3f_developer_name)
+	{
+		free(t3f_developer_name);
+	}
+	if(t3f_package_name)
+	{
+		free(t3f_package_name);
 	}
 }
 
