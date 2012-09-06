@@ -1,0 +1,15 @@
+CC = gcc
+CFLAGS = $(GLOBAL_CFLAGS) $(APP_CFLAGS) $(MINGW_CFLAGS) -mwindows
+LIB_SUFFIX = .dll
+PLATFORM_OFILES = $(MINGW_PLATFORM_OFILES)
+DEL_COMMAND = del /q
+DEL_FOLDER_COMMAND = rmdir /q
+
+include makefile.common
+
+icon.o : icon.ico icon.rc
+	windres -o icon.o icon.rc
+
+../$(APP_BUNDLE_NAME).app:
+	echo nothing >> ../$(APP_BUNDLE_NAME).app
+	@$(DEL_COMMAND) ../$(APP_BUNDLE_NAME).app

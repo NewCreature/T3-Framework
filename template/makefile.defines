@@ -1,0 +1,65 @@
+include makefile.include
+
+#########################
+# application variables #
+#########################
+APP_COMPANY = t3-i
+APP_NAME = vgolf-deluxe
+APP_EXE_NAME = ../bin/$(APP_NAME)$(EXE_SUFFIX)
+APP_BUNDLE_NAME = vGolf\ Deluxe
+APP_VERSION = 0.75
+APP_OFILES = $(T3F_OFILES) $(T3NET_OFILES) $(JOYNET_OFILES) fx.o hyperlink.o newmenu.o main.o init.o config.o body.o poly.o course.o legacy_course.o atlas.o vfont.o profile.o commentary.o message.o credits.o avatar.o lzss.o file.o pcx.o menu_proc.o gameplay.o replay.o utility.o file_select.o dlc.o minizip/unzip.o minizip/ioapi.o network/client.o network/server.o network/callbacks.o
+APP_LIBS = $(T3F_DEPEND_LIBS) -lallegro_dialog$(LIB_SUFFIX) -lmxml
+APP_CFLAGS = -Ijoynet/enet-1.3.1/include -DT3F_COMPANY="\"$(APP_COMPANY)\""
+APP_PACKAGE_NAME = $(APP_NAME)-$(APP_VERSION)
+APP_PACKAGE_FILENAME = $(APP_PACKAGE_NAME)-src.tar.gz
+
+################
+# global stuff #
+################
+GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall
+
+##################
+# Mac OS X stuff #
+##################
+#MACOSX_CFLAGS = 
+MACOSX_PLATFORM_OFILES = joynet/enet-1.3.1/unix.o
+MACOSX_PLATFORM_LIBS = -lcurl-static
+#MACOSX_DEPEND_LIBS = 
+MACOSX_PLATFORM_TARGET = ../$(APP_BUNDLE_NAME).app
+
+###############
+# Linux stuff #
+###############
+LINUX_CFLAGS = -fno-stack-protector
+LINUX_PLATFORM_OFILES = joynet/enet-1.3.1/unix.o
+LINUX_PLATFORM_LIBS = -lcurl
+
+################################################
+# Linux static stuff (for binary distrubution) #
+################################################
+LINUX_STATIC_DEPEND_LIBS = `pkg-config --libs gtk+-2.0`
+
+##############################
+# MinGW cross-compiler stuff #
+##############################
+#MINGW_CROSS_CFLAGS = 
+MINGW_CROSS_PLATFORM_OFILES = icon.o joynet/enet-1.3.1/win32.o
+MINGW_CROSS_PLATFORM_LIBS = -lcurldll -lws2_32 -lwinmm
+
+###############
+# MinGW stuff #
+###############
+#MINGW_CFLAGS = 
+MINGW_PLATFORM_OFILES = icon.o joynet/enet-1.3.1/win32.o
+
+##########################
+# Debian packaging stuff #
+##########################
+DEBIAN_SECTION = games
+DEBIAN_ARCHITECTURE = i386
+DEBIAN_DEPENDS = libc6,\ libmxml1,\ libcurl3-gnutls
+DEBIAN_INSTALL_SIZE = 16000
+DEBIAN_MAINTAINER = Todd\ Cope\ \<todd\@t3-i.com\>
+DEBIAN_DESCRIPTION = vGolf\ is\ a\ miniature\ golf\ game.
+DEBIAN_LONG_DESCRIPTION = Play\ the\ angles\ and\ try\ to\ hit\ the\ cup\ in\ as\ few\ strokes\ as\ possible.\ Testing\ a\ longer\ description\ to\ see\ if\ our\ generator\ makes\ proper\ newlines.

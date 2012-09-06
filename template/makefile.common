@@ -1,0 +1,24 @@
+include makefile.defines
+
+T3F_DEPEND_LIBS = -lallegro_image$(LIB_SUFFIX) -lallegro_font$(LIB_SUFFIX) -lallegro_ttf$(LIB_SUFFIX) -lallegro_primitives$(LIB_SUFFIX) -lallegro_audio$(LIB_SUFFIX) -lallegro_acodec$(LIB_SUFFIX) -lallegro_memfile$(LIB_SUFFIX) -lallegro$(LIB_SUFFIX)
+
+all : $(APP_EXE_NAME) $(PLATFORM_TARGET)
+	@echo All targets built!
+
+$(APP_EXE_NAME) : $(APP_OFILES) $(PLATFORM_OFILES)
+	$(CC) $(APP_OFILES) $(PLATFORM_OFILES) $(CFLAGS) $(PLATFORM_LIBS) $(APP_LIBS) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
+	@echo vGolf executable built!
+
+clean:
+	@$(PLATFORM_CLEAN)
+	@$(DEL_COMMAND) $(APP_OFILES) $(PLATFORM_OFILES)
+	@$(DEL_COMMAND) $(APP_EXE_NAME)
+	@echo Cleanup complete!
+
+#create tar.gz package for source code distribution
+package:
+	make -f Makefile clean_all
+#	$(shell rm -rf ../../$(PACKAGE_FOLDER); mkdir ../../$(PACKAGE_FOLDER); cp -a "../bin" ../../$(PACKAGE_FOLDER); cp -a "../src" ../../$(PACKAGE_FOLDER); cp -a "../docs" ../../$(PACKAGE_FOLDER); cp -a "../debian" ../../$(PACKAGE_FOLDER); cd ../../; rm -f $(PACKAGE_NAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="bin" --dereference -czf $(PACKAGE_NAME) $(PACKAGE_FOLDER))
+	$(shell rm -rf ../../$(APP_PACKAGE_NAME); mkdir ../../$(APP_PACKAGE_NAME); cp -a "../bin" ../../$(APP_PACKAGE_NAME); cp -a "../src" ../../$(APP_PACKAGE_NAME); cp -a "../docs" ../../$(APP_PACKAGE_NAME); cp -a "../debian" ../../$(APP_PACKAGE_NAME); cd ../../; rm -f $(APP_PACKAGE_FILENAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="old" --dereference -czf $(APP_PACKAGE_FILENAME) $(APP_PACKAGE_NAME))
+#	$(shell rm -rf ../../$(APP_PACKAGE_NAME); mkdir ../../$(APP_PACKAGE_NAME); cp -a "../src" ../../$(APP_PACKAGE_NAME); cp -a "../docs" ../../$(APP_PACKAGE_NAME); cp -a "../debian" ../../$(APP_PACKAGE_NAME); cd ../../; rm -f $(APP_PACKAGE_FILENAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="old" --dereference -czf $(APP_PACKAGE_FILENAME) $(APP_PACKAGE_NAME))
+	@echo Package successfully created!

@@ -1,0 +1,4 @@
+T3F_OFILES = t3f/t3f.o t3f/music.o t3f/sound.o t3f/font.o t3f/animation.o t3f/bitmap.o
+T3NET_OFILES = t3net/t3net.o t3net/dlc.o
+ENET_OFILES = joynet/enet-1.3.1/callbacks.o joynet/enet-1.3.1/compress.o joynet/enet-1.3.1/host.o joynet/enet-1.3.1/list.o joynet/enet-1.3.1/packet.o joynet/enet-1.3.1/peer.o joynet/enet-1.3.1/protocol.o
+JOYNET_OFILES = $(ENET_OFILES) joynet/chat.o joynet/client.o joynet/game_message.o joynet/game.o joynet/joynet.o joynet/message.o joynet/serialize.o joynet/server.o

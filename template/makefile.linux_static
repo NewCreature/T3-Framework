@@ -1,0 +1,73 @@
+CC = gcc
+CFLAGS = $(GLOBAL_CFLAGS) $(APP_CFLAGS) $(LINUX_CFLAGS) -DT3F_PACKAGE_NAME="\"$(APP_NAME)\""
+PLATFORM_OFILES = $(LINUX_PLATFORM_OFILES)
+PLATFORM_LIBS = $(LINUX_PLATFORM_LIBS)
+DEPEND_LIBS = -lpng -ljpeg -lfreetype -lpulse -lpulse-simple -lasound -ldumb -lvorbisfile -lvorbis -lX11 -lXcursor -lXinerama -lXrandr -lGL $(LINUX_STATIC_DEPEND_LIBS)
+LIB_SUFFIX = -static
+DEL_COMMAND = rm -f
+DEL_FOLDER_COMMAND = rm -rf
+
+include makefile.common
+
+../$(APP_BUNDLE_NAME).app:
+	echo nothing >> ../$(APP_BUNDLE_NAME).app
+	@rm -f ../$(APP_BUNDLE_NAME).app
+
+../debian/control_gen: ../debian/control_gen.o
+	$(CC) $(GLOBAL_CFLAGS) ../debian/control_gen.o -o ../debian/control_gen
+
+#generate Debian package
+debian_package: $(APP_EXE_NAME) ../debian/control_gen
+	echo Generating files...
+	echo "!C menu-2\n?package("$(APP_NAME)"):\n	needs=\"X11\"\n	section=\"Games/Action\"\n	title=\""$(APP_BUNDLE_NAME)"\"\n	command=\"/usr/games/$(APP_NAME)\"\n	;" > ../debian/menu
+	echo "[Desktop Entry]\nName="$(APP_BUNDLE_NAME)"\nExec=/usr/games/$(APP_NAME)\nIcon=$(APP_NAME)\nTerminal=false\nType=Application\nCategories=Game;" > ../debian/app.desktop
+	../debian/control_gen ../debian $(APP_NAME) $(APP_VERSION) $(DEBIAN_SECTION) optional $(DEBIAN_ARCHITECTURE) $(DEBIAN_DEPENDS) $(DEBIAN_INSTALL_SIZE) $(DEBIAN_MAINTAINER) $(DEBIAN_DESCRIPTION) $(DEBIAN_LONG_DESCRIPTION)
+	echo Building directory structure...
+	mkdir -p ../temp
+	mkdir -p ../temp/debian_temp
+	mkdir -p ../temp/DEBIAN
+	mkdir -p ../temp/debian_temp/usr
+	mkdir -p ../temp/debian_temp/usr/share
+	mkdir -p ../temp/debian_temp/usr/share/$(APP_NAME)
+	mkdir -p ../temp/debian_temp/usr/share/doc
+	mkdir -p ../temp/debian_temp/usr/share/doc/$(APP_NAME)
+	mkdir -p ../temp/debian_temp/usr/share/pixmaps
+	mkdir -p ../temp/debian_temp/usr/share/applications
+	mkdir -p ../temp/debian_temp/usr/share/menu
+	mkdir -p ../temp/debian_temp/usr/games
+	echo Copying files...
+	cp -a ../bin/data ../temp/debian_temp/usr/share/$(APP_NAME)
+	cp ../docs/changelog ../temp/debian_temp/usr/share/doc/$(APP_NAME)/changelog
+	cp ../docs/README ../temp/debian_temp/usr/share/doc/$(APP_NAME)/README
+	cp ../docs/copyright ../temp/debian_temp/usr/share/doc/$(APP_NAME)/copyright
+	cp ../debian/icon.svg ../temp/debian_temp/usr/share/pixmaps/$(APP_NAME).svg
+	cp ../debian/app.desktop ../temp/debian_temp/usr/share/applications/$(APP_NAME).desktop
+	cp ../debian/menu ../temp/debian_temp/usr/share/menu/$(APP_NAME)
+	cp ../bin/$(APP_NAME) ../temp/debian_temp/usr/games/$(APP_NAME)
+	cp ../debian/control ../temp/DEBIAN
+	cp ../debian/postinst ../temp/DEBIAN
+	echo Building package...
+	strip ../temp/debian_temp/usr/games/$(APP_NAME)
+	find ../temp/debian_temp -type d | xargs chmod 755
+	find ../temp/debian_temp/usr/share/$(APP_NAME) -type f -exec chmod 644 {} \;
+	chmod 644 ../temp/debian_temp/usr/share/doc/$(APP_NAME)/README
+	chmod 644 ../temp/debian_temp/usr/share/doc/$(APP_NAME)/changelog
+	chmod 644 ../temp/debian_temp/usr/share/doc/$(APP_NAME)/copyright
+	gzip -9 ../temp/debian_temp/usr/share/doc/$(APP_NAME)/changelog
+	chmod 644 ../temp/debian_temp/usr/share/pixmaps/$(APP_NAME).svg
+	chmod 644 ../temp/debian_temp/usr/share/applications/$(APP_NAME).desktop
+	chmod 644 ../temp/debian_temp/usr/share/menu/$(APP_NAME)
+	cd ../temp/debian_temp; find ./ ! -type d -print0 | xargs -0 md5sum >../DEBIAN/md5sums-pre; sed s-./-- <../DEBIAN/md5sums-pre >../DEBIAN/md5sums
+	rm -f ../temp/DEBIAN/md5sums-pre
+	mv ../temp/DEBIAN ../temp/debian_temp
+	fakeroot dpkg-deb --build ../temp/debian_temp
+	mv ../temp/debian_temp.deb ../$(APP_NAME)_$(APP_VERSION)_$(DEBIAN_ARCHITECTURE).deb
+	echo Cleaning up...
+	rm -rf ../temp
+	rm -f ../debian/control
+	rm -f ../debian/menu
+	rm -f ../debian/app.desktop
+	rm -f ../debian/control_gen
+	rm -f ../debian/control_gen.o
+	echo Testing package...
+	lintian ../$(APP_NAME)_$(APP_VERSION)_$(DEBIAN_ARCHITECTURE).deb
