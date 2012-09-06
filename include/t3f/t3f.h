@@ -63,6 +63,18 @@ typedef struct
 	
 } T3F_ATLAS;
 
+/* include all T3F modules */
+#include "sound.h"
+#include "music.h"
+#include "bitmap.h"
+#include "animation.h"
+#include "font.h"
+#include "collision.h"
+#include "controller.h"
+#include "gui.h"
+#include "tilemap.h"
+#include "vector.h"
+
 extern int t3f_virtual_display_width;
 extern int t3f_virtual_display_height;
 
