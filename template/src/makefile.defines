@@ -63,7 +63,6 @@ GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall
 # Debian packaging stuff #
 ##########################
 DEBIAN_SECTION = games
-DEBIAN_ARCHITECTURE = i386
 DEBIAN_DEPENDS = libc6,\ libmxml1,\ libcurl3-gnutls
 DEBIAN_INSTALL_SIZE = 16000
 DEBIAN_MAINTAINER = Todd\ Cope\ \<todd\@t3-i.com\>

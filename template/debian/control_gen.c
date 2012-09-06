@@ -100,6 +100,11 @@ int main(int argc, char * argv[])
 		printf("Usage: control_gen <out_path> <package_name> <package_version> <section> <priority> <architecture> <depends> <install_size> <maintainer> <description> <long_description>\n");
 		return -1;
 	}
+	else if(strcasecmp(argv[6], "i386") && !strcasecmp(argv[6], "amd64"))
+	{
+		printf("Usage: make package DEBIAN_ARCHITECTURE=arch (i386 or amd64)\n");
+		return -2;
+	}
 	generate_control_file(argc, argv);
 	return 0;
 }
