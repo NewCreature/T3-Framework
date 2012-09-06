@@ -1,15 +1,16 @@
 project : 
 ifndef DIR
-	echo "Usage: make project DIR=location"
+	@echo "Usage: make project DIR=location"
 else
-	mkdir $(DIR)
-	mkdir $(DIR)/bin
-	mkdir $(DIR)/bin/data
-	mkdir $(DIR)/src
-	mkdir $(DIR)/src/t3f
-	mkdir $(DIR)/docs
-	cp include/t3f/*.h $(DIR)/src/t3f
-	cp src/*.c $(DIR)/src/t3f
-	cp template/src/* $(DIR)/src
-	cp template/docs/* $(DIR)/docs
+	@echo "Creating new project in '$(DIR)'..."
+	@mkdir $(DIR)
+	@mkdir $(DIR)/bin
+	@mkdir $(DIR)/bin/data
+	@mkdir $(DIR)/src
+	@mkdir $(DIR)/src/t3f
+	@mkdir $(DIR)/docs
+	@cp include/t3f/*.h $(DIR)/src/t3f
+	@cp src/*.c $(DIR)/src/t3f
+	@cp template/src/* $(DIR)/src
+	@cp template/docs/* $(DIR)/docs
 endif
