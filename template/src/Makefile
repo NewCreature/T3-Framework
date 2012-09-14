@@ -43,3 +43,6 @@ package:
 
 debian_package:
 	$(MAKE) -f makefile.$(SYSTEM)_static debian_package
+
+android_package:
+	$(MAKE) -f makefile.android android_package

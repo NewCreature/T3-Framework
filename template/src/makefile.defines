@@ -6,6 +6,7 @@ APP_NAME = app-name
 APP_BUNDLE_NAME = App\ Display\ Name
 APP_VERSION = 0.1
 APP_OBJECTS = main.o
+APP_ANDROID_PACKAGE = com.t3i.t3f
 #APP_LIBS = 
 #APP_CFLAGS = 
 

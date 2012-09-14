@@ -1,0 +1,21 @@
+CC = gcc
+CFLAGS = $(GLOBAL_CFLAGS) $(APP_CFLAGS) $(ANDROID_CFLAGS)
+PLATFORM_OBJECTS = $(ANDROID_PLATFORM_OBJECTS)
+PLATFORM_LIBS = $(ANDROID_PLATFORM_LIBS)
+DEPEND_LIBS = $(ANDROID_DEPEND_LIBS)
+LIB_SUFFIX = -static
+DEL_COMMAND = rm -f
+DEL_FOLDER_COMMAND = rm -rf
+
+include makefile.common
+
+#generate Debian package
+android_package:
+	@echo Copying sources to Android project...
+	mkdir -p ../temp
+	cp -a ../android ../temp
+	cp $APP_SOURCES ../temp/android/jni
+	@echo Need to replace strings in various files here before building the project
+	@echo Building Android project
+	cd ../temp/android; $TC/ndk-build; android update project -p .; ant debug; cp bin/android-project-debug.apk ../$APP_PACKAGE_NAME.apk
+	rm -rf ../temp
