@@ -13,4 +13,6 @@ else
 	@cp src/*.c $(DIR)/src/t3f
 	@cp template/src/* $(DIR)/src
 	@cp template/docs/* $(DIR)/docs
+	@cp -a template/debian $(DIR)
+	@cp -a template/android $(DIR) 
 endif
