@@ -45,9 +45,16 @@ LOCAL_CFLAGS    += -W -Wall
 LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/$(TARGET_ARCH_ABI)/lib
 LOCAL_LDLIBS    += -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI)
 LOCAL_LDLIBS    += -llog
+LOCAL_LDLIBS    += $(T3F_APP_LIBS)
 LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro-debug.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_color-debug.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_memfile-debug.so
 LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_primitives-debug.so
 LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_image-debug.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_font-debug.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_ttf-debug.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_audio-debug.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_acodec-debug.so
 
 include $(BUILD_SHARED_LIBRARY)
 
