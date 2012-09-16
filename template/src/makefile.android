@@ -12,7 +12,7 @@ ANDROID_ARCHITECTURE = armeabi-v7a
 
 include makefile.common
 
-#generate Debian package
+#generate Android package
 #sed info: sed -i requires backup extension argument on OS X, should work fine this
 #          way on other Unix platforms, we should do "sed -i '' -original-new- filename"
 android_package:
