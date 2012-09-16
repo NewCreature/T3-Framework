@@ -20,7 +20,7 @@ android_package:
 	@echo Copying Allegro libs to Android project...
 	mkdir ../temp/android/jni/$(ANDROID_ARCHITECTURE)
 	mkdir ../temp/android/jni/$(ANDROID_ARCHITECTURE)/lib
-	cp -a $(TC)/user/$(ANDROID_ARCHITECTURE)/lib/liballegro*.so ../temp/android/jni/$(ANDROID_ARCHITECTURE)/lib
+	cp -a $(ANDROID_NDK_ROOT)/user/$(ANDROID_ARCHITECTURE)/lib/liballegro*.so ../temp/android/jni/$(ANDROID_ARCHITECTURE)/lib
 	@echo Copying data to Android project...
 	cp -a ../bin/data ../temp/android/assets
 	@echo Need to replace strings in various files here before building the project
@@ -34,5 +34,5 @@ android_package:
 	sed -i '' |armeabi-v7a|$(ANDROID_ARCHITECTURE)| ../temp/android/jni/Android.mk
 	sed -i '' |armeabi-v7a|$(ANDROID_ARCHITECTURE)| ../temp/android/jni/Application.mk
 	@echo Building Android project
-	cd ../temp/android; export T3F_APP_LIBS=$(APP_LIBS); $(TC)/ndk-build; android update project -p .; ant debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
+	cd ../temp/android; export T3F_APP_LIBS=$(APP_LIBS); $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
 	rm -rf ../temp
