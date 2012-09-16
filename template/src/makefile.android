@@ -24,6 +24,13 @@ android_package:
 	@echo Copying data to Android project...
 	cp -a ../bin/data ../temp/android/assets
 	@echo Need to replace strings in various files here before building the project
+	sed -i '' |org.liballeg.app|$(APP_ANDROID_PACKAGE)| ../temp/android/src/org/liballeg/app/AllegroActivity.java
+	sed -i '' |org.liballeg.app|$(APP_ANDROID_PACKAGE)| ../temp/android/AndroidManifest.xml
+	sed -i '' |allegro-example|$(APP_NAME)| ../temp/android/AndroidManifest.xml
+	sed -i '' |allegro-example|$(APP_NAME)| ../temp/android/jni/Android.mk
+	sed -i '' |allegro-example|$(APP_NAME)| ../temp/android/jni/Application.mk
+	sed -i '' |main.c|$(APP_SOURCE_FILES)| ../temp/android/jni/Android.mk
+	sed -i '' |app_name|$(APP_BUNDLE_NAME)| ../temp/android/res/values/strings.xml
 	@echo Building Android project
 	cd ../temp/android; $(TC)/ndk-build; android update project -p .; ant debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME).apk
 	rm -rf ../temp
