@@ -15,6 +15,10 @@ android_package:
 	mkdir -p ../temp
 	cp -a ../android ../temp
 	cp $(APP_SOURCE_FILES) ../temp/android/jni
+	@echo Copying Allegro libs to Android project...
+	mkdir ../temp/android/jni/$(ANDROID_ARCHITECTURE)
+	mkdir ../temp/android/jni/$(ANDROID_ARCHITECTURE)/lib
+	cp -a $(TC)/user/$(ANDROID_ARCHITECTURE)/lib/liballegro*.so ../temp/android/jni/$(ANDROID_ARCHITECTURE)/lib
 	@echo Copying data to Android project...
 	cp -a ../bin/data ../temp/android/assets
 	@echo Need to replace strings in various files here before building the project
