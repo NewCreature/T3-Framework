@@ -15,6 +15,8 @@ android_package:
 	mkdir -p ../temp
 	cp -a ../android ../temp
 	cp $(APP_SOURCE_FILES) ../temp/android/jni
+	@echo Copying data to Android project...
+	cp -a ../bin/data ../temp/android/assets
 	@echo Need to replace strings in various files here before building the project
 	@echo Building Android project
 	cd ../temp/android; $(TC)/ndk-build; android update project -p .; ant debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME).apk
