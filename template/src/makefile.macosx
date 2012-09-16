@@ -14,8 +14,8 @@ include makefile.common
 ../$(APP_BUNDLE_NAME).app : $(APP_EXE_NAME)
 	@$(DEL_FOLDER_COMMAND) ../$(APP_BUNDLE_NAME).app
 	@cp $(APP_EXE_NAME) ../bin/$(APP_BUNDLE_NAME)
-	@fixbundle ../bin/$(APP_BUNDLE_NAME) -o ../$(APP_BUNDLE_NAME) icon.tga
-	@cp icon.icns ../$(APP_BUNDLE_NAME).app/Contents/Resources/$(APP_BUNDLE_NAME).icns
+	@fixbundle ../bin/$(APP_BUNDLE_NAME) -o ../$(APP_BUNDLE_NAME) ../icons/macosx_icon.tga
+	@cp ../icons/macosx_icon.icns ../$(APP_BUNDLE_NAME).app/Contents/Resources/$(APP_BUNDLE_NAME).icns
 	@mkdir ../$(APP_BUNDLE_NAME).app/Contents/Resources/$(APP_BUNDLE_NAME)
 	@cp -a ../bin/data ../$(APP_BUNDLE_NAME).app/Contents/Resources/$(APP_BUNDLE_NAME)
 	@rm ../bin/$(APP_BUNDLE_NAME)

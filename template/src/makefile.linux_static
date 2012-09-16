@@ -36,7 +36,7 @@ debian_package: $(APP_EXE_NAME) ../debian/control_gen
 	cp ../docs/changelog ../temp/debian_temp/usr/share/doc/$(APP_NAME)/changelog
 	cp ../docs/README ../temp/debian_temp/usr/share/doc/$(APP_NAME)/README
 	cp ../docs/copyright ../temp/debian_temp/usr/share/doc/$(APP_NAME)/copyright
-	cp ../debian/icon.svg ../temp/debian_temp/usr/share/pixmaps/$(APP_NAME).svg
+	cp ../icons/debian_icon.svg ../temp/debian_temp/usr/share/pixmaps/$(APP_NAME).svg
 	cp ../debian/app.desktop ../temp/debian_temp/usr/share/applications/$(APP_NAME).desktop
 	cp ../debian/menu ../temp/debian_temp/usr/share/menu/$(APP_NAME)
 	cp ../bin/$(APP_NAME) ../temp/debian_temp/usr/games/$(APP_NAME)
