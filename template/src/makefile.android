@@ -32,5 +32,5 @@ android_package:
 	sed -i '' |main.c|$(APP_SOURCE_FILES)| ../temp/android/jni/Android.mk
 	sed -i '' |app_name|$(APP_BUNDLE_NAME)| ../temp/android/res/values/strings.xml
 	@echo Building Android project
-	cd ../temp/android; $(TC)/ndk-build; android update project -p .; ant debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME).apk
+	cd ../temp/android; $(TC)/ndk-build; android update project -p .; ant debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
 	rm -rf ../temp
