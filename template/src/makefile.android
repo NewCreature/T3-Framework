@@ -36,7 +36,7 @@ android_package:
 	cp ../icons/android_icon-mdpi_48.png ../temp/android/res/drawable-mdpi/icon.png
 	mkdir ../temp/android/res/drawable-xhdpi
 	cp ../icons/android_icon-xhdpi_96.png ../temp/android/res/drawable-xhdpi/icon.png
-	@echo Need to replace strings in various files here before building the project
+	@echo Editing project data to match our project definitions...
 	sed -i '' |org.liballeg.app|$(APP_ANDROID_PACKAGE)| ../temp/android/src/org/liballeg/app/AllegroActivity.java
 	sed -i '' |org.liballeg.app|$(APP_ANDROID_PACKAGE)| ../temp/android/AndroidManifest.xml
 	sed -i '' |allegro-example|$(APP_NAME)| ../temp/android/AndroidManifest.xml
