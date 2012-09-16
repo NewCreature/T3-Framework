@@ -7,6 +7,10 @@
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_memfile.h>
 
+#ifdef T3F_ANDROID
+	#include <allegro5/allegro_android.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 
@@ -434,6 +438,16 @@ bool t3f_locate_resource(const char * filename)
 		}
 		al_destroy_path(file_path);
 	}
+	
+	#ifdef T3F_ANDROID
+		al_android_set_apk_file_interface();
+		if(al_filename_exists(filename))
+		{
+			return true;
+		}
+		al_set_standard_fs_interface();
+	#endif
+	
 	if(found)
 	{
 		path = al_create_path("/usr/share/");
