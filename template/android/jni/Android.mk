@@ -17,12 +17,21 @@ LOCAL_PATH := $(call my-dir)
 TARGET_ARCH_ABI := armeabi-v7a
 
 include $(CLEAR_VARS)
-
 LOCAL_MODULE := liballegro-prebuilt
 LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro-debug.so
 include $(PREBUILT_SHARED_LIBRARY)
-include $(CLEAR_VARS)
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := liballegro_color-prebuilt
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_color-debug.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := liballegro_memfile-prebuilt
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_memfile-debug.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
 LOCAL_MODULE := liballegro_primitives-prebuilt
 LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_primitives-debug.so
 include $(PREBUILT_SHARED_LIBRARY)
@@ -31,6 +40,26 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro_image-prebuilt
 LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_image-debug.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := liballegro_font-prebuilt
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_font-debug.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := liballegro_ttf-prebuilt
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_ttf-debug.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := liballegro_audio-prebuilt
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_audio-debug.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := liballegro_acodec-prebuilt
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_acodec-debug.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -44,8 +73,7 @@ LOCAL_CFLAGS    += -W -Wall
 
 LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/$(TARGET_ARCH_ABI)/lib
 LOCAL_LDLIBS    += -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI)
-LOCAL_LDLIBS    += -llog
-LOCAL_LDLIBS    += $(T3F_APP_LIBS)
+LOCAL_LDLIBS    += -llog $(T3F_APP_LIBS)
 LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro-debug.so
 LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_color-debug.so
 LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_memfile-debug.so

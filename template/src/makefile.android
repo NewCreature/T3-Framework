@@ -32,6 +32,7 @@ android_package:
 	sed -i '' |main.c|$(APP_SOURCE_FILES)| ../temp/android/jni/Android.mk
 	sed -i '' |app_name|$(APP_BUNDLE_NAME)| ../temp/android/res/values/strings.xml
 	sed -i '' |armeabi-v7a|$(ANDROID_ARCHITECTURE)| ../temp/android/jni/Android.mk
+	sed -i '' |armeabi-v7a|$(ANDROID_ARCHITECTURE)| ../temp/android/jni/Application.mk
 	@echo Building Android project
 	cd ../temp/android; export T3F_APP_LIBS=$(APP_LIBS); $(TC)/ndk-build; android update project -p .; ant debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
 	rm -rf ../temp
