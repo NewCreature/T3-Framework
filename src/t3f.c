@@ -46,6 +46,9 @@ bool t3f_mouse_hidden = false;
 ALLEGRO_JOYSTICK * t3f_joystick[T3F_MAX_JOYSTICKS] = {NULL};
 ALLEGRO_JOYSTICK_STATE t3f_joystick_state[T3F_MAX_JOYSTICKS];
 
+/* touch data */
+T3F_TOUCH t3f_touch[T3F_MAX_TOUCHES];
+
 ALLEGRO_TRANSFORM t3f_base_transform;
 ALLEGRO_TRANSFORM t3f_current_transform;
 
@@ -301,6 +304,17 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		else
 		{
 			t3f_flags |= T3F_USE_JOYSTICK;
+		}
+	}
+	if(flags & T3F_USE_TOUCH)
+	{
+		if(!al_install_touch_input())
+		{
+			printf("Failed to initialize touch input!\n");
+		}
+		else
+		{
+			t3f_flags |= T3F_USE_TOUCH;
 		}
 	}
 	al_init_primitives_addon();
@@ -978,6 +992,14 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
+			
+			if(t3f_flags & T3F_USE_TOUCH)
+			{
+				t3f_touch[0].active = true;
+				t3f_touch[0].x = t3f_mouse_x;
+				t3f_touch[0].y = t3f_mouse_y;
+				t3f_touch[0].primary = true;
+			}
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
@@ -986,6 +1008,13 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
+
+			if(t3f_flags & T3F_USE_TOUCH)
+			{
+				t3f_touch[0].active = false;
+				t3f_touch[0].x = t3f_mouse_x;
+				t3f_touch[0].y = t3f_mouse_y;
+			}
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_AXES:
@@ -993,12 +1022,24 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
+
+			if(t3f_flags & T3F_USE_TOUCH)
+			{
+				t3f_touch[0].x = t3f_mouse_x;
+				t3f_touch[0].y = t3f_mouse_y;
+			}
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_WARPED:
 		{
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
+
+			if(t3f_flags & T3F_USE_TOUCH)
+			{
+				t3f_touch[0].x = t3f_mouse_x;
+				t3f_touch[0].y = t3f_mouse_y;
+			}
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY:
@@ -1024,6 +1065,30 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			break;
 		}
 		
+		case ALLEGRO_EVENT_TOUCH_BEGIN:
+		{
+			t3f_touch[event->touch.id + 1].active = true;
+			t3f_touch[event->touch.id + 1].x = (float)(event->touch.x - t3f_display_offset_x) * t3f_mouse_scale_x;
+			t3f_touch[event->touch.id + 1].y = (float)(event->touch.y - t3f_display_offset_y) * t3f_mouse_scale_y;
+			t3f_touch[event->touch.id + 1].primary = event->touch.primary;
+			break;
+		}
+		
+		case ALLEGRO_EVENT_TOUCH_MOVE:
+		{
+			t3f_touch[event->touch.id + 1].x = (float)(event->touch.x - t3f_display_offset_x) * t3f_mouse_scale_x;
+			t3f_touch[event->touch.id + 1].y = (float)(event->touch.y - t3f_display_offset_y) * t3f_mouse_scale_y;
+			break;
+		}
+
+		case ALLEGRO_EVENT_TOUCH_END:
+		case ALLEGRO_EVENT_TOUCH_CANCEL:
+		{
+			t3f_touch[event->touch.id + 1].active = false;
+			t3f_touch[event->touch.id + 1].x = (float)(event->touch.x - t3f_display_offset_x) * t3f_mouse_scale_x;
+			t3f_touch[event->touch.id + 1].y = (float)(event->touch.y - t3f_display_offset_y) * t3f_mouse_scale_y;
+			break;
+		}
 		/* this keeps your program running */
 		case ALLEGRO_EVENT_TIMER:
 		{

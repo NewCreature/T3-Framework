@@ -23,13 +23,16 @@
 #define T3F_RESIZABLE      32
 #define T3F_FORCE_ASPECT   64
 #define T3F_USE_CONSOLE   128
-#define T3F_DEFAULT (T3F_USE_KEYBOARD | T3F_USE_SOUND)
+#define T3F_USE_TOUCH     256
+#define T3F_DEFAULT (T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_JOYSTICK | T3F_USE_TOUCH | T3F_USE_SOUND | T3F_FORCE_ASPECT)
 
 #define T3F_KEY_BUFFER_MAX 256
 #define T3F_KEY_BUFFER_FORCE_LOWER 1
 #define T3F_KEY_BUFFER_FORCE_UPPER 2
 
 #define T3F_MAX_JOYSTICKS 16
+
+#define T3F_MAX_TOUCHES   64
 
 #define T3F_MAX_STACK     16
 
@@ -63,6 +66,15 @@ typedef struct
 	
 } T3F_ATLAS;
 
+typedef struct
+{
+	
+	bool active; // is this touch active?
+	float x, y;
+	bool primary;
+	
+} T3F_TOUCH;
+
 /* include all T3F modules */
 #include "sound.h"
 #include "music.h"
@@ -93,6 +105,7 @@ extern bool t3f_mouse_hidden;
 
 extern ALLEGRO_JOYSTICK * t3f_joystick[T3F_MAX_JOYSTICKS];
 extern ALLEGRO_JOYSTICK_STATE t3f_joystick_state[T3F_MAX_JOYSTICKS];
+extern T3F_TOUCH t3f_touch[T3F_MAX_TOUCHES];
 extern ALLEGRO_DISPLAY * t3f_display;
 extern ALLEGRO_TIMER * t3f_timer;
 extern ALLEGRO_CONFIG * t3f_config;
