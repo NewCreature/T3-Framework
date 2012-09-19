@@ -306,6 +306,8 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 			t3f_flags |= T3F_USE_JOYSTICK;
 		}
 	}
+	
+	memset(t3f_touch, 0, sizeof(T3F_TOUCH) * T3F_MAX_TOUCHES);
 	if(flags & T3F_USE_TOUCH)
 	{
 		if(!al_install_touch_input())
