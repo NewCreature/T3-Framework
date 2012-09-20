@@ -39,6 +39,7 @@ examples/ex_3d
 examples/ex_animation
 examples/ex_atlas
 examples/ex_basic
+examples/ex_touch
 examples/ex_collision
 examples/ex_controller
 examples/ex_gui
@@ -54,3 +55,6 @@ tools/gain_editor
 tools/loop_editor
 tools/mapper
 tools/vector_editor
+lib/libt3f.a
+lib/libt3f_i386.a
+lib/libt3f_ppc.a
