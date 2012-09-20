@@ -15,7 +15,7 @@
             </intent-filter>
             
             <!--  Tell Allegro the name of the game .so when using dynamic linking -->
-            <meta-data android:name="org.liballeg.app"
+            <meta-data android:name="org.liballeg.app_name"
                        android:value="allegro-example"/>
         </activity>
     </application>
