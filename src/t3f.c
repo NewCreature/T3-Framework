@@ -215,6 +215,22 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	int i;
 	ALLEGRO_PATH * temp_path = NULL;
 	
+	// compile time configuration
+	#ifdef T3F_DEVELOPER_NAME
+		t3f_developer_name = malloc(strlen(T3F_DEVELOPER_NAME) + 1);
+		if(t3f_developer_name)
+		{
+			strcpy(t3f_developer_name, T3F_DEVELOPER_NAME);
+		}
+	#endif
+	#ifdef T3F_PACKAGE_NAME
+		t3f_package_name = malloc(strlen(T3F_PACKAGE_NAME) + 1);
+		if(t3f_package_name)
+		{
+			strcpy(t3f_package_name, T3F_PACKAGE_NAME);
+		}
+	#endif
+
 	/* initialize Allegro */
 	if(!al_init())
 	{
