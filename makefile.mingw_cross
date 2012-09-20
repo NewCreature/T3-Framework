@@ -1,5 +1,5 @@
 CC = i586-mingw32msvc-gcc
-CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall -It3f -I./
+CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall -It3f -I./include
 LIBS = -lallegro_image.dll -lallegro_font.dll -lallegro_ttf.dll -lallegro_primitives.dll -lallegro_audio.dll -lallegro_acodec.dll -lallegro_dialog.dll -lallegro_memfile.dll -lallegro.dll
 
 include makefile.common
@@ -41,6 +41,9 @@ $(TEMPLATE_EXENAME) : $(TEMPLATE_OFILES)
 
 $(EX_BASIC_EXENAME) : $(EX_BASIC_OFILES)
 	$(CC) $(EX_BASIC_OFILES) $(CFLAGS) $(LIBS) -o $(EX_BASIC_EXENAME)
+
+$(EX_TOUCH_EXENAME) : $(EX_TOUCH_OFILES)
+	gcc $(EX_TOUCH_OFILES) $(CFLAGS) $(LIBS) -o $(EX_TOUCH_EXENAME)
 
 $(EX_MUSIC_EXENAME) : $(EX_MUSIC_OFILES)
 	$(CC) $(EX_MUSIC_OFILES) $(CFLAGS) $(LIBS) -o $(EX_MUSIC_EXENAME)
@@ -100,7 +103,7 @@ $(AV_EXENAME) : $(AV_OFILES)
 	$(CC) $(AV_OFILES) $(CFLAGS) $(LIBS) -o $(AV_EXENAME)
 
 clean:
-	@rm -f t3f/*.o
+	@rm -f $(T3F_OBJECTS)
 	@rm -f examples/*.o
 	@rm -f tools/*.o
 	@rm -f games/paddle/*.o

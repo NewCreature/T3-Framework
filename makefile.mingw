@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall -It3f -I./ -mwindows
+CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall -It3f -I./include -mwindows
 LIBS = -lallegro_image-5.0.0.dll -lallegro_font-5.0.0.dll  -lallegro_ttf-5.0.0.dll -lallegro_primitives-5.0.0.dll -lallegro_audio-5.0.0.dll -lallegro_vorbis-5.0.0.dll -lallegro_memfile-5.0.0.dll -lallegro-5.0.0.dll
 
 include makefile.common
@@ -46,6 +46,9 @@ $(TEMPLATE_EXENAME) : $(TEMPLATE_OFILES)
 
 $(EX_BASIC_EXENAME) : $(EX_BASIC_OFILES)
 	gcc $(EX_BASIC_OFILES) $(CFLAGS) $(LIBS) -o $(EX_BASIC_EXENAME)
+
+$(EX_TOUCH_EXENAME) : $(EX_TOUCH_OFILES)
+	gcc $(EX_TOUCH_OFILES) $(CFLAGS) $(LIBS) -o $(EX_TOUCH_EXENAME)
 
 $(EX_MUSIC_EXENAME) : $(EX_MUSIC_OFILES)
 	gcc $(EX_MUSIC_OFILES) $(CFLAGS) $(LIBS) -o $(EX_MUSIC_EXENAME)
@@ -105,7 +108,7 @@ $(AV_EXENAME) : $(AV_OFILES)
 	gcc $(AV_OFILES) $(CFLAGS) $(LIBS) -o $(AV_EXENAME)
 
 clean:
-	@del t3f\*.o
+	@del $(T3F_OBJECTS)
 	@del examples\*.o
 	@del tools\*.o
 	@del games\paddle\*.o
