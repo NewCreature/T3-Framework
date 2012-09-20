@@ -19,7 +19,11 @@ android_package:
 	@echo Copying sources to Android project...
 	mkdir -p ../temp
 	cp -a ../android ../temp
-	cp $(APP_SOURCE_FILES) ../temp/android/jni
+#	cp -p $(APP_SOURCE_FILES) ../temp/android/jni
+	cp -a ../src ../temp
+	cp ../temp/android/jni/*.mk ../temp/src
+	rm -rf ../temp/android/jni
+	mv ../temp/src ../temp/android/jni
 	@echo Copying Allegro libs to Android project...
 	mkdir ../temp/android/jni/$(ANDROID_ARCHITECTURE)
 	mkdir ../temp/android/jni/include
