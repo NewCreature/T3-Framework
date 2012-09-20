@@ -6,7 +6,7 @@
 static bool t3f_gui_left_clicked = 0;
 T3F_GUI_DRIVER t3f_gui_allegro_driver;
 static T3F_GUI_DRIVER * t3f_gui_current_driver = NULL;
-static bool t3f_gui_check_hover_y(T3F_GUI * pp, int i);
+static bool t3f_gui_check_hover_y(T3F_GUI * pp, int i, float y);
 static float t3f_gui_hover_y;
 
 static float allegro_get_element_width(T3F_GUI_ELEMENT * ep)
@@ -62,7 +62,7 @@ static void allegro_render_element(T3F_GUI * pp, int i, bool hover)
 		{
 			if(pp->element[i].flags & T3F_GUI_ELEMENT_SHADOW)
 			{
-				if(!(pp->element[i].flags & T3F_GUI_ELEMENT_AUTOHIDE) || t3f_gui_check_hover_y(pp, i))
+				if(!(pp->element[i].flags & T3F_GUI_ELEMENT_AUTOHIDE) || t3f_gui_check_hover_y(pp, i, t3f_gui_hover_y))
 				{
 					if(pp->element[i].flags & T3F_GUI_ELEMENT_CENTRE)
 					{
@@ -78,7 +78,7 @@ static void allegro_render_element(T3F_GUI * pp, int i, bool hover)
 			}
 			else
 			{
-				if(!(pp->element[i].flags & T3F_GUI_ELEMENT_AUTOHIDE) || t3f_gui_check_hover_y(pp, i))
+				if(!(pp->element[i].flags & T3F_GUI_ELEMENT_AUTOHIDE) || t3f_gui_check_hover_y(pp, i, t3f_gui_hover_y))
 				{
 					if(pp->element[i].flags & T3F_GUI_ELEMENT_CENTRE)
 					{
@@ -282,7 +282,7 @@ void t3f_center_gui(T3F_GUI * pp, float oy, float my)
 	pp->oy = offset - top;
 }
 
-static bool t3f_gui_check_hover_x(T3F_GUI * pp, int i)
+static bool t3f_gui_check_hover_x(T3F_GUI * pp, int i, float x)
 {
 	if((pp->element[i].flags & T3F_GUI_ELEMENT_STATIC))
 	{
@@ -290,14 +290,14 @@ static bool t3f_gui_check_hover_x(T3F_GUI * pp, int i)
 	}
 	if(pp->element[i].flags & T3F_GUI_ELEMENT_CENTRE)
 	{
-		if(t3f_mouse_x >= pp->ox + pp->element[i].ox - t3f_gui_current_driver->get_element_width(&pp->element[i]) / 2 && t3f_mouse_x < pp->ox + pp->element[i].ox + t3f_gui_current_driver->get_element_width(&pp->element[i]) / 2)
+		if(x >= pp->ox + pp->element[i].ox - t3f_gui_current_driver->get_element_width(&pp->element[i]) / 2 && x < pp->ox + pp->element[i].ox + t3f_gui_current_driver->get_element_width(&pp->element[i]) / 2)
 		{
 			return true;
 		}
 	}
 	else
 	{
-		if(t3f_mouse_x >= pp->ox + pp->element[i].ox && t3f_mouse_x < pp->ox + pp->element[i].ox + t3f_gui_current_driver->get_element_width(&pp->element[i]))
+		if(x >= pp->ox + pp->element[i].ox && x < pp->ox + pp->element[i].ox + t3f_gui_current_driver->get_element_width(&pp->element[i]))
 		{
 			return true;
 		}
@@ -305,22 +305,22 @@ static bool t3f_gui_check_hover_x(T3F_GUI * pp, int i)
 	return false;
 }
 
-static bool t3f_gui_check_hover_y(T3F_GUI * pp, int i)
+static bool t3f_gui_check_hover_y(T3F_GUI * pp, int i, float y)
 {
 	if((pp->element[i].flags & T3F_GUI_ELEMENT_STATIC))
 	{
 		return false;
 	}
-	if(t3f_gui_hover_y >= pp->oy + pp->element[i].oy && t3f_gui_hover_y < pp->oy + pp->element[i].oy + t3f_gui_current_driver->get_element_height(&pp->element[i]))
+	if(y >= pp->oy + pp->element[i].oy && y < pp->oy + pp->element[i].oy + t3f_gui_current_driver->get_element_height(&pp->element[i]))
 	{
 		return true;
 	}
 	return false;
 }
 
-static bool t3f_gui_check_hover(T3F_GUI * pp, int i)
+static bool t3f_gui_check_hover(T3F_GUI * pp, int i, float x, float y)
 {
-	return t3f_gui_check_hover_x(pp, i) && t3f_gui_check_hover_y(pp, i);
+	return t3f_gui_check_hover_x(pp, i, x) && t3f_gui_check_hover_y(pp, i, t3f_gui_hover_y);
 }
 
 void t3f_select_previous_gui_element(T3F_GUI * pp)
@@ -370,23 +370,37 @@ void t3f_process_gui(T3F_GUI * pp)
 {
 	int i;
 	bool mouse_moved = false;
+	bool touched = false;
 	int x, y;
+	float mouse_x = 0.0, mouse_y = 0.0;
 	
 	/* check if the mouse has been moved */
 	t3f_get_mouse_mickeys(&x, &y, NULL);
 	if(x != 0 || y != 0 || t3f_mouse_button[0])
 	{
+		mouse_x = t3f_mouse_x;
+		mouse_y = t3f_mouse_y;
 		mouse_moved = true;
+	}
+	for(i = 0; i < T3F_MAX_TOUCHES; i++)
+	{
+		if(t3f_touch[i].active)
+		{
+			mouse_x = t3f_touch[i].x;
+			mouse_y = t3f_touch[i].y;
+			touched = true;
+			break;
+		}
 	}
 	if(pp)
 	{
-		if(mouse_moved)
+		if(mouse_moved || touched)
 		{
-			t3f_gui_hover_y = t3f_mouse_y;
+			t3f_gui_hover_y = mouse_y;
 			pp->hover_element = -1;
 			for(i = 0; i < pp->elements; i++)
 			{
-				if(t3f_gui_check_hover(pp, i))
+				if(t3f_gui_check_hover(pp, i, mouse_x, mouse_y))
 				{
 					pp->hover_element = i;
 					break;
@@ -397,12 +411,12 @@ void t3f_process_gui(T3F_GUI * pp)
 		{
 			t3f_gui_hover_y = pp->oy + pp->element[pp->hover_element].oy;
 		}
-		if(t3f_mouse_button[0] && !t3f_gui_left_clicked && pp->hover_element >= 0)
+		if((t3f_mouse_button[0] || touched) && !t3f_gui_left_clicked && pp->hover_element >= 0)
 		{
 			t3f_activate_selected_gui_element(pp);
 			t3f_gui_left_clicked = true;
 		}
-		if(!t3f_mouse_button[0])
+		if(!t3f_mouse_button[0] && !touched)
 		{
 			t3f_gui_left_clicked = false;
 		}
@@ -411,7 +425,7 @@ void t3f_process_gui(T3F_GUI * pp)
 
 void t3f_render_gui_element(T3F_GUI * pp, int i, bool hover)
 {
-	if(!(pp->element[i].flags & T3F_GUI_ELEMENT_AUTOHIDE) || t3f_gui_check_hover_y(pp, i))
+	if(!(pp->element[i].flags & T3F_GUI_ELEMENT_AUTOHIDE) || t3f_gui_check_hover_y(pp, i, t3f_gui_hover_y))
 	{
 		t3f_gui_current_driver->render_element(pp, i, hover);
 	}
