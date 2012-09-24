@@ -164,6 +164,10 @@ void le_exit(void)
 	char val[256];
 	
 	config = al_load_config_file(le_config_filename);
+	if(!config)
+	{
+		config = al_create_config();
+	}
 	if(config)
 	{
 		sprintf(val, "%f", le_loop_start);
