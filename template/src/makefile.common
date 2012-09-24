@@ -15,7 +15,7 @@ all : $(APP_EXE_NAME) $(PLATFORM_TARGET)
 
 $(APP_EXE_NAME) : $(PROJECT_OBJECTS)
 	$(CC) $(PROJECT_OBJECTS) $(CFLAGS) $(PLATFORM_LIBS) $(APP_LIBS) $(T3F_DEPEND_LIBS) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
-	@echo vGolf executable built!
+	@echo Executable built!
 
 clean:
 	@$(PLATFORM_CLEAN)
