@@ -72,22 +72,6 @@ void le_render(void)
 	al_draw_textf(le_font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 16.0 + ox, LE_PROGRESS_Y - 8.0 - al_get_font_line_height(le_font), ALLEGRO_ALIGN_CENTRE, "%3.3f", le_loop_end);
 	ox = (le_music_pos / le_music_length) * (640.0 - 32.0);
 	al_draw_line(16.0 + ox + 0.5, LE_PROGRESS_Y - 8.0, 16.0 + ox + 0.5, LE_PROGRESS_Y + 8.0, al_map_rgba_f(0.0, 1.0, 0.0, 1.0), 1.0);
-	
-	/* render loop start close up */
-	al_draw_filled_rectangle(16.0, LE_ZOOM_Y - 2.0, 320.0 - 16.0 - 1.0, LE_ZOOM_Y + 2.0, al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
-	ox = le_music_pos / 10.0;
-	ticks = le_music_length * 10.0;
-	for(i = 0; i < ticks; i++)
-	{
-		time = 0.1 * (float)i;
-		ox = le_loop_start;
-		if(time - le_loop_start > 0.0 && time - le_loop_start < le_music_length)
-		{
-			al_draw_line(16.0 + (float)i * 10.0 - le_loop_start * 10.0 + 0.5, LE_ZOOM_Y, 16.0 + (float)i * 10.0 - le_loop_start * 10.0 + 0.5, LE_ZOOM_Y + 4.0, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 1.0);
-		}
-	}
-	ox = 160.0;
-	al_draw_line(16.0 + ox + 0.5, LE_ZOOM_Y - 8.0, 16.0 + ox + 0.5, LE_ZOOM_Y + 8.0, al_map_rgba_f(1.0, 0.0, 0.0, 1.0), 1.0);
 }
 
 bool le_initialize(void)
