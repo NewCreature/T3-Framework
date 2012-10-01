@@ -42,20 +42,20 @@ android_package:
 	mkdir ../temp/android/res/drawable-xhdpi
 	cp ../icons/android_icon-xhdpi_96.png ../temp/android/res/drawable-xhdpi/icon.png
 	@echo Editing project data to match our project definitions...
-	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroActivity.java
-	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroAPKStream.java
-	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroInputStream.java
-	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/AndroidManifest.xml
-	sed -i '' "s|$(APP_ANDROID_PACKAGE)_name|org.liballeg.app_name|" ../temp/android/AndroidManifest.xml
-	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/AndroidManifest.xml
-	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/jni/Android.mk
-	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/jni/Application.mk
+#	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroActivity.java
+#	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroAPKStream.java
+#	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroInputStream.java
+#	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/AndroidManifest.xml
+#	sed -i '' "s|$(APP_ANDROID_PACKAGE)_name|org.liballeg.app_name|" ../temp/android/AndroidManifest.xml
+#	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/AndroidManifest.xml
+#	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/jni/Android.mk
+#	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/jni/Application.mk
 	sed -i '' "s|main.c|$(APP_SOURCE_FILES)|" ../temp/android/jni/Android.mk
-#	sed -i '' "s|app_name|$(APP_ANDROID_NAME)_name|" ../temp/android/res/values/strings.xml
+##	sed -i '' "s|app_name|$(APP_ANDROID_NAME)_name|" ../temp/android/res/values/strings.xml
 	sed -i '' "s|AllegroActivity|$(APP_BUNDLE_NAME)|" ../temp/android/res/values/strings.xml
-#	sed -i '' "s|/app_name|/$(APP_ANDROID_NAME)_name|" ../temp/android/AndroidManifest.xml
-	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/jni/Android.mk
-	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/jni/Application.mk
+##	sed -i '' "s|/app_name|/$(APP_ANDROID_NAME)_name|" ../temp/android/AndroidManifest.xml
+#	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/jni/Android.mk
+#	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/jni/Application.mk
 	@echo Building Android project
-	cd ../temp/android; export T3F_APP_LIBS=$(APP_LIBS); export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT); $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
+	cd ../temp/android; export T3F_APP_LIBS=$(APP_LIBS); export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT); export T3F_APP_LIBS=$(T3F_APP_LIBS); export ANDROID_PLATFORM_LIBS=$(ANDROID_PLATFORM_LIBS); $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant -Dcompression.disabled=set debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
 	rm -rf ../temp
