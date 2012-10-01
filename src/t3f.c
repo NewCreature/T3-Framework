@@ -476,6 +476,7 @@ bool t3f_locate_resource(const char * filename)
 	
 	#ifdef T3F_ANDROID
 		al_android_set_apk_file_interface();
+		/* will check if file actually exists when Allegro implements file system access */
 /*		if(al_filename_exists(filename))
 		{
 			return true;
