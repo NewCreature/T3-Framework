@@ -283,11 +283,14 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		{
 			printf("Could not set up voice and mixer.\n");
 		}
+		else if(!al_init_acodec_addon())
+		{
+			printf("Could not initialize codecs\n");
+		}
 		else
 		{
 			t3f_flags |= T3F_USE_SOUND;
 		}
-		al_init_acodec_addon();
 	}
 	if(flags & T3F_USE_KEYBOARD)
 	{
@@ -473,11 +476,12 @@ bool t3f_locate_resource(const char * filename)
 	
 	#ifdef T3F_ANDROID
 		al_android_set_apk_file_interface();
-		if(al_filename_exists(filename))
+/*		if(al_filename_exists(filename))
 		{
 			return true;
 		}
-		al_set_standard_fs_interface();
+		al_set_standard_fs_interface(); */
+		return true;
 	#endif
 	
 	if(found)
