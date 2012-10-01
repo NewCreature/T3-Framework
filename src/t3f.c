@@ -649,6 +649,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		}
 		else
 		{
+			al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
 			cvalue = al_get_config_value(t3f_config, "T3F", "force_fullscreen");
 			cvalue2 = al_get_config_value(t3f_config, "T3F", "force_window");
 			if((flags & T3F_USE_FULLSCREEN || (cvalue && !strcmp(cvalue, "true"))) && !(cvalue2 && !strcmp(cvalue2, "true")))
