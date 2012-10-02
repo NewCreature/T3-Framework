@@ -384,6 +384,10 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 			t3f_joystick[i] = al_get_joystick(i);
 		}
 	}
+	if(t3f_flags & T3F_USE_TOUCH)
+	{
+		al_register_event_source(t3f_queue, al_get_touch_input_event_source());
+	}
 	if(!(t3f_flags & T3F_USE_CONSOLE))
 	{
 		al_register_event_source(t3f_queue, al_get_display_event_source(t3f_display));
