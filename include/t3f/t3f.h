@@ -70,6 +70,7 @@ typedef struct
 {
 	
 	bool active; // is this touch active?
+	bool released;
 	float x, y;
 	bool primary;
 	

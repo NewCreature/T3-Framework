@@ -972,7 +972,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			char val[8] = {0};
 			al_acknowledge_resize(t3f_display);
 			t3f_get_base_transform();
-			al_set_clipping_rectangle(0, 0, 0, 0);
+			al_set_clipping_rectangle(0, 0, al_get_display_width(t3f_display), al_get_display_height(t3f_display));
 			al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.0));
 			al_flip_display();
 			al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.0));
@@ -1037,6 +1037,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_touch[0].active = false;
 			t3f_touch[0].x = t3f_mouse_x;
 			t3f_touch[0].y = t3f_mouse_y;
+			t3f_touch[0].released = true;
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_AXES:
@@ -1103,6 +1104,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_touch[event->touch.id + 1].active = false;
 			t3f_touch[event->touch.id + 1].x = (float)(event->touch.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_touch[event->touch.id + 1].y = (float)(event->touch.y - t3f_display_offset_y) * t3f_mouse_scale_y;
+			t3f_touch[event->touch.id + 1].released = true;
 			break;
 		}
 		/* this keeps your program running */
