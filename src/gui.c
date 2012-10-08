@@ -388,7 +388,15 @@ void t3f_process_gui(T3F_GUI * pp)
 		{
 			mouse_x = t3f_touch[i].x;
 			mouse_y = t3f_touch[i].y;
+			mouse_moved = true;
+			break;
+		}
+		else if(t3f_touch[i].released)
+		{
+			mouse_x = t3f_touch[i].x;
+			mouse_y = t3f_touch[i].y;
 			touched = true;
+			t3f_touch[i].released = false;
 			break;
 		}
 	}
