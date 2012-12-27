@@ -11,7 +11,7 @@ static float t3f_music_target_volume = 1.0;
 static float t3f_music_fade_speed = 0.0;
 
 static char t3f_music_thread_fn[4096] = {0};
-static ALLEGRO_FILE_INTERFACE * t3f_music_thread_file_interface = NULL;
+static const ALLEGRO_FILE_INTERFACE * t3f_music_thread_file_interface = NULL;
 
 static const char * t3f_get_music_extension(const char * fn)
 {
@@ -197,12 +197,22 @@ void t3f_stop_music(void)
 
 void t3f_pause_music(void)
 {
-	al_set_audio_stream_playing(t3f_stream, false);
+	if(t3f_stream && t3f_music_mutex)
+	{
+		al_lock_mutex(t3f_music_mutex);
+		al_set_audio_stream_playing(t3f_stream, false);
+		al_unlock_mutex(t3f_music_mutex);
+	}
 }
 
 void t3f_resume_music(void)
 {
-	al_set_audio_stream_playing(t3f_stream, true);
+	if(t3f_stream && t3f_music_mutex)
+	{
+		al_lock_mutex(t3f_music_mutex);
+		al_set_audio_stream_playing(t3f_stream, true);
+		al_unlock_mutex(t3f_music_mutex);
+	}
 }
 
 void t3f_set_music_volume(float volume)

@@ -1,8 +1,8 @@
 #CC = gcc
 #CFLAGS = $(GLOBAL_CFLAGS) $(APP_CFLAGS) $(ANDROID_CFLAGS)
 #PLATFORM_OBJECTS = $(ANDROID_PLATFORM_OBJECTS)
-#PLATFORM_LIBS = $(ANDROID_PLATFORM_LIBS)
-#DEPEND_LIBS = $(ANDROID_DEPEND_LIBS)
+PLATFORM_LIBS = $(ANDROID_PLATFORM_LIBS)
+DEPEND_LIBS = $(ANDROID_DEPEND_LIBS)
 #LIB_SUFFIX = -static
 #DEL_COMMAND = rm -f
 #DEL_FOLDER_COMMAND = rm -rf
@@ -12,50 +12,57 @@ ANDROID_ARCHITECTURE = armeabi-v7a
 
 include makefile.common
 
-#generate Android package
+#generate Android package, rebuilds Allegro first to update package name
+android_package: build_temp build_allegro build_android
+	rm -rf ../temp
+
+#generate Android package, doesn't rebuild Allegro
+android_repackage: build_temp build_android
+	rm -rf ../temp
+
 #sed info: sed -i requires backup extension argument on OS X, should work fine this
 #          way on other Unix platforms, we should do "sed -i '' -original-new- filename"
-android_package:
+build_android:
 	@echo Copying sources to Android project...
-	mkdir -p ../temp
 	cp -a ../android ../temp
-#	cp -p $(APP_SOURCE_FILES) ../temp/android/jni
 	cp -a ../src ../temp
 	cp ../temp/android/jni/*.mk ../temp/src
 	rm -rf ../temp/android/jni
 	mv ../temp/src ../temp/android/jni
 	@echo Copying Allegro libs to Android project...
-	mkdir ../temp/android/jni/$(ANDROID_ARCHITECTURE)
-	mkdir ../temp/android/jni/include
+	mkdir -p ../temp/android/jni/$(ANDROID_ARCHITECTURE)
+	mkdir -p ../temp/android/jni/include
 	cp -a $(ANDROID_NDK_ROOT)/user/$(ANDROID_ARCHITECTURE)/lib/liballegro*.so ../temp/android/jni/$(ANDROID_ARCHITECTURE)
-#	cp -a $(ANDROID_NDK_ROOT)/user/$(ANDROID_ARCHITECTURE)/include/allegro5 ../temp/android/jni/include
 	@echo Copying data to Android project...
 	cp -a ../bin/data ../temp/android/assets
-	mkdir ../temp/android/res/drawable
+	mkdir -p ../temp/android/res/drawable
 	cp ../icons/android_icon-mdpi_48.png ../temp/android/res/drawable/icon.png
-	mkdir ../temp/android/res/drawable-hdpi
+	mkdir -p ../temp/android/res/drawable-hdpi
 	cp ../icons/android_icon-hdpi_72.png ../temp/android/res/drawable-hdpi/icon.png
-	mkdir ../temp/android/res/drawable-ldpi
+	mkdir -p ../temp/android/res/drawable-ldpi
 	cp ../icons/android_icon-ldpi_36.png ../temp/android/res/drawable-ldpi/icon.png
-	mkdir ../temp/android/res/drawable-mdpi
+	mkdir -p ../temp/android/res/drawable-mdpi
 	cp ../icons/android_icon-mdpi_48.png ../temp/android/res/drawable-mdpi/icon.png
-	mkdir ../temp/android/res/drawable-xhdpi
+	mkdir -p ../temp/android/res/drawable-xhdpi
 	cp ../icons/android_icon-xhdpi_96.png ../temp/android/res/drawable-xhdpi/icon.png
 	@echo Editing project data to match our project definitions...
-#	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroActivity.java
-#	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroAPKStream.java
-#	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroInputStream.java
-#	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/AndroidManifest.xml
-#	sed -i '' "s|$(APP_ANDROID_PACKAGE)_name|org.liballeg.app_name|" ../temp/android/AndroidManifest.xml
-#	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/AndroidManifest.xml
-#	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/jni/Android.mk
-#	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/jni/Application.mk
-	sed -i '' "s|main.c|$(APP_SOURCE_FILES)|" ../temp/android/jni/Android.mk
-##	sed -i '' "s|app_name|$(APP_ANDROID_NAME)_name|" ../temp/android/res/values/strings.xml
+	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroActivity.java
+	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/AndroidManifest.xml
+	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/AndroidManifest.xml
+	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/jni/Android.mk
+	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/jni/Application.mk
 	sed -i '' "s|AllegroActivity|$(APP_BUNDLE_NAME)|" ../temp/android/res/values/strings.xml
-##	sed -i '' "s|/app_name|/$(APP_ANDROID_NAME)_name|" ../temp/android/AndroidManifest.xml
-#	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/jni/Android.mk
-#	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/jni/Application.mk
+	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroAPKStream.java
+	sed -i '' "s|org.liballeg.app|$(APP_ANDROID_PACKAGE)|" ../temp/android/src/org/liballeg/app/AllegroInputStream.java
+	sed -i '' "s|main.c|$(APP_SOURCE_FILES)|" ../temp/android/jni/Android.mk
+	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/jni/Android.mk
+	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/jni/Application.mk
 	@echo Building Android project
-	cd ../temp/android; export T3F_APP_LIBS=$(APP_LIBS); export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT); export T3F_APP_LIBS=$(T3F_APP_LIBS); export ANDROID_PLATFORM_LIBS=$(ANDROID_PLATFORM_LIBS); $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant -Dcompression.disabled=set debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
-	rm -rf ../temp
+	cd ../temp/android; export T3F_APP_LIBS=$(APP_LIBS); export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT); export APP_LIBS=$(APP_LIBS); export ANDROID_PLATFORM_LIBS=$(ANDROID_PLATFORM_LIBS); $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant debug; cp bin/alandroid-project-debug.apk ../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
+
+build_allegro:
+	@echo Building Allegro...
+	cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT) -DWANT_ANDROID=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DANDROID_APP_NAME=$(APP_ANDROID_PACKAGE); make install
+	
+build_temp:
+	mkdir -p ../temp

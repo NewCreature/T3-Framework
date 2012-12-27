@@ -46,3 +46,6 @@ debian_package:
 
 android_package:
 	$(MAKE) -f makefile.android android_package
+
+android_repackage:
+	$(MAKE) -f makefile.android android_repackage

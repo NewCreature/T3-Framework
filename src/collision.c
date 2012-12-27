@@ -365,7 +365,7 @@ bool t3f_save_collision_tilemap_f(T3F_COLLISION_TILEMAP * tmp, ALLEGRO_FILE * fp
 			if(tmp->flags & T3F_COLLISION_TILEMAP_FLAG_USER_DATA)
 			{
 				al_fputc(fp, sizeof(tmp->data[j][k].user_data) / sizeof(int));
-				for(l = 0; l < sizeof(tmp->data[j][k].user_data) / sizeof(int); l++)
+				for(l = 0; l < (int)(sizeof(tmp->data[j][k].user_data) / sizeof(int)); l++)
 				{
 					al_fwrite32le(fp, tmp->data[j][k].user_data[l]);
 				}

@@ -4,8 +4,10 @@
 #include "t3f/t3f.h"
 #include "t3f/animation.h"
 #include "t3f/bitmap.h"
+#include "resource.h"
 
 static char ani_header[12] = {'O', 'C', 'D', 'A', 'S', 0};
+static char ani_filename[1024] = {0};
 
 /* memory management */
 T3F_ANIMATION * t3f_create_animation(void)
@@ -62,7 +64,7 @@ void t3f_destroy_animation(T3F_ANIMATION * ap)
 	}
 	for(i = 0; i < ap->bitmaps; i++)
 	{
-		al_destroy_bitmap(ap->bitmap[i]);
+		t3f_destroy_resource(ap->bitmap[i]);
 	}
 	al_free(ap);
 }
@@ -138,7 +140,7 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp)
 				for(i = 0; i < ap->bitmaps; i++)
 				{
 					fpos = al_ftell(fp);
-					ap->bitmap[i] = t3f_load_bitmap_f(fp);
+					ap->bitmap[i] = t3f_load_resource_f((void **)(&ap->bitmap[i]), T3F_RESOURCE_TYPE_BITMAP, fp, ani_filename, 0, 0);
 					if(!ap->bitmap[i])
 					{
 						al_fseek(fp, fpos, ALLEGRO_SEEK_SET);
@@ -194,6 +196,7 @@ T3F_ANIMATION * t3f_load_animation(const char * fn)
 	{
 		return NULL;
 	}
+	strcpy(ani_filename, fn);
 	ap = t3f_load_animation_f(fp);
 	al_fclose(fp);
 	return ap;
@@ -202,21 +205,20 @@ T3F_ANIMATION * t3f_load_animation(const char * fn)
 T3F_ANIMATION * t3f_load_animation_from_bitmap(const char * fn)
 {
 	T3F_ANIMATION * ap;
-	ALLEGRO_BITMAP * bp;
 	
 	ap = t3f_create_animation();
 	if(!ap)
 	{
 		return NULL;
 	}
-	bp = al_load_bitmap(fn);
-	if(!bp)
+	ap->bitmap[0] = t3f_load_resource((void **)(&(ap->bitmap[0])), T3F_RESOURCE_TYPE_BITMAP, fn, 0, 0, 0);
+	if(!ap->bitmap[0])
 	{
 		t3f_destroy_animation(ap);
 		return NULL;
 	}
-	t3f_animation_add_bitmap(ap, bp);
-	t3f_animation_add_frame(ap, 0, 0.0, 0.0, 0.0, al_get_bitmap_width(bp), al_get_bitmap_height(bp), 0.0, 1);
+	ap->bitmaps = 1;
+	t3f_animation_add_frame(ap, 0, 0.0, 0.0, 0.0, al_get_bitmap_width(ap->bitmap[0]), al_get_bitmap_height(ap->bitmap[0]), 0.0, 1);
 	return ap;
 }
 
@@ -355,7 +357,7 @@ bool t3f_add_animation_to_atlas(T3F_ATLAS * sap, T3F_ANIMATION * ap, int type)
 	/* add bitmaps to sprite sheet */
 	for(i = 0; i < ap->bitmaps; i++)
 	{
-		newbp[i] = t3f_add_bitmap_to_atlas(sap, ap->bitmap[i], type);
+		newbp[i] = t3f_add_bitmap_to_atlas(sap, &ap->bitmap[i], type);
 		if(!newbp[i])
 		{
 			failed = 1;

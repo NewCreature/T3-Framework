@@ -9,5 +9,5 @@ EXE_SUFFIX = .exe
 
 include makefile.common
 
-icon.o : icon.ico icon.rc
-	i586-mingw32msvc-windres -o icon.o icon.rc
+icon.o : ../icons/windows_icon.ico icon.rc
+	i586-mingw32msvc-windres --include-dir=../icons -o icon.o icon.rc

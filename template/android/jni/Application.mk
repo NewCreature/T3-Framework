@@ -10,4 +10,5 @@ APP_MODULES += liballegro_font-prebuilt
 APP_MODULES += liballegro_ttf-prebuilt
 APP_MODULES += liballegro_audio-prebuilt
 APP_MODULES += liballegro_acodec-prebuilt
+APP_MODULES += liballegro_physfs-prebuilt
 APP_MODULES += allegro-example

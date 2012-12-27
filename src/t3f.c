@@ -9,6 +9,8 @@
 
 #ifdef T3F_ANDROID
 	#include <allegro5/allegro_android.h>
+	#include <allegro5/allegro_physfs.h>
+	#include <physfs.h>
 #endif
 
 #include <stdio.h>
@@ -16,6 +18,7 @@
 
 #include "t3f/t3f.h"
 #include "t3f/memory.h"
+#include "resource.h"
 
 /* display data */
 int t3f_virtual_display_width = 0;
@@ -29,7 +32,7 @@ float t3f_mouse_scale_y = 1.0;
 
 /* keyboard data */
 bool t3f_key[ALLEGRO_KEY_MAX] = {false};
-char t3f_key_buffer[T3F_KEY_BUFFER_MAX] = {0};
+int t3f_key_buffer[T3F_KEY_BUFFER_MAX] = {0};
 int t3f_key_buffer_keys = 0;
 
 /* mouse data */
@@ -86,7 +89,10 @@ ALLEGRO_COLOR t3f_color_black;
 
 /* internal variables */
 static bool t3f_need_redraw = false;
+static int t3f_halted = 0;
 static void (*t3f_event_handler_proc)(ALLEGRO_EVENT * event) = NULL;
+static T3F_ATLAS * t3f_atlas[T3F_MAX_ATLASES] = {NULL};
+static int t3f_atlases = 0;
 
 static char * t3f_developer_name = NULL;
 static char * t3f_package_name = NULL; // used to locate resources
@@ -161,6 +167,8 @@ bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp)
 	return ret;
 }
 
+/* imports a bitmap from within the source file, reads size, creates mem buffer,
+ * loads from that buffer */
 ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp)
 {
 	ALLEGRO_BITMAP * bp = NULL;
@@ -406,6 +414,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	t3f_color_white = al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
 	t3f_color_black = al_map_rgba_f(0.0, 0.0, 0.0, 1.0);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+	al_inhibit_screensaver(true); // stop screensaver from showing
 	
 	t3f_logic_proc = logic_proc;
 	t3f_render_proc = render_proc;
@@ -416,11 +425,42 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 /* function to ease the burden of having resources located in different places
  * on different platforms, changes to the directory where it finds the specified
  * resource */
-bool t3f_locate_resource(const char * filename)
+bool t3f_locate_resource(char * argv, const char * filename)
 {
 	ALLEGRO_PATH * path;
 	ALLEGRO_PATH * file_path;
 	bool found = false;
+	
+	/* handle Android first so we don't do unnecessary checks */
+	#ifdef T3F_ANDROID
+	
+		int ret;
+		
+		/* try to use PHYSFS to access data */
+		if(PHYSFS_init(argv))
+		{
+			path = al_get_standard_path(ALLEGRO_EXENAME_PATH);
+			if(path)
+			{
+				ret = PHYSFS_addToSearchPath(al_path_cstr(path, '/'), 1);
+				al_destroy_path(path);
+				if(ret)
+				{
+					al_set_physfs_file_interface();
+					al_change_directory("assets");
+					if(al_filename_exists(filename))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		
+		/* if PHYSFS setup failed, use APK file interface instead */
+		al_android_set_apk_file_interface();
+		return true;
+
+	#endif
 	
 	/* if we are already in the correct directory */
 	if(al_filename_exists(filename))
@@ -477,17 +517,6 @@ bool t3f_locate_resource(const char * filename)
 		}
 		al_destroy_path(file_path);
 	}
-	
-	#ifdef T3F_ANDROID
-		al_android_set_apk_file_interface();
-		/* will check if file actually exists when Allegro implements file system access */
-/*		if(al_filename_exists(filename))
-		{
-			return true;
-		}
-		al_set_standard_fs_interface(); */
-		return true;
-	#endif
 	
 	if(found)
 	{
@@ -783,7 +812,7 @@ void t3f_clear_keys(void)
 	t3f_key_buffer_keys = 0;
 }
 
-bool t3f_add_key(char key)
+bool t3f_add_key(int key)
 {
 	if(t3f_key_buffer_keys < T3F_KEY_BUFFER_MAX)
 	{
@@ -840,7 +869,17 @@ void t3f_get_mouse_mickeys(int * x, int * y, int * z)
 
 void t3f_set_mouse_xy(float x, float y)
 {
-	al_set_mouse_xy(t3f_display, t3f_mouse_x / t3f_mouse_scale_x, t3f_mouse_y / t3f_mouse_scale_y);
+	al_set_mouse_xy(t3f_display, x / t3f_mouse_scale_x, y / t3f_mouse_scale_y);
+}
+
+void t3f_clear_touch_data(void)
+{
+	int i;
+	
+	for(i = 0; i < T3F_MAX_TOUCHES; i++)
+	{
+		t3f_touch[i].released = false;
+	}
 }
 
 bool t3f_push_state(int flags)
@@ -917,11 +956,16 @@ unsigned long t3f_checksum_file(const char * fn)
 {
 	ALLEGRO_FILE * fp;
 	unsigned long sum = 0;
+	int c;
 	
 	fp = al_fopen(fn, "rb");
 	while(!al_feof(fp))
 	{
-		sum += al_fgetc(fp);
+		c = al_fgetc(fp);
+		if(c != EOF)
+		{
+			sum += c;
+		}
 	}
 	al_fclose(fp);
 	return sum;
@@ -952,6 +996,12 @@ bool t3f_copy_file(const char * src, const char * dest)
 	al_fclose(fdest);
 	al_fclose(fsrc);
 	return true;
+}
+
+static void t3f_reload_proc(void)
+{
+	t3f_reload_resources();
+	t3f_rebuild_atlases();
 }
 
 void t3f_event_handler(ALLEGRO_EVENT * event)
@@ -1107,6 +1157,32 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_touch[event->touch.id + 1].released = true;
 			break;
 		}
+		
+		/* handle drawing halt */
+		case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
+		{
+			al_stop_timer(t3f_timer);
+			t3f_unload_resources();
+			t3f_halted = 1;
+			if(t3f_stream)
+			{
+				t3f_pause_music();
+			}
+			break;
+		}
+		case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
+		{
+			al_acknowledge_drawing_resume(t3f_display, t3f_reload_proc);
+			t3f_halted = 0;
+			if(t3f_stream)
+			{
+				t3f_resume_music();
+			}
+			t3f_set_clipping_rectangle(0, 0, 0, 0);
+			al_start_timer(t3f_timer);
+			break;
+		}
+		
 		/* this keeps your program running */
 		case ALLEGRO_EVENT_TIMER:
 		{
@@ -1148,7 +1224,15 @@ void t3f_run(void)
        	/* draw after we have run all the logic */
 		if(!(t3f_flags & T3F_USE_CONSOLE) && t3f_need_redraw && al_event_queue_is_empty(t3f_queue))
 		{
-			t3f_render();
+			if(!t3f_halted)
+			{
+				t3f_render();
+			}
+		}
+		if(t3f_halted == 1)
+		{
+			al_acknowledge_drawing_halt(t3f_display);
+			t3f_halted = 2;
 		}
 	}
 	if(t3f_developer_name)
@@ -1267,6 +1351,18 @@ float t3f_project_y(float y, float z)
 	}
 }
 
+static ALLEGRO_BITMAP * t3f_create_bitmap(int w, int h)
+{
+	ALLEGRO_STATE old_state;
+	ALLEGRO_BITMAP * bp;
+
+	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
+	bp = al_create_bitmap(w, h);
+	al_restore_state(&old_state);
+	return bp;
+}
+
 /* create an empty atlas of the specified type and size */
 T3F_ATLAS * t3f_create_atlas(int w, int h)
 {
@@ -1278,46 +1374,67 @@ T3F_ATLAS * t3f_create_atlas(int w, int h)
 	{
 		return NULL;
 	}
-	ap->bitmap = al_create_bitmap(w, h);
-	if(!ap->bitmap)
+	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
+	ap->page = t3f_create_bitmap(w, h);
+	al_restore_state(&old_state);
+	if(!ap->page)
 	{
 		al_free(ap);
 		return NULL;
 	}
 	ap->x = 1; // start at 1 so we get consistency with filtered bitmaps
 	ap->y = 1;
+	ap->width = w;
+	ap->height = h;
 	ap->line_height = 0;
+	ap->bitmaps = 0;
 	
 	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
-	al_set_target_bitmap(ap->bitmap);
+	al_set_target_bitmap(ap->page);
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 0.0));
 	al_restore_state(&old_state);
 	
+	t3f_atlas[t3f_atlases] = ap;
+	t3f_atlases++;
 	return ap;
 }
 
 /* destroy the atlas */
 void t3f_destroy_atlas(T3F_ATLAS * ap)
 {
-	al_destroy_bitmap(ap->bitmap);
+	int i, j;
+	
+	al_destroy_bitmap(ap->page);
 	al_free(ap);
+	for(i = 0; i < t3f_atlases; i++)
+	{
+		if(t3f_atlas[i] == ap)
+		{
+			for(j = i; j < t3f_atlases - 1; j++)
+			{
+				t3f_atlas[j] = t3f_atlas[j + 1];
+			}
+			t3f_atlases--;
+			break;
+		}
+	}
 }
 
-/* fix for when you have exceeded the size of the sprite sheet */
-ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, int type)
+ALLEGRO_BITMAP * t3f_put_bitmap_on_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int type)
 {
 	ALLEGRO_STATE old_state;
 	ALLEGRO_BITMAP * retbp = NULL;
 	ALLEGRO_TRANSFORM identity_transform;
 	
-	if(ap->y >= al_get_bitmap_height(ap->bitmap))
+	if(ap->y >= al_get_bitmap_height(ap->page))
 	{
 		return NULL;
 	}
 	
 	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TRANSFORM);
-	al_set_target_bitmap(ap->bitmap);
+	al_set_target_bitmap(ap->page);
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 	al_identity_transform(&identity_transform);
 	al_use_transform(&identity_transform);
@@ -1327,13 +1444,13 @@ ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, in
 		{
 			
 			/* go to next line if it doesn't fit */
-			if(ap->x + al_get_bitmap_width(bp) + 2 >= al_get_bitmap_width(ap->bitmap))
+			if(ap->x + al_get_bitmap_width(*bp) + 2 >= al_get_bitmap_width(ap->page))
 			{
 				ap->x = 1; // start at 1 so we get consistency with filtered bitmaps
 				ap->y += ap->line_height;
 				
 				/* if it still doesn't fit, fail */
-				if(ap->y  + al_get_bitmap_height(bp) + 2 >= al_get_bitmap_height(ap->bitmap))
+				if(ap->y  + al_get_bitmap_height(*bp) + 2 >= al_get_bitmap_height(ap->page))
 				{
 					al_restore_state(&old_state);
 					return NULL;
@@ -1342,56 +1459,103 @@ ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, in
 			
 //			retbp = _t3f_add_bitmap_to_region(t3f_ss_working_bitmap, bp, t3f_ss_working_pos_x + 1, t3f_ss_working_pos_y + 1);
 			/* need to extend edges of tiles so they don't have soft edges */
-			al_draw_bitmap(bp, ap->x, ap->y, 0);
-			al_draw_bitmap(bp, ap->x + 2, ap->y, 0);
-			al_draw_bitmap(bp, ap->x, ap->y + 2, 0);
-			al_draw_bitmap(bp, ap->x + 2, ap->y + 2, 0);
-			al_draw_bitmap(bp, ap->x + 1, ap->y, 0);
-			al_draw_bitmap(bp, ap->x + 1, ap->y + 2, 0);
-			al_draw_bitmap(bp, ap->x, ap->y + 1, 0);
-			al_draw_bitmap(bp, ap->x + 2, ap->y + 1, 0);
-			al_draw_bitmap(bp, ap->x + 1, ap->y + 1, 0);
+			al_draw_bitmap(*bp, ap->x, ap->y, 0);
+			al_draw_bitmap(*bp, ap->x + 2, ap->y, 0);
+			al_draw_bitmap(*bp, ap->x, ap->y + 2, 0);
+			al_draw_bitmap(*bp, ap->x + 2, ap->y + 2, 0);
+			al_draw_bitmap(*bp, ap->x + 1, ap->y, 0);
+			al_draw_bitmap(*bp, ap->x + 1, ap->y + 2, 0);
+			al_draw_bitmap(*bp, ap->x, ap->y + 1, 0);
+			al_draw_bitmap(*bp, ap->x + 2, ap->y + 1, 0);
+			al_draw_bitmap(*bp, ap->x + 1, ap->y + 1, 0);
 			
-			retbp = al_create_sub_bitmap(ap->bitmap, ap->x + 1, ap->y + 1, al_get_bitmap_width(bp), al_get_bitmap_height(bp));
+			retbp = al_create_sub_bitmap(ap->page, ap->x + 1, ap->y + 1, al_get_bitmap_width(*bp), al_get_bitmap_height(*bp));
 			
-			ap->x += al_get_bitmap_width(bp) + 2;
-			if(al_get_bitmap_height(bp) + 2 > ap->line_height)
+			ap->x += al_get_bitmap_width(*bp) + 2;
+			if(al_get_bitmap_height(*bp) + 2 > ap->line_height)
 			{
-				ap->line_height = al_get_bitmap_height(bp) + 2;
+				ap->line_height = al_get_bitmap_height(*bp) + 2;
 			}
 			break;
 		}
 		case T3F_ATLAS_SPRITE:
 		{
 			/* go to next line if it doesn't fit */
-			if(ap->x + al_get_bitmap_width(bp) + 2 >= al_get_bitmap_width(ap->bitmap))
+			if(ap->x + al_get_bitmap_width(*bp) + 2 >= al_get_bitmap_width(ap->page))
 			{
-				ap->x = 0;
+				ap->x = 1;
 				ap->y += ap->line_height;
 				
 				/* if it still doesn't fit, fail */
-				if(ap->y + al_get_bitmap_height(bp) + 2 >= al_get_bitmap_height(ap->bitmap))
+				if(ap->y + al_get_bitmap_height(*bp) + 2 >= al_get_bitmap_height(ap->page))
 				{
 					al_restore_state(&old_state);
 					return NULL;
 				}
 			}
 //			retbp = _t3f_add_bitmap_to_region(t3f_ss_working_bitmap, bp, t3f_ss_working_pos_x, t3f_ss_working_pos_y);
-			al_draw_bitmap(bp, ap->x + 1, ap->y + 1, 0);
+			al_draw_bitmap(*bp, ap->x + 1, ap->y + 1, 0);
 			
-			retbp = al_create_sub_bitmap(ap->bitmap, ap->x + 1, ap->y + 1, al_get_bitmap_width(bp), al_get_bitmap_height(bp));
+			retbp = al_create_sub_bitmap(ap->page, ap->x + 1, ap->y + 1, al_get_bitmap_width(*bp), al_get_bitmap_height(*bp));
 			
-			ap->x += al_get_bitmap_width(bp) + 2;
-			if(al_get_bitmap_height(bp) + 1 > ap->line_height)
+			ap->x += al_get_bitmap_width(*bp) + 2;
+			if(al_get_bitmap_height(*bp) + 1 > ap->line_height)
 			{
-				ap->line_height = al_get_bitmap_height(bp) + 2;
+				ap->line_height = al_get_bitmap_height(*bp) + 2;
 			}
 			break;
 		}
 	}
 	al_restore_state(&old_state);
+	return retbp;
+}
+
+/* fix for when you have exceeded the size of the sprite sheet */
+ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int type)
+{
+	ALLEGRO_BITMAP * retbp = NULL;
+	
+	retbp = t3f_put_bitmap_on_atlas(ap, bp, type);
+	if(retbp)
+	{
+		ap->bitmap[ap->bitmaps] = bp;
+		ap->bitmap_type[ap->bitmaps] = type;
+		ap->bitmaps++;
+	}
 		
 	return retbp;
+}
+
+bool t3f_rebuild_atlases(void)
+{
+	ALLEGRO_STATE old_state;
+	int i, j;
+	
+	for(i = 0; i < t3f_atlases; i++)
+	{
+		al_destroy_bitmap(t3f_atlas[i]->page);
+		al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+		al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
+		t3f_atlas[i]->page = t3f_create_bitmap(t3f_atlas[i]->width, t3f_atlas[i]->height);
+		al_restore_state(&old_state);
+		if(!t3f_atlas[i]->page)
+		{
+			return false;
+		}
+		al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
+		al_set_target_bitmap(t3f_atlas[i]->page);
+		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+		al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 0.0));
+		al_restore_state(&old_state);
+		t3f_atlas[i]->x = 1; // start at 1 so we get consistency with filtered bitmaps
+		t3f_atlas[i]->y = 1;
+		t3f_atlas[i]->line_height = 0;
+		for(j = 0; j < t3f_atlas[i]->bitmaps; j++)
+		{
+			*t3f_atlas[i]->bitmap[j] = t3f_put_bitmap_on_atlas(t3f_atlas[i], t3f_atlas[i]->bitmap[j], t3f_atlas[i]->bitmap_type[j]);
+		}
+	}
+	return true;
 }
 
 void t3f_draw_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float x, float y, float z, int flags)

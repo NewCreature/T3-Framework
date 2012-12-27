@@ -192,7 +192,7 @@ void t3f_destroy_font(T3F_FONT * fp)
 float t3f_get_text_width(T3F_FONT * fp, const char * text)
 {
 	float w = 0.0;
-	int i;
+	unsigned int i;
 	
 	for(i = 0; i < strlen(text); i++)
 	{
@@ -230,7 +230,7 @@ void t3f_create_text_line_data(T3F_TEXT_LINE_DATA * lp, T3F_FONT * fp, float w, 
 	}
 	
 	/* divide text into lines */
-	for(i = 0; i < strlen(text); i++)
+	for(i = 0; i < (int)strlen(text); i++)
 	{
 		current_line[current_line_pos] = text[i];
 		current_line[current_line_pos + 1] = '\0';
@@ -291,7 +291,8 @@ void t3f_draw_text_lines(T3F_TEXT_LINE_DATA * lines, ALLEGRO_COLOR color, float 
 void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * text)
 {
 	T3F_TEXT_LINE_DATA line_data;
-	int i, j;
+	unsigned int i;
+	int j;
 	float pos = x - fp->adjust * fp->scale;
 	float posy = y - fp->adjust * fp->scale;
 	float fw, fh;

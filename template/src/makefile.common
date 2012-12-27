@@ -1,6 +1,6 @@
 include makefile.defines
 
-T3F_OBJECTS = t3f/t3f.o t3f/bitmap.o t3f/animation.o t3f/sound.o t3f/music.o t3f/collision.o t3f/controller.o t3f/font.o t3f/gui.o t3f/tilemap.o t3f/vector.o
+T3F_OBJECTS = t3f/t3f.o t3f/bitmap.o t3f/animation.o t3f/sound.o t3f/music.o t3f/collision.o t3f/controller.o t3f/font.o t3f/gui.o t3f/tilemap.o t3f/vector.o t3f/resource.o
 T3F_DEPEND_LIBS = -lallegro_image$(LIB_SUFFIX) -lallegro_font$(LIB_SUFFIX) -lallegro_ttf$(LIB_SUFFIX) -lallegro_primitives$(LIB_SUFFIX) -lallegro_audio$(LIB_SUFFIX) -lallegro_acodec$(LIB_SUFFIX) -lallegro_memfile$(LIB_SUFFIX) -lallegro$(LIB_SUFFIX)
 
 PROJECT_OBJECTS = $(T3F_OBJECTS) $(APP_OBJECTS) $(PLATFORM_OBJECTS)

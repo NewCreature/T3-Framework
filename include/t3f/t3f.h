@@ -8,6 +8,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
@@ -38,6 +39,8 @@
 
 #define T3F_ATLAS_TILE     0
 #define T3F_ATLAS_SPRITE   1
+#define T3F_ATLAS_MAX_BITMAPS 1024
+#define T3F_MAX_ATLASES   32
 
 /* structure holds information about a 3D viewport usually used to represent
    one player's screen, split screen games will have multiple viewports */
@@ -58,11 +61,14 @@ typedef struct
 
 typedef struct
 {
-	
-	ALLEGRO_BITMAP * bitmap;
-	int type;
+
+	ALLEGRO_BITMAP * page;
 	int x, y;
+	int width, height;
 	int line_height;
+	ALLEGRO_BITMAP ** bitmap[T3F_ATLAS_MAX_BITMAPS];
+	int bitmap_type[T3F_ATLAS_MAX_BITMAPS];
+	int bitmaps;
 	
 } T3F_ATLAS;
 
@@ -85,7 +91,7 @@ typedef struct
 #include "collision.h"
 #include "controller.h"
 #include "gui.h"
-#include "tilemap.h"
+//#include "tilemap.h"
 #include "vector.h"
 
 extern int t3f_virtual_display_width;
@@ -123,7 +129,7 @@ extern ALLEGRO_COLOR t3f_color_black;
 void t3f_set_developer_name(const char * developer);
 void t3f_set_package_name(const char * package);
 int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(), void (*render_proc)(), int flags);
-bool t3f_locate_resource(const char * filename);
+bool t3f_locate_resource(char * argv, const char * filename);
 int t3f_set_gfx_mode(int w, int h, int flags);
 void t3f_set_clipping_rectangle(int x, int y, int w, int h);
 void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event));
@@ -137,12 +143,15 @@ double t3f_drand(void);
 
 /* keyboard */
 void t3f_clear_keys(void);
-bool t3f_add_key(char key);
+bool t3f_add_key(int key);
 char t3f_read_key(int flags);
 
 /* mouse */
 void t3f_get_mouse_mickeys(int * x, int * y, int * z);
 void t3f_set_mouse_xy(float x, float y);
+
+/* touch */
+void t3f_clear_touch_data(void);
 
 bool t3f_push_state(int flags);
 bool t3f_pop_state(void);
@@ -171,7 +180,8 @@ float t3f_project_y(float y, float z);
 /* sprite atlas functions */
 T3F_ATLAS * t3f_create_atlas(int w, int h);
 void t3f_destroy_atlas(T3F_ATLAS * ap);
-ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, int type);
+ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int type);
+bool t3f_rebuild_atlases(void);
 
 /* drawing functions */
 void t3f_draw_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float x, float y, float z, int flags);

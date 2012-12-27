@@ -117,6 +117,7 @@ public class AllegroActivity extends Activity implements SensorEventListener
       System.loadLibrary("allegro_ttf-debug");
       System.loadLibrary("allegro_audio-debug");
       System.loadLibrary("allegro_acodec-debug");
+      System.loadLibrary("allegro_physfs-debug");
       //System.loadLibrary("allegro_monolith-debug");
    }
 	
@@ -431,6 +432,7 @@ public class AllegroActivity extends Activity implements SensorEventListener
   
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+      getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
       Log.d("AllegroActivity", "onCreate end");
    }
@@ -1022,6 +1024,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    public native void nativeOnChange(int format, int width, int height);
    public native void nativeOnKeyDown(int key);
    public native void nativeOnKeyUp(int key);
+   public native void nativeOnKeyChar(int key, int unichar);
    public native void nativeOnTouch(int id, int action, float x, float y, boolean primary);
    
    /** functions that native code calls */
@@ -1478,8 +1481,26 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
          }
    }
 
+   public boolean onKeyPreIme(int keyCode, KeyEvent event)
+   {
+      int unichar;
+      if (event.getAction() == KeyEvent.ACTION_DOWN) {
+         nativeOnKeyDown(keyMap[keyCode]);
+         unichar = event.getUnicodeChar();
+         nativeOnKeyChar(keyMap[keyCode], unichar);
+         return true;
+      }
+      else if (event.getAction() == KeyEvent.ACTION_UP) {
+         nativeOnKeyUp(keyMap[keyCode]);
+         return true;
+      }
+         
+      return false;
+   }
+
    public boolean onKey(View v, int keyCode, KeyEvent event)
    {
+      int unichar;
       if (event.getAction() == KeyEvent.ACTION_DOWN) {
          if (!captureVolume) {
             if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
@@ -1491,6 +1512,8 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
                return true;
             }
          }
+         unichar = event.getUnicodeChar();
+         nativeOnKeyChar(keyMap[keyCode], unichar);
          nativeOnKeyDown(keyMap[keyCode]);
          return true;
       }
