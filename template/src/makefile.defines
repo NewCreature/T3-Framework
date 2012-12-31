@@ -14,7 +14,7 @@ APP_ANDROID_NAME = t3f_app
 ################
 # global stuff #
 ################
-GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall
+GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall -I. -DT3F_DEVELOPER_NAME="\"$(APP_COMPANY)\"" -DT3F_PACKAGE_NAME="\"$(APP_NAME)\""
 
 ##################
 # Mac OS X stuff #
