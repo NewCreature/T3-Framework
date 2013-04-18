@@ -432,7 +432,7 @@ public class AllegroActivity extends Activity implements SensorEventListener
   
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-      getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+//      getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
       Log.d("AllegroActivity", "onCreate end");
    }
@@ -1024,7 +1024,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
    public native void nativeOnChange(int format, int width, int height);
    public native void nativeOnKeyDown(int key);
    public native void nativeOnKeyUp(int key);
-   public native void nativeOnKeyChar(int key, int unichar);
+//   public native void nativeOnKeyChar(int key, int unichar);
    public native void nativeOnTouch(int id, int action, float x, float y, boolean primary);
    
    /** functions that native code calls */
@@ -1481,7 +1481,7 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
          }
    }
 
-   public boolean onKeyPreIme(int keyCode, KeyEvent event)
+/*   public boolean onKeyPreIme(int keyCode, KeyEvent event)
    {
       int unichar;
       if (event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -1496,11 +1496,11 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
       }
          
       return false;
-   }
+   } */
 
    public boolean onKey(View v, int keyCode, KeyEvent event)
    {
-      int unichar;
+//      int unichar;
       if (event.getAction() == KeyEvent.ACTION_DOWN) {
          if (!captureVolume) {
             if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
@@ -1512,8 +1512,8 @@ class AllegroSurface extends SurfaceView implements SurfaceHolder.Callback,
                return true;
             }
          }
-         unichar = event.getUnicodeChar();
-         nativeOnKeyChar(keyMap[keyCode], unichar);
+//         unichar = event.getUnicodeChar();
+//         nativeOnKeyChar(keyMap[keyCode], unichar);
          nativeOnKeyDown(keyMap[keyCode]);
          return true;
       }

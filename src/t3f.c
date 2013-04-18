@@ -627,41 +627,67 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	{
 		fsw_supported = false;
 	}
+	cvalue = al_get_config_value(t3f_config, "T3F", "force_resizable");
+	if(cvalue && !strcmp(cvalue, "true"))
+	{
+		flags |= T3F_RESIZABLE;
+	}
 	
 	if(t3f_display)
 	{
-		if(flags & T3F_USE_FULLSCREEN)
+		if(flags & T3F_RESIZABLE)
 		{
-			/* toggle flag if going from window to full screen */
-			if(!(t3f_flags & T3F_USE_FULLSCREEN))
+			if(!(t3f_flags & T3F_RESIZABLE))
 			{
-				if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, true))
-				{
-					ret = 2;
-				}
-				else
-				{
-					t3f_flags |= T3F_USE_FULLSCREEN;
-				}
+				ret = 2;
 			}
 		}
 		else
 		{
-			/* if we are switching from full screen to window */
-			if(t3f_flags & T3F_USE_FULLSCREEN)
+			if(t3f_flags & T3F_RESIZABLE)
 			{
-				if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false))
+				ret = 2;
+			}
+		}
+
+		/* don't attempt to set new video mode if we already know we need to destroy the display
+		 * to get the type of display requested */
+		if(ret != 2)
+		{
+			if(flags & T3F_USE_FULLSCREEN)
+			{
+				/* toggle flag if going from window to full screen */
+				if(!(t3f_flags & T3F_USE_FULLSCREEN))
 				{
-					ret = 2;
-				}
-				else
-				{
-					t3f_flags &= ~T3F_USE_FULLSCREEN;
+					if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, true))
+					{
+						ret = 2;
+					}
+					else
+					{
+						t3f_flags |= T3F_USE_FULLSCREEN;
+					}
 				}
 			}
 			else
 			{
-				al_resize_display(t3f_display, w, h);
+				/* if we are switching from full screen to window */
+				if(t3f_flags & T3F_USE_FULLSCREEN)
+				{
+					if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false))
+					{
+						ret = 2;
+					}
+					else
+					{
+						t3f_flags &= ~T3F_USE_FULLSCREEN;
+						al_resize_display(t3f_display, w, h);
+					}
+				}
+				else
+				{
+					al_resize_display(t3f_display, w, h);
+				}
 			}
 		}
 		sprintf(val, "%d", w);
@@ -698,14 +724,26 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				}
 				t3f_flags |= T3F_USE_FULLSCREEN;
 			}
+			else
+			{
+				t3f_flags &= ~T3F_USE_FULLSCREEN;
+			}
 			if(flags & T3F_RESIZABLE)
 			{
 				dflags |= ALLEGRO_RESIZABLE;
 				t3f_flags |= T3F_RESIZABLE;
 			}
+			else
+			{
+				t3f_flags &= ~T3F_RESIZABLE;
+			}
 			if(flags & T3F_FORCE_ASPECT)
 			{
 				t3f_flags |= T3F_FORCE_ASPECT;
+			}
+			else
+			{
+				t3f_flags &= ~T3F_FORCE_ASPECT;
 			}
 			al_set_new_display_flags(dflags);
 			al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
@@ -998,12 +1036,6 @@ bool t3f_copy_file(const char * src, const char * dest)
 	return true;
 }
 
-static void t3f_reload_proc(void)
-{
-	t3f_reload_resources();
-	t3f_rebuild_atlases();
-}
-
 void t3f_event_handler(ALLEGRO_EVENT * event)
 {
 	switch(event->type)
@@ -1172,8 +1204,10 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		}
 		case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
 		{
-			al_acknowledge_drawing_resume(t3f_display, t3f_reload_proc);
+			al_acknowledge_drawing_resume(t3f_display);
 			t3f_halted = 0;
+			t3f_reload_resources();
+			t3f_rebuild_atlases();
 			if(t3f_stream)
 			{
 				t3f_resume_music();

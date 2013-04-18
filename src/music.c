@@ -6,12 +6,34 @@
 
 ALLEGRO_AUDIO_STREAM * t3f_stream = NULL;
 ALLEGRO_MUTEX * t3f_music_mutex = NULL;
+ALLEGRO_MUTEX * t3f_music_state_mutex = NULL;
+int t3f_music_state = T3F_MUSIC_STATE_OFF;
 static float t3f_music_volume = 1.0;
+static float t3f_new_music_volume = 1.0;
 static float t3f_music_target_volume = 1.0;
 static float t3f_music_fade_speed = 0.0;
 
 static char t3f_music_thread_fn[4096] = {0};
 static const ALLEGRO_FILE_INTERFACE * t3f_music_thread_file_interface = NULL;
+
+static bool t3f_set_music_state(int state)
+{
+	
+	/* create the mutex if necessary */
+	if(!t3f_music_state_mutex)
+	{
+		t3f_music_state_mutex = al_create_mutex();
+		if(!t3f_music_state_mutex)
+		{
+			return false;
+		}
+	}
+	
+	al_lock_mutex(t3f_music_state_mutex);
+	t3f_music_state = state;
+	al_unlock_mutex(t3f_music_state_mutex);
+	return true;
+}
 
 static const char * t3f_get_music_extension(const char * fn)
 {
@@ -49,6 +71,7 @@ static void * t3f_play_music_thread(void * arg)
 	if(!t3f_stream)
 	{
 		al_unlock_mutex(t3f_music_mutex);
+		t3f_set_music_state(T3F_MUSIC_STATE_OFF);
 		return NULL;
 	}
 	
@@ -120,10 +143,11 @@ static void * t3f_play_music_thread(void * arg)
 			al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_LOOP);
 		}
 	}
-	
+	t3f_music_volume = t3f_new_music_volume;
 	al_set_audio_stream_gain(t3f_stream, t3f_music_volume * gain);
 	al_attach_audio_stream_to_mixer(t3f_stream, al_get_default_mixer());
 	al_unlock_mutex(t3f_music_mutex);
+	t3f_set_music_state(T3F_MUSIC_STATE_PLAYING);
 	return NULL;
 }
 
@@ -176,11 +200,13 @@ bool t3f_play_music(const char * fn)
 	{
 		strcpy(t3f_music_thread_fn, fn);
 		t3f_music_thread_file_interface = al_get_new_file_interface(); // copy current file interface so we can use it in the music thread
+		t3f_set_music_state(T3F_MUSIC_STATE_TRACK_CHANGE);
 		al_run_detached_thread(t3f_play_music_thread, NULL);
 		return true;
 	}
 	else
 	{
+		t3f_set_music_state(T3F_MUSIC_STATE_OFF);
 		return false;
 	}
 }
@@ -192,6 +218,7 @@ void t3f_stop_music(void)
 		al_drain_audio_stream(t3f_stream);
 		al_destroy_audio_stream(t3f_stream);
 		t3f_stream = NULL;
+		t3f_set_music_state(T3F_MUSIC_STATE_OFF);
 	}
 }
 
@@ -202,6 +229,7 @@ void t3f_pause_music(void)
 		al_lock_mutex(t3f_music_mutex);
 		al_set_audio_stream_playing(t3f_stream, false);
 		al_unlock_mutex(t3f_music_mutex);
+		t3f_set_music_state(T3F_MUSIC_STATE_PAUSED);
 	}
 }
 
@@ -212,6 +240,7 @@ void t3f_resume_music(void)
 		al_lock_mutex(t3f_music_mutex);
 		al_set_audio_stream_playing(t3f_stream, true);
 		al_unlock_mutex(t3f_music_mutex);
+		t3f_set_music_state(T3F_MUSIC_STATE_PLAYING);
 	}
 }
 
@@ -222,6 +251,11 @@ void t3f_set_music_volume(float volume)
 	{
 		al_set_audio_stream_gain(t3f_stream, t3f_music_volume);
 	}
+}
+
+void t3f_set_new_music_volume(float volume)
+{
+	t3f_new_music_volume = volume;
 }
 
 float t3f_get_music_volume(void)
@@ -236,4 +270,18 @@ void t3f_fade_out_music(float speed)
 		t3f_music_fade_speed = speed;
 		al_run_detached_thread(t3f_fade_music_thread, NULL);
 	}
+}
+
+int t3f_get_music_state(void)
+{
+	int state;
+	
+	if(t3f_music_state_mutex)
+	{
+		al_lock_mutex(t3f_music_state_mutex);
+		state = t3f_music_state;
+		al_unlock_mutex(t3f_music_state_mutex);
+		return state;
+	}
+	return T3F_MUSIC_STATE_OFF;
 }

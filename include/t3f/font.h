@@ -5,6 +5,8 @@
 
 #define T3F_FONT_MAX_CHARACTERS 256
 #define T3F_FONT_OUTLINE          1
+#define T3F_FONT_ALIGN_RIGHT      1
+#define T3F_FONT_ALIGN_CENTER     2
 
 typedef struct
 {
@@ -35,6 +37,7 @@ typedef struct
 
 ALLEGRO_FONT * t3f_load_bitmap_font(const char * fn);
 
+T3F_FONT * t3f_load_font_f(ALLEGRO_FILE * fp, int size, int flags);
 T3F_FONT * t3f_load_font(const char * fn, int size, int flags);
 void t3f_destroy_font(T3F_FONT * fp);
 float t3f_get_text_width(T3F_FONT * fp, const char * text);

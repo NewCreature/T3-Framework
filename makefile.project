@@ -15,5 +15,7 @@ else
 	@cp template/docs/* $(DIR)/docs
 	@cp -a template/debian $(DIR)
 	@cp -a template/android $(DIR) 
+	@cp -a template/win32 $(DIR) 
+	@cp -a template/macosx $(DIR) 
 	@cp -a template/icons $(DIR)
 endif

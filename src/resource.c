@@ -108,11 +108,39 @@ void t3f_bitmap_font_resource_handler_destroy_proc(void * ptr)
 	al_destroy_font(ptr);
 }
 
+void * t3f_t3f_font_resource_handler_proc(ALLEGRO_FILE * fp, const char * filename, int option, int flags, unsigned long offset)
+{
+	void * ptr = NULL;
+	ALLEGRO_STATE old_state;
+	bool openfp = false;
+	
+	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
+	if(fp)
+	{
+		openfp = true;
+	}
+	
+	/* load file directly if offset is 0 and open file not passed */
+	else if(offset == 0)
+	{
+		ptr = t3f_load_font(filename, option, flags);
+	}
+	al_restore_state(&old_state);
+	return ptr;
+}
+
+void t3f_t3f_font_resource_handler_destroy_proc(void * ptr)
+{
+	t3f_destroy_font(ptr);
+}
+
 static T3F_RESOURCE_HANDLER t3f_resource_handler[T3F_MAX_RESOURCE_HANDLERS] = 
 {
 	{t3f_bitmap_resource_handler_proc, t3f_bitmap_resource_handler_destroy_proc, 0},	
 	{t3f_font_resource_handler_proc, t3f_font_resource_handler_destroy_proc, 0},	
 	{t3f_bitmap_font_resource_handler_proc, t3f_bitmap_font_resource_handler_destroy_proc, 0},	
+	{t3f_t3f_font_resource_handler_proc, t3f_t3f_font_resource_handler_destroy_proc, 0},	
 };
 
 void t3f_register_resource_handler(int type, void * (*proc)(ALLEGRO_FILE * fp, const char * filename, int option, int flags, unsigned long offset), void (*destroy_proc)(void * ptr))

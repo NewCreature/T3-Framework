@@ -115,6 +115,7 @@ extern ALLEGRO_JOYSTICK_STATE t3f_joystick_state[T3F_MAX_JOYSTICKS];
 extern T3F_TOUCH t3f_touch[T3F_MAX_TOUCHES];
 extern ALLEGRO_DISPLAY * t3f_display;
 extern ALLEGRO_TIMER * t3f_timer;
+extern ALLEGRO_EVENT_QUEUE * t3f_queue;
 extern ALLEGRO_CONFIG * t3f_config;
 extern ALLEGRO_PATH * t3f_data_path;
 extern ALLEGRO_PATH * t3f_config_path;

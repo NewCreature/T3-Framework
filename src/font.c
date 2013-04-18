@@ -94,6 +94,7 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 	char buf[2] = {0};
 	int i;
 	int space;
+	int cx, cy, cw, ch, cox;
 	
 	if(flags & T3F_FONT_OUTLINE)
 	{
@@ -129,7 +130,15 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 				for(i = 0; i < 256; i++)
 				{
 					buf[0] = i;
+					al_get_text_dimensions(font, buf, &cx, &cy, &cw, &ch);
 					w = al_get_text_width(font, buf) + space;
+					cox = 0;
+					if(cx < 0)
+					{
+						ox -= cx;
+						w -= cx;
+						cox = -cx;
+					}
 					if(ox + w > 1024)
 					{
 						ox = 1;
@@ -143,7 +152,7 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 						al_draw_text(font, al_map_rgba_f(0.0, 0.0, 0.0, 1.0), ox + 2, oy + 1, 0, buf);
 					}
 					al_draw_text(font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), ox + 1, oy + 1, 0, buf);
-					fp->character[i] = al_create_sub_bitmap(fp->character_sheet, ox, oy, w - 2, h - 2);
+					fp->character[i] = al_create_sub_bitmap(fp->character_sheet, ox - cox, oy, w - 2, h - 2);
 					if(!fp->character[i])
 					{
 						printf("could not create sub-bitmap\n");
@@ -306,6 +315,14 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 	if(!held)
 	{
 		al_hold_bitmap_drawing(true);
+	}
+	if(flags & T3F_FONT_ALIGN_CENTER)
+	{
+		pos -= t3f_get_text_width(fp, text) / 2.0;
+	}
+	else if(flags & T3F_FONT_ALIGN_RIGHT)
+	{
+		pos -= t3f_get_text_width(fp, text);
 	}
 	if(w > 0.0)
 	{

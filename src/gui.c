@@ -21,10 +21,6 @@ static float allegro_get_element_width(T3F_GUI_ELEMENT * ep)
 		{
 			return al_get_bitmap_width(((ALLEGRO_BITMAP *)(ep->data)));
 		}
-		case T3F_GUI_ELEMENT_SLIDER:
-		{
-			return (ep->d2 - ep->d1) * ep->d3;
-		}
 	}
 	return 0.0;
 }
@@ -38,10 +34,6 @@ static float allegro_get_element_height(T3F_GUI_ELEMENT * ep)
 			return al_get_font_line_height((ALLEGRO_FONT *)ep->aux_data);
 		}
 		case T3F_GUI_ELEMENT_IMAGE:
-		{
-			return al_get_bitmap_height(((ALLEGRO_BITMAP *)(ep->data)));
-		}
-		case T3F_GUI_ELEMENT_SLIDER:
 		{
 			return al_get_bitmap_height(((ALLEGRO_BITMAP *)(ep->data)));
 		}
@@ -135,46 +127,6 @@ static void allegro_render_element(T3F_GUI * pp, int i, bool hover)
 					if(pp->element[i].data)
 					{
 						al_draw_bitmap((ALLEGRO_BITMAP *)(pp->element[i].data), pp->ox + pp->element[i].ox + sx, pp->oy + pp->element[i].oy + sy, 0);
-					}
-				}
-			}
-			break;
-		}
-		case T3F_GUI_ELEMENT_SLIDER:
-		{
-			if(pp->element[i].flags & T3F_GUI_ELEMENT_SHADOW)
-			{
-				if(pp->element[i].flags & T3F_GUI_ELEMENT_CENTRE)
-				{
-					if(pp->element[i].data)
-					{
-						al_draw_tinted_bitmap((ALLEGRO_BITMAP *)(pp->element[i].data), al_map_rgba_f(0.0, 0.0, 0.0, 0.5), pp->ox + pp->element[i].ox - al_get_bitmap_width(((ALLEGRO_BITMAP *)(pp->element[i].data))) / 2 + pp->element[i].d4 * pp->element[i].d3, pp->oy + pp->element[i].oy - al_get_bitmap_width(((ALLEGRO_BITMAP *)(pp->element[i].data))) / 2, 0);
-						al_draw_bitmap((ALLEGRO_BITMAP *)(pp->element[i].data), pp->ox + pp->element[i].ox - al_get_bitmap_width(((ALLEGRO_BITMAP *)(pp->element[i].data))) / 2 + pp->element[i].d4 * pp->element[i].d3 + sx, pp->oy + pp->element[i].oy - al_get_bitmap_width(((ALLEGRO_BITMAP *)(pp->element[i].data))) / 2 + sy, 0);
-					}
-				}
-				else
-				{
-					if(pp->element[i].data)
-					{
-						al_draw_tinted_bitmap((ALLEGRO_BITMAP *)(pp->element[i].data), al_map_rgba_f(0.0, 0.0, 0.0, 0.5), pp->ox + pp->element[i].ox + pp->element[i].d4 * pp->element[i].d3, pp->oy + pp->element[i].oy, 0);
-						al_draw_bitmap((ALLEGRO_BITMAP *)(pp->element[i].data), pp->ox + pp->element[i].ox + pp->element[i].d4 * pp->element[i].d3 + sx, pp->oy + pp->element[i].oy + sy, 0);
-					}
-				}
-			}
-			else
-			{
-				if(pp->element[i].flags & T3F_GUI_ELEMENT_CENTRE)
-				{
-					if(pp->element[i].data)
-					{
-						al_draw_bitmap((ALLEGRO_BITMAP *)(pp->element[i].data), pp->ox + pp->element[i].ox - al_get_bitmap_width(((ALLEGRO_BITMAP *)(pp->element[i].data))) / 2 + pp->element[i].d4 * pp->element[i].d3 + sx, pp->oy + pp->element[i].oy - al_get_bitmap_width(((ALLEGRO_BITMAP *)(pp->element[i].data))) / 2 + sy, 0);
-					}
-				}
-				else
-				{
-					if(pp->element[i].data)
-					{
-						al_draw_bitmap((ALLEGRO_BITMAP *)(pp->element[i].data), pp->ox + pp->element[i].ox + pp->element[i].d4 * pp->element[i].d3 + sx, pp->oy + pp->element[i].oy + sy, 0);
 					}
 				}
 			}
@@ -277,21 +229,6 @@ int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(int, void *), char * text
 	pp->element[pp->elements].ox = ox;
 	pp->element[pp->elements].oy = oy;
 	pp->element[pp->elements].color = color;
-	pp->element[pp->elements].flags = flags;
-	pp->element[pp->elements].description = NULL;
-	pp->elements++;
-	return 1;
-}
-
-int t3f_add_gui_slider_element(T3F_GUI * pp, ALLEGRO_BITMAP * bp, int min, int max, int scale, int ox, int oy, int flags)
-{
-	pp->element[pp->elements].type = T3F_GUI_ELEMENT_SLIDER;
-	pp->element[pp->elements].data = bp;
-	pp->element[pp->elements].d1 = min;
-	pp->element[pp->elements].d2 = max;
-	pp->element[pp->elements].d3 = scale;
-	pp->element[pp->elements].ox = ox;
-	pp->element[pp->elements].oy = oy;
 	pp->element[pp->elements].flags = flags;
 	pp->element[pp->elements].description = NULL;
 	pp->elements++;
@@ -435,7 +372,7 @@ void t3f_process_gui(T3F_GUI * pp)
 	bool mouse_moved = false;
 	bool touched = false;
 	int touch_id = 0;
-	int x, y, w;
+	int x, y;
 	float mouse_x = 0.0, mouse_y = 0.0;
 	
 	/* check if the mouse has been moved */
@@ -490,17 +427,9 @@ void t3f_process_gui(T3F_GUI * pp)
 		}
 		if((t3f_mouse_button[0] || touched) && !t3f_gui_left_clicked && pp->hover_element >= 0)
 		{
-			if(pp->element[pp->hover_element].type == T3F_GUI_ELEMENT_SLIDER)
-			{
-				w = (pp->element[pp->hover_element].d2 - pp->element[pp->hover_element].d1) * pp->element[pp->hover_element].d3;
-				pp->element[pp->hover_element].d4 = mouse_x - (pp->element[pp->hover_element].ox - w / 2) - pp->element[pp->hover_element].d1;
-			}
-			else
-			{
-				t3f_activate_selected_gui_element(pp);
-				t3f_gui_left_clicked = true;
-				t3f_touch[touch_id].released = false;
-			}
+			t3f_activate_selected_gui_element(pp);
+			t3f_gui_left_clicked = true;
+			t3f_touch[touch_id].released = false;
 		}
 		if(!t3f_mouse_button[0] && !touched)
 		{

@@ -13,7 +13,6 @@
 /* GUI element types */
 #define T3F_GUI_ELEMENT_TEXT      0 // text element
 #define T3F_GUI_ELEMENT_IMAGE     1 // image element
-#define T3F_GUI_ELEMENT_SLIDER    2
 
 /* GUI_element flags */
 #define T3F_GUI_ELEMENT_STATIC    1 // do not animate on hover
@@ -69,7 +68,6 @@ void t3f_destroy_gui(T3F_GUI * pp);
 
 int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *), void * bp, int ox, int oy, int flags);
 int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(int, void *), char * text, void * fp, int ox, int oy, ALLEGRO_COLOR color, int flags);
-int t3f_add_gui_slider_element(T3F_GUI * pp, ALLEGRO_BITMAP * bp, int min, int max, int scale, int ox, int oy, int flags);
 int t3f_describe_last_gui_element(T3F_GUI * pp, char * text);
 void t3f_center_gui(T3F_GUI * pp, float oy, float my);
 

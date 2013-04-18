@@ -49,3 +49,6 @@ android_package:
 
 android_repackage:
 	$(MAKE) -f makefile.android android_repackage
+
+windows_package:
+	$(MAKE) -f makefile.mingw_cross windows_package
