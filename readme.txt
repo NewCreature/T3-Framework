@@ -9,6 +9,26 @@ T3F is divided into modules which handle different tasks. These will be broken
 down below. You only need to link the modules you use to your project.
 
 
+How to Create a New Project
+---------------------------
+
+From the root directory of T3F type the following command:
+
+make project DIR=location_of_your_new_project
+
+Replace 'location_of_your_new_project' with the full path of the location you
+would like to create your project. This will set up a skeleton project with all
+the build scripts you need for building on every supported platform.
+
+The project details are located at the top of the 'src/makefile.defines' file.
+Here you can set the name of your application and a few other things used by the
+build scripts. Set these up and the info will be filled out correctly for all
+supported platforms by the build scripts.
+
+The file 'src/main.c' is a barebones file to get you started. Type 'make' from
+the 'src' directory to build your new project.
+
+
 t3f.c
 -----
 
