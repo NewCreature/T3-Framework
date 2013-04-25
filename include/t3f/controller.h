@@ -19,6 +19,7 @@
 #define T3F_CONTROLLER_FLAG_AXIS_POSITIVE        2
 #define T3F_CONTROLLER_FLAG_AXIS_ANALOGUE        4
 #define T3F_CONTROLLER_FLAG_AXIS_INVERT          8
+#define T3F_CONTROLLER_FLAG_AXIS_NO_ADJUST      16
 
 #define T3F_CONTROLLER_AXIS_THRESHOLD         (0.3)
 
@@ -31,6 +32,7 @@ typedef struct
 	int joystick; // which joystick
 	int stick;    // which stick (joystick)
 	int axis;     // which axis
+	float min, mid, max;
 	int flags;
 
 } T3F_CONTROLLER_BINDING;

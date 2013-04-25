@@ -122,6 +122,18 @@ void t3f_write_controller_config(ALLEGRO_CONFIG * acp, const char * section, T3F
 		sprintf(temp_string, "Binding %d Flags", j);
 		sprintf(temp_string2, "%d", cp->binding[j].flags);
 		al_set_config_value(acp, section, temp_string, temp_string2);
+		if(cp->binding[j].type == T3F_CONTROLLER_BINDING_JOYSTICK_AXIS)
+		{
+			sprintf(temp_string, "Binding %d Min", j);
+			sprintf(temp_string2, "%f", cp->binding[j].min);
+			al_set_config_value(acp, section, temp_string, temp_string2);
+			sprintf(temp_string, "Binding %d Mid", j);
+			sprintf(temp_string2, "%f", cp->binding[j].mid);
+			al_set_config_value(acp, section, temp_string, temp_string2);
+			sprintf(temp_string, "Binding %d Max", j);
+			sprintf(temp_string2, "%f", cp->binding[j].max);
+			al_set_config_value(acp, section, temp_string, temp_string2);
+		}
 	}
 }
 
@@ -202,6 +214,39 @@ bool t3f_read_controller_config(ALLEGRO_CONFIG * acp, const char * section, T3F_
 		else
 		{
 			return false;
+		}
+		if(cp->binding[j].type == T3F_CONTROLLER_BINDING_JOYSTICK_AXIS)
+		{
+			sprintf(temp_string, "Binding %d Min", j);
+			item = al_get_config_value(acp, section, temp_string);
+			if(item)
+			{
+				cp->binding[j].min = atof(item);
+			}
+			else
+			{
+				return false;
+			}
+			sprintf(temp_string, "Binding %d Mid", j);
+			item = al_get_config_value(acp, section, temp_string);
+			if(item)
+			{
+				cp->binding[j].mid = atof(item);
+			}
+			else
+			{
+				return false;
+			}
+			sprintf(temp_string, "Binding %d Max", j);
+			item = al_get_config_value(acp, section, temp_string);
+			if(item)
+			{
+				cp->binding[j].max = atof(item);
+			}
+			else
+			{
+				return false;
+			}
 		}
 	}
 	return true;
@@ -327,6 +372,7 @@ bool t3f_bind_controller(T3F_CONTROLLER * cp, int binding)
 void t3f_read_controller(T3F_CONTROLLER * cp)
 {
 	int i;
+	float vpos, vscale;
 	
 	for(i = 0; i < cp->bindings; i++)
 	{
@@ -359,11 +405,31 @@ void t3f_read_controller(T3F_CONTROLLER * cp)
 			case T3F_CONTROLLER_BINDING_JOYSTICK_AXIS:
 			{
 				bool held = false;
+				
+				/* get analog position */
 				cp->state[i].pos = t3f_joystick_state[cp->binding[i].joystick].stick[cp->binding[i].stick].axis[cp->binding[i].axis];
 				if(cp->binding[i].flags & T3F_CONTROLLER_FLAG_AXIS_INVERT)
 				{
 					cp->state[i].pos = -cp->state[i].pos;
 				}
+				
+				/* correct position for controller configuration */
+				if(!(cp->binding[i].flags & T3F_CONTROLLER_FLAG_AXIS_NO_ADJUST))
+				{
+					vpos = cp->state[i].pos - cp->binding[i].mid;
+					if(vpos < 0.0)
+					{
+						vscale = 1.0 / fabs(cp->binding[i].min - cp->binding[i].mid);
+					}
+					else
+					{
+						vscale = 1.0 / fabs(cp->binding[i].mid - cp->binding[i].max);
+					}
+					vpos *= vscale;
+					cp->state[i].pos = vpos;
+				}
+				
+				/* if position is past threshold, consider the axis pressed */
 				if((cp->binding[i].flags & T3F_CONTROLLER_FLAG_AXIS_NEGATIVE) && t3f_joystick_state[cp->binding[i].joystick].stick[cp->binding[i].stick].axis[cp->binding[i].axis] < -T3F_CONTROLLER_AXIS_THRESHOLD)
 				{
 					held = true;
