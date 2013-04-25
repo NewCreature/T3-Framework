@@ -7,7 +7,6 @@
 #include "resource.h"
 
 static char ani_header[12] = {'O', 'C', 'D', 'A', 'S', 0};
-static char ani_filename[1024] = {0};
 
 /* memory management */
 T3F_ANIMATION * t3f_create_animation(void)
@@ -84,7 +83,7 @@ static int check_header(char * h)
 	return h[11];
 }
 
-T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp)
+T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp, const char * fn)
 {
 	T3F_ANIMATION * ap;
 	int i;
@@ -140,7 +139,7 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp)
 				for(i = 0; i < ap->bitmaps; i++)
 				{
 					fpos = al_ftell(fp);
-					ap->bitmap[i] = t3f_load_resource_f((void **)(&ap->bitmap[i]), T3F_RESOURCE_TYPE_BITMAP, fp, ani_filename, 0, 0);
+					ap->bitmap[i] = t3f_load_resource_f((void **)(&ap->bitmap[i]), T3F_RESOURCE_TYPE_BITMAP, fp, fn, 0, 0);
 					if(!ap->bitmap[i])
 					{
 						al_fseek(fp, fpos, ALLEGRO_SEEK_SET);
@@ -196,8 +195,7 @@ T3F_ANIMATION * t3f_load_animation(const char * fn)
 	{
 		return NULL;
 	}
-	strcpy(ani_filename, fn);
-	ap = t3f_load_animation_f(fp);
+	ap = t3f_load_animation_f(fp, fn);
 	al_fclose(fp);
 	return ap;
 }

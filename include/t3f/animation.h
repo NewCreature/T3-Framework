@@ -49,7 +49,7 @@ typedef struct
 T3F_ANIMATION * t3f_create_animation(void);
 T3F_ANIMATION * t3f_clone_animation(T3F_ANIMATION * ap);
 void t3f_destroy_animation(T3F_ANIMATION * ap);
-T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp);
+T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp, const char * fn);
 T3F_ANIMATION * t3f_load_animation(const char * fn);
 T3F_ANIMATION * t3f_load_animation_from_bitmap(const char * fn);
 int t3f_save_animation_f(T3F_ANIMATION * ap, ALLEGRO_FILE * fp);
