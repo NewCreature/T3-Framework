@@ -301,7 +301,6 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 {
 	T3F_TEXT_LINE_DATA line_data;
 	unsigned int i;
-	int j;
 	float pos = x - fp->adjust * fp->scale;
 	float posy = y - fp->adjust * fp->scale;
 	float fw, fh;
@@ -327,18 +326,7 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 	if(w > 0.0)
 	{
 		t3f_create_text_line_data(&line_data, fp, w, tab, text);
-		for(j = 0; j < line_data.lines; j++)
-		{
-			for(i = 0; i < strlen(line_data.line[j].text); i++)
-			{
-				fw = (float)al_get_bitmap_width(fp->character[(int)line_data.line[j].text[i]]) * fp->scale;
-				fh = (float)al_get_bitmap_height(fp->character[(int)line_data.line[j].text[i]]) * fp->scale;
-				t3f_draw_scaled_bitmap(fp->character[(int)line_data.line[j].text[i]], color, pos, posy, z, fw, fh, 0);
-//				pos += fw - ((fp->adjust * 2.0) * fp->scale);
-				pos += fw - fp->adjust * fp->scale;
-			}
-			pos = x - fp->adjust + tab;
-		}
+		t3f_draw_text_lines(&line_data, color, x, y, z);
 	}
 	else
 	{
