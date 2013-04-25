@@ -737,13 +737,28 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			{
 				t3f_flags &= ~T3F_RESIZABLE;
 			}
-			if(flags & T3F_FORCE_ASPECT)
+			cvalue = al_get_config_value(t3f_config, "T3F", "force_aspect_ratio");
+			if(cvalue)
 			{
-				t3f_flags |= T3F_FORCE_ASPECT;
+				if(!strcmp(cvalue, "true"))
+				{
+					t3f_flags |= T3F_FORCE_ASPECT;
+				}
+				else
+				{
+					t3f_flags &= ~T3F_FORCE_ASPECT;
+				}
 			}
 			else
 			{
-				t3f_flags &= ~T3F_FORCE_ASPECT;
+				if(flags & T3F_FORCE_ASPECT)
+				{
+					t3f_flags |= T3F_FORCE_ASPECT;
+				}
+				else
+				{
+					t3f_flags &= ~T3F_FORCE_ASPECT;
+				}
 			}
 			al_set_new_display_flags(dflags);
 			al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
@@ -759,6 +774,11 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				dw = w;
 				dh = h;
 			}
+			/* always create 800x480 display on OpenPandora */
+			#ifdef PANDORA
+				dw = 800;
+				dh = 480;
+			#endif
 			t3f_display = al_create_display(dw, dh);
 			if(!t3f_display)
 			{
@@ -1204,7 +1224,11 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		}
 		case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
 		{
-			al_acknowledge_drawing_resume(t3f_display);
+			#if ALLEGRO_VERSION_INT >= ((5 << 24) | (1 << 16) | (7 << 8))
+				al_acknowledge_drawing_resume(t3f_display);
+			#else
+				al_acknowledge_drawing_resume(t3f_display, NULL);
+			#endif
 			t3f_halted = 0;
 			t3f_reload_resources();
 			t3f_rebuild_atlases();
