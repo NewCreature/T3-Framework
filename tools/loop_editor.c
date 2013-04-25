@@ -18,19 +18,25 @@ float le_loop_range_end = 0.0;
 
 void le_logic(void)
 {
+	float amount = 0.001;
+	
 	if(t3f_key[ALLEGRO_KEY_ESCAPE])
 	{
 		t3f_exit();
+	}
+	if(t3f_key[ALLEGRO_KEY_LCTRL])
+	{
+		amount = 1.0;
 	}
 	if(t3f_key[ALLEGRO_KEY_OPENBRACE])
 	{
 		if(t3f_key[ALLEGRO_KEY_LSHIFT])
 		{
-			le_loop_start -= 0.001;
+			le_loop_start -= amount;
 		}
 		else
 		{
-			le_loop_end -= 0.001;
+			le_loop_end -= amount;
 		}
 		al_set_audio_stream_loop_secs(t3f_stream, le_loop_start, le_loop_end);
 		t3f_key[ALLEGRO_KEY_OPENBRACE] = 0;
@@ -39,14 +45,24 @@ void le_logic(void)
 	{
 		if(t3f_key[ALLEGRO_KEY_LSHIFT])
 		{
-			le_loop_start += 0.001;
+			le_loop_start += amount;
 		}
 		else
 		{
-			le_loop_end += 0.001;
+			le_loop_end += amount;
 		}
 		al_set_audio_stream_loop_secs(t3f_stream, le_loop_start, le_loop_end);
 		t3f_key[ALLEGRO_KEY_CLOSEBRACE] = 0;
+	}
+	le_loop_range_start = le_loop_end - 5.0;
+	if(le_loop_range_start < le_loop_start)
+	{
+		le_loop_range_start = le_loop_start;
+	}
+	le_loop_range_end = le_loop_start + 5.0;
+	if(le_loop_range_end > le_loop_end)
+	{
+		le_loop_range_end = le_loop_end;
 	}
 	le_music_pos = al_get_audio_stream_position_secs(t3f_stream);
 	if(le_music_pos > le_loop_range_end && le_music_pos < le_loop_range_start)
