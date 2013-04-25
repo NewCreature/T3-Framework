@@ -127,8 +127,6 @@ extern T3F_VIEW * t3f_default_view;
 extern ALLEGRO_COLOR t3f_color_white;
 extern ALLEGRO_COLOR t3f_color_black;
 
-void t3f_set_developer_name(const char * developer);
-void t3f_set_package_name(const char * package);
 int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(), void (*render_proc)(), int flags);
 bool t3f_locate_resource(char * argv, const char * filename);
 int t3f_set_gfx_mode(int w, int h, int flags);

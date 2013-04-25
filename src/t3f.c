@@ -193,30 +193,6 @@ ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp)
 	return bp;
 }
 
-void t3f_set_developer_name(const char * developer)
-{
-	if(developer)
-	{
-		t3f_developer_name = malloc(strlen(developer) + 1);
-		if(t3f_developer_name)
-		{
-			strcpy(t3f_developer_name, developer);
-		}
-	}
-}
-
-void t3f_set_package_name(const char * package)
-{
-	if(package)
-	{
-		t3f_package_name = malloc(strlen(package) + 1);
-		if(t3f_package_name)
-		{
-			strcpy(t3f_package_name, package);
-		}
-	}
-}
-
 /* this gets Allegro ready */
 int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(), void (*render_proc)(), int flags)
 {
