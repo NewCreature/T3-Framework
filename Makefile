@@ -22,9 +22,6 @@ endif
 top:
 	$(MAKE) -f makefile.$(SYSTEM)
 
-library:
-	$(MAKE) -f makefile.$(SYSTEM) library
-
 clean:
 	$(MAKE) -f makefile.$(SYSTEM) clean
 
