@@ -249,6 +249,56 @@ unsigned long t3f_checksum_file(const char * fn)
 	Create a 32-bit checksum of the specified file.
 
 
+resource.c
+----------
+
+This module handles resource management. It will help you reduce memory usage,
+which is necessary if you intend to target mobile devices.
+
+void * t3f_load_resource(void ** ptr, int type, const char * filename,
+	int option, int flags, unsigned long offset)
+
+	Load resource of type 'type' from file 'filename' with the specified
+	options into '*ptr'. Valid types are:
+	
+		T3F_RESOURCE_TYPE_BITMAP (resource loaded using al_load_bitmap())
+		T3F_RESOURCE_TYPE_FONT (resource loaded using al_load_ttf_font())
+		T3F_RESOURCE_TYPE_BITMAP_FONT (resource loaded using
+			al_load_bitmap_font_flags())
+		T3F_RESOURCE_TYPE_T3F_FONT (resource loaded using t3f_load_font())
+	
+	'option' is used to specify the size of the loaded font when loading a
+		T3F_RESOURCE_TYPE_FONT resource.
+	
+	'offset' is the seek offset within the file. You will always pass 0 for this
+	argument. This parameter is used internally by the resource manager to help
+	reloading resources after they have been lost or unloaded.
+		
+void * t3f_load_resource_f(void ** ptr, int type, ALLEGRO_FILE * fp, const char
+	* filename, int option, int flags);
+
+	Same as t3f_load_resource() but loads from 'fp' instead of a filename. This
+	is useful if you embed graphics into your own file format and need to use
+	the resource manager with them.
+	
+void t3f_destroy_resource(void * ptr)
+
+	Destroy the specified resource and quit tracking it. Call this instead of
+	Allegro's normal al_destroy_*() functions on resources loaded with the
+	resource manager.
+	
+void t3f_unload_resources(void)
+
+	Unload all loaded resources. This is done automatically by the framework
+	when necessary. There are some cases when you may wish to do this yourself,
+	like if you need to recreate a display.
+	
+void t3f_reload_resources(void)
+
+	Reload all resources being handled by the resource manager. Use this if you
+	have unloaded the resources using t3f_unload_resources().
+
+
 music.c
 -------
 
