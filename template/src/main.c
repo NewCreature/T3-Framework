@@ -33,11 +33,6 @@ void app_render(void)
 /* initialize our app, load graphics, etc. */
 bool app_initialize(int argc, char * argv[])
 {
-	/* need to figure out a way to not need these since we already define them
-	 * elsewhere */
-	t3f_set_developer_name("Me");
-	t3f_set_package_name("my-app");
-
 	/* initialize T3F */
 	if(!t3f_initialize("My App", 640, 480, 60.0, app_logic, app_render, T3F_DEFAULT))
 	{
