@@ -1,5 +1,5 @@
 CC = i586-mingw32msvc-gcc
-CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall -It3f -I./include
+CFLAGS = -O2 -fomit-frame-pointer -ffast-math -funroll-loops -Wall -It3f -I./include -I./include/t3f
 LIBS = -lallegro_image.dll -lallegro_font.dll -lallegro_ttf.dll -lallegro_primitives.dll -lallegro_audio.dll -lallegro_acodec.dll -lallegro_dialog.dll -lallegro_memfile.dll -lallegro.dll
 
 include makefile.common
