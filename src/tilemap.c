@@ -71,7 +71,7 @@ void t3f_destroy_tileset(T3F_TILESET * tsp)
 	free(tsp);
 }
 
-T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp)
+T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp, const char * fn)
 {
 	int i, j;
 	T3F_TILESET * tsp;
@@ -97,7 +97,7 @@ T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp)
 			for(i = 0; i < tsp->tiles; i++)
 			{
 				tsp->tile[i] = t3f_create_tile();
-				tsp->tile[i]->ap = t3f_load_animation_f(fp);
+				tsp->tile[i]->ap = t3f_load_animation_f(fp, fn);
 				if(!tsp->tile[i]->ap)
 				{
 					printf("load animation failed\n");
@@ -143,7 +143,7 @@ T3F_TILESET * t3f_load_tileset(const char * fn)
 	{
 		return NULL;
 	}
-	tsp = t3f_load_tileset_f(fp);
+	tsp = t3f_load_tileset_f(fp, fn);
 	al_fclose(fp);
 	return tsp;
 }

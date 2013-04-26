@@ -89,7 +89,7 @@ void t3f_destroy_tile(T3F_TILE * tp);
 short t3f_get_tile(T3F_TILESET * tsp, int tile, int tick);
 T3F_TILESET * t3f_create_tileset(int w, int h);
 void t3f_destroy_tileset(T3F_TILESET * tsp);
-T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp);
+T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp, const char * fn);
 T3F_TILESET * t3f_load_tileset(const char * fn);
 int t3f_save_tileset_f(T3F_TILESET * tsp, ALLEGRO_FILE * fp);
 int t3f_save_tileset(T3F_TILESET * tsp, const char * fn);
