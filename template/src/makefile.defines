@@ -20,7 +20,7 @@ APP_OBJECTS = main.o
 ################
 # global stuff #
 ################
-GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall -I. -DT3F_DEVELOPER_NAME="\"$(APP_COMPANY)\"" -DT3F_PACKAGE_NAME="\"$(APP_NAME)\""
+GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall -I. -DT3F_DEVELOPER_NAME="\"$(APP_COMPANY)\"" -DT3F_PACKAGE_NAME="\"$(DEBIAN_APP_NAME)\""
 
 ##################
 # Mac OS X stuff #
@@ -70,6 +70,7 @@ GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall -I. -DT3F_DEVELOPE
 ##########################
 # Debian packaging stuff #
 ##########################
+DEBIAN_APP_NAME = $(subst _,-,$(APP_NAME))
 DEBIAN_SECTION = games
 DEBIAN_DEPENDS = libc6,\ libmxml1,\ libcurl3-gnutls
 DEBIAN_INSTALL_SIZE = 16000
