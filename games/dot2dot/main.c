@@ -69,7 +69,6 @@ bool dot_initialize(int argc, char * argv[])
 	{
 		return false;
 	}
-	al_init_ttf_addon();
 	
 	/* load images */
 	dot_bitmap[DOT_BITMAP_BALL_RED] = al_load_bitmap("data/graphics/ball_red.png");

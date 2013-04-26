@@ -170,10 +170,6 @@ bool av_initialize(void)
 	{
 		return false;
 	}
-	if(!al_init_ttf_addon())
-	{
-		return false;
-	}
 	
 	/* setting this blender allows us draw sprites with varying levels of translucency */
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);

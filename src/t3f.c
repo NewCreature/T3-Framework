@@ -257,6 +257,10 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		return 0;
 	}
 	al_init_font_addon();
+	if(!al_init_ttf_addon())
+	{
+		return false;
+	}
 	if(flags & T3F_USE_SOUND)
 	{
 		if(!al_install_audio())
