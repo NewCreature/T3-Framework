@@ -274,7 +274,7 @@ bool av_initialize(void)
 	{
 		for(i = 0; i < 16; i++)
 		{
-			t3f_add_bitmap_to_atlas(av_atlas, av_theme.block[i], T3F_ATLAS_SPRITE);
+			t3f_add_bitmap_to_atlas(av_atlas, &av_theme.block[i], T3F_ATLAS_SPRITE);
 		}
 		for(i = 0; i < 3; i++)
 		{

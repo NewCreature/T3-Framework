@@ -153,6 +153,7 @@ bool dot_initialize(int argc, char * argv[])
 		return false;
 	}
 	
+	printf("break 1\n");
 	dot_font = al_load_font("data/fonts/kongtext.ttf", 16, 0);
 	if(!dot_font)
 	{
@@ -169,7 +170,7 @@ bool dot_initialize(int argc, char * argv[])
 			if(dot_bitmap[i])
 			{
 				temp_bitmap = dot_bitmap[i];
-				dot_bitmap[i] = t3f_add_bitmap_to_atlas(dot_atlas, dot_bitmap[i], T3F_ATLAS_SPRITE);
+				dot_bitmap[i] = t3f_add_bitmap_to_atlas(dot_atlas, &dot_bitmap[i], T3F_ATLAS_SPRITE);
 				if(dot_bitmap[i])
 				{
 					al_destroy_bitmap(temp_bitmap);
