@@ -9,9 +9,11 @@ void * t3f_bitmap_resource_handler_proc(ALLEGRO_FILE * fp, const char * filename
 	void * ptr = NULL;
 	ALLEGRO_STATE old_state;
 	bool openfp = false; // operating on already open file
+	int old_flags;
 	
+	old_flags = al_get_new_bitmap_flags();
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE | (old_flags & ALLEGRO_NO_PREMULTIPLIED_ALPHA));
 	if(fp)
 	{
 		openfp = true;
