@@ -110,10 +110,31 @@ void global_logic(void)
 	}
 }
 
+ALLEGRO_BITMAP * pad_bitmap(ALLEGRO_BITMAP * bp)
+{
+	ALLEGRO_BITMAP * ret_bp = NULL;
+	ALLEGRO_STATE old_state;
+	
+	ret_bp = al_create_bitmap(al_get_bitmap_width(bp) + 2, al_get_bitmap_height(bp) + 2);
+	if(ret_bp)
+	{
+		al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
+		al_set_target_bitmap(ret_bp);
+		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+		al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 0.0));
+		al_draw_bitmap(bp, 1, 1, 0);
+		al_restore_state(&old_state);
+		al_destroy_bitmap(bp);
+		return ret_bp;
+	}
+	return NULL;
+}
+
 void bitmap_logic(void)
 {
 	const char * fn = NULL;
 	ALLEGRO_BITMAP * bp = NULL;
+	int i;
 	
 	if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
 	{
@@ -160,6 +181,21 @@ void bitmap_logic(void)
 			strcpy(last_filename, fn);
 		}
 		t3f_key[ALLEGRO_KEY_ENTER] = 0;
+	}
+	if(t3f_key[ALLEGRO_KEY_P])
+	{
+		for(i = 0; i < animation->bitmaps; i++)
+		{
+			animation->bitmap[i] = pad_bitmap(animation->bitmap[i]);
+		}
+		for(i = 0; i < animation->frames; i++)
+		{
+			animation->frame[i]->x -= 1.0;
+			animation->frame[i]->y -= 1.0;
+			animation->frame[i]->width += 2.0;
+			animation->frame[i]->height += 2.0;
+		}
+		t3f_key[ALLEGRO_KEY_P] = 0;
 	}
 	if(animation->bitmaps > 0)
 	{
