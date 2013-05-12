@@ -75,7 +75,7 @@ void generate_control_file(int argc, char * argv[])
 	fputs(line, fp);
 	sprintf(line, "Depends: %s\n", argv[7]);
 	fputs(line, fp);
-	sprintf(line, "Installed-Size: %s\n", argv[8]);
+	sprintf(line, "Installed-Size: %d\n", atoi(argv[8]));
 	fputs(line, fp);
 	sprintf(line, "Maintainer: %s\n", argv[9]);
 	fputs(line, fp);
@@ -100,7 +100,7 @@ int main(int argc, char * argv[])
 		printf("Usage: control_gen <out_path> <package_name> <package_version> <section> <priority> <architecture> <depends> <install_size> <maintainer> <description> <long_description>\n");
 		return -1;
 	}
-	else if(strcasecmp(argv[6], "i386") && !strcasecmp(argv[6], "amd64"))
+	else if(strcasecmp(argv[6], "i386") && strcasecmp(argv[6], "amd64"))
 	{
 		printf("Usage: make package DEBIAN_ARCHITECTURE=arch (i386 or amd64)\n");
 		return -2;
