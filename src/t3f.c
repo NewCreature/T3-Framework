@@ -329,14 +329,6 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	al_init_primitives_addon();
 	
 	strcpy(t3f_window_title, name);
-	/* create display unless we have opted for no display */
-	if(!(flags & T3F_NO_DISPLAY))
-	{
-		if(!t3f_set_gfx_mode(w, h, flags))
-		{
-			return 0;
-		}
-	}
 	
 	t3f_timer = al_create_timer(1.000 / fps);
 	if(!t3f_timer)
@@ -350,6 +342,15 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	{
 		printf("Failed to create event queue!\n");
 		return 0;
+	}
+	
+	/* create display unless we have opted for no display */
+	if(!(flags & T3F_NO_DISPLAY))
+	{
+		if(!t3f_set_gfx_mode(w, h, flags))
+		{
+			return 0;
+		}
 	}
 	
 	if(t3f_flags & T3F_USE_KEYBOARD)
