@@ -328,13 +328,9 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	}
 	al_init_primitives_addon();
 	
-	/* if we are using console (for a server, for instance) don't create display */
 	strcpy(t3f_window_title, name);
-	if(flags & T3F_USE_CONSOLE)
-	{
-		t3f_flags |= T3F_USE_CONSOLE;
-	}
-	else
+	/* create display unless we have opted for no display */
+	if(!(flags & T3F_NO_DISPLAY))
 	{
 		if(!t3f_set_gfx_mode(w, h, flags))
 		{
@@ -376,21 +372,16 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	{
 		al_register_event_source(t3f_queue, al_get_touch_input_event_source());
 	}
-	if(!(t3f_flags & T3F_USE_CONSOLE))
-	{
-		al_register_event_source(t3f_queue, al_get_display_event_source(t3f_display));
-	}
 	al_register_event_source(t3f_queue, al_get_timer_event_source(t3f_timer));
 	
-	if(!(flags & T3F_USE_CONSOLE))
+	/* create a default view */
+	t3f_default_view = t3f_create_view(0, 0, w, h, w / 2, h / 2);
+	if(!t3f_default_view)
 	{
-		t3f_default_view = t3f_create_view(0, 0, w, h, w / 2, h / 2);
-		if(!t3f_default_view)
-		{
-			return 0;
-		}
-		t3f_select_view(t3f_default_view);
+		return 0;
 	}
+	t3f_select_view(t3f_default_view);
+	
 	t3f_color_white = al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
 	t3f_color_black = al_map_rgba_f(0.0, 0.0, 0.0, 1.0);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
@@ -683,105 +674,99 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	else
 	{
 		/* if we are using console (for a server, for instance) don't create display */
-		if(flags & T3F_USE_CONSOLE)
+		al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
+		cvalue = al_get_config_value(t3f_config, "T3F", "force_fullscreen");
+		cvalue2 = al_get_config_value(t3f_config, "T3F", "force_window");
+		if((flags & T3F_USE_FULLSCREEN || (cvalue && !strcmp(cvalue, "true"))) && !(cvalue2 && !strcmp(cvalue2, "true")))
 		{
-			t3f_flags |= T3F_USE_CONSOLE;
+			if(fsw_supported)
+			{
+				dflags |= ALLEGRO_FULLSCREEN_WINDOW;
+			}
+			else
+			{
+				dflags |= ALLEGRO_FULLSCREEN;
+			}
+			t3f_flags |= T3F_USE_FULLSCREEN;
 		}
 		else
 		{
-			al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
-			cvalue = al_get_config_value(t3f_config, "T3F", "force_fullscreen");
-			cvalue2 = al_get_config_value(t3f_config, "T3F", "force_window");
-			if((flags & T3F_USE_FULLSCREEN || (cvalue && !strcmp(cvalue, "true"))) && !(cvalue2 && !strcmp(cvalue2, "true")))
+			t3f_flags &= ~T3F_USE_FULLSCREEN;
+		}
+		if(flags & T3F_RESIZABLE)
+		{
+			dflags |= ALLEGRO_RESIZABLE;
+			t3f_flags |= T3F_RESIZABLE;
+		}
+		else
+		{
+			t3f_flags &= ~T3F_RESIZABLE;
+		}
+		cvalue = al_get_config_value(t3f_config, "T3F", "force_aspect_ratio");
+		if(cvalue)
+		{
+			if(!strcmp(cvalue, "true"))
 			{
-				if(fsw_supported)
-				{
-					dflags |= ALLEGRO_FULLSCREEN_WINDOW;
-				}
-				else
-				{
-					dflags |= ALLEGRO_FULLSCREEN;
-				}
-				t3f_flags |= T3F_USE_FULLSCREEN;
+				t3f_flags |= T3F_FORCE_ASPECT;
 			}
 			else
 			{
-				t3f_flags &= ~T3F_USE_FULLSCREEN;
+				t3f_flags &= ~T3F_FORCE_ASPECT;
 			}
+		}
+		else
+		{
+			if(flags & T3F_FORCE_ASPECT)
+			{
+				t3f_flags |= T3F_FORCE_ASPECT;
+			}
+			else
+			{
+				t3f_flags &= ~T3F_FORCE_ASPECT;
+			}
+		}
+		al_set_new_display_flags(dflags);
+		al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
+		cvalue = al_get_config_value(t3f_config, "T3F", "display_width");
+		cvalue2 = al_get_config_value(t3f_config, "T3F", "display_height");
+		if(cvalue && cvalue2)
+		{
+			dw = atoi(cvalue);
+			dh = atoi(cvalue2);
+		}
+		else
+		{
+			dw = w;
+			dh = h;
+		}
+		/* always create 800x480 display on OpenPandora */
+		#ifdef PANDORA
+			dw = 800;
+			dh = 480;
+		#endif
+		t3f_display = al_create_display(dw, dh);
+		if(!t3f_display)
+		{
+			printf("Failed to create display! Trying safe mode.\n");
+			dflags = 0;
 			if(flags & T3F_RESIZABLE)
 			{
 				dflags |= ALLEGRO_RESIZABLE;
-				t3f_flags |= T3F_RESIZABLE;
-			}
-			else
-			{
-				t3f_flags &= ~T3F_RESIZABLE;
-			}
-			cvalue = al_get_config_value(t3f_config, "T3F", "force_aspect_ratio");
-			if(cvalue)
-			{
-				if(!strcmp(cvalue, "true"))
-				{
-					t3f_flags |= T3F_FORCE_ASPECT;
-				}
-				else
-				{
-					t3f_flags &= ~T3F_FORCE_ASPECT;
-				}
-			}
-			else
-			{
-				if(flags & T3F_FORCE_ASPECT)
-				{
-					t3f_flags |= T3F_FORCE_ASPECT;
-				}
-				else
-				{
-					t3f_flags &= ~T3F_FORCE_ASPECT;
-				}
 			}
 			al_set_new_display_flags(dflags);
-			al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
-			cvalue = al_get_config_value(t3f_config, "T3F", "display_width");
-			cvalue2 = al_get_config_value(t3f_config, "T3F", "display_height");
-			if(cvalue && cvalue2)
-			{
-				dw = atoi(cvalue);
-				dh = atoi(cvalue2);
-			}
-			else
-			{
-				dw = w;
-				dh = h;
-			}
-			/* always create 800x480 display on OpenPandora */
-			#ifdef PANDORA
-				dw = 800;
-				dh = 480;
-			#endif
 			t3f_display = al_create_display(dw, dh);
 			if(!t3f_display)
 			{
-				printf("Failed to create display! Trying safe mode.\n");
-				dflags = 0;
-				if(flags & T3F_RESIZABLE)
-				{
-					dflags |= ALLEGRO_RESIZABLE;
-				}
-				al_set_new_display_flags(dflags);
-				t3f_display = al_create_display(dw, dh);
-				if(!t3f_display)
-				{
-					return 0;
-				}
-				t3f_flags = t3f_flags & ~T3F_USE_FULLSCREEN;
-				ret = 3;
+				return 0;
 			}
-			t3f_virtual_display_width = w;
-			t3f_virtual_display_height = h;
-			t3f_get_base_transform();
-			al_set_window_title(t3f_display, t3f_window_title);
+			t3f_flags = t3f_flags & ~T3F_USE_FULLSCREEN;
+			ret = 3;
 		}
+		al_register_event_source(t3f_queue, al_get_display_event_source(t3f_display));
+		t3f_virtual_display_width = w;
+		t3f_virtual_display_height = h;
+		t3f_get_base_transform();
+		al_set_window_title(t3f_display, t3f_window_title);
 	}
 	return ret;
 }
@@ -1260,12 +1245,9 @@ void t3f_run(void)
 			t3f_event_handler(&event);
 		}
        	/* draw after we have run all the logic */
-		if(!(t3f_flags & T3F_USE_CONSOLE) && t3f_need_redraw && al_event_queue_is_empty(t3f_queue))
+		if(t3f_display && t3f_render_proc && !t3f_halted && t3f_need_redraw && al_event_queue_is_empty(t3f_queue))
 		{
-			if(!t3f_halted)
-			{
-				t3f_render();
-			}
+			t3f_render();
 		}
 		if(t3f_halted == 1)
 		{
