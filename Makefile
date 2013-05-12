@@ -26,4 +26,7 @@ clean:
 	$(MAKE) -f makefile.$(SYSTEM) clean
 
 project:
-	@$(MAKE) -f makefile.project
+	@$(MAKE) -f makefile.project project
+
+upgrade_project:
+	@$(MAKE) -f makefile.project upgrade_project
