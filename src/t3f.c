@@ -547,6 +547,14 @@ static void t3f_get_base_transform(void)
 		t3f_display_height = atoi(value);
 	}
 	
+	if(t3f_flags & T3F_NO_TRANSFORM)
+	{
+		al_build_transform(&t3f_base_transform, 0.0, 0.0, 1.0, 1.0, 0.0);
+		t3f_mouse_scale_x = 1.0;
+		t3f_mouse_scale_y = 1.0;
+		return;
+	}
+	
 	/* if we encounter any overrides in the config file, switch to manual mode */
 	if(override_setup)
 	{
@@ -781,6 +789,10 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		al_register_event_source(t3f_queue, al_get_display_event_source(t3f_display));
 		t3f_virtual_display_width = w;
 		t3f_virtual_display_height = h;
+		if(flags & T3F_NO_TRANSFORM)
+		{
+			t3f_flags |= T3F_NO_TRANSFORM;
+		}
 		t3f_get_base_transform();
 		al_set_window_title(t3f_display, t3f_window_title);
 	}
