@@ -6,6 +6,7 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_memfile.h>
+#include <allegro5/allegro_native_dialog.h>
 
 #ifdef T3F_ANDROID
 	#include <allegro5/allegro_android.h>
@@ -327,6 +328,14 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		}
 	}
 	al_init_primitives_addon();
+	if(!al_init_native_dialog_addon())
+	{
+		return 0;
+	}
+	if(flags & T3F_USE_MENU)
+	{
+		t3f_flags |= T3F_USE_MENU;
+	}
 	
 	strcpy(t3f_window_title, name);
 	
@@ -726,6 +735,12 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				t3f_flags &= ~T3F_FORCE_ASPECT;
 			}
 		}
+		#ifdef ALLEGRO_GTK_TOPLEVEL
+			if(flags & T3F_USE_MENU)
+			{
+				dflags |= ALLEGRO_GTK_TOPLEVEL;
+			}
+		#endif
 		al_set_new_display_flags(dflags);
 		al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
 		cvalue = al_get_config_value(t3f_config, "T3F", "display_width");
