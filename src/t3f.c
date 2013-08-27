@@ -6,7 +6,6 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_memfile.h>
-#include <allegro5/allegro_native_dialog.h>
 
 #ifdef T3F_ANDROID
 	#include <allegro5/allegro_android.h>
@@ -97,6 +96,8 @@ static int t3f_atlases = 0;
 
 static char * t3f_developer_name = NULL;
 static char * t3f_package_name = NULL; // used to locate resources
+
+static bool t3f_always_clear_buffer = false;
 
 static bool t3f_is_path_present(ALLEGRO_PATH * pp)
 {
@@ -328,14 +329,6 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		}
 	}
 	al_init_primitives_addon();
-	if(!al_init_native_dialog_addon())
-	{
-		return 0;
-	}
-	if(flags & T3F_USE_MENU)
-	{
-		t3f_flags |= T3F_USE_MENU;
-	}
 	
 	strcpy(t3f_window_title, name);
 	
@@ -547,14 +540,6 @@ static void t3f_get_base_transform(void)
 		t3f_display_height = atoi(value);
 	}
 	
-	if(t3f_flags & T3F_NO_TRANSFORM)
-	{
-		al_build_transform(&t3f_base_transform, 0.0, 0.0, 1.0, 1.0, 0.0);
-		t3f_mouse_scale_x = 1.0;
-		t3f_mouse_scale_y = 1.0;
-		return;
-	}
-	
 	/* if we encounter any overrides in the config file, switch to manual mode */
 	if(override_setup)
 	{
@@ -620,6 +605,12 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	if(cvalue && !strcmp(cvalue, "true"))
 	{
 		flags |= T3F_RESIZABLE;
+	}
+	
+	cvalue = al_get_config_value(t3f_config, "T3F", "always_clear_buffer");
+	if(cvalue && strcmp(cvalue, "true"))
+	{
+		t3f_always_clear_buffer = true;
 	}
 	
 	if(t3f_display)
@@ -743,12 +734,6 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				t3f_flags &= ~T3F_FORCE_ASPECT;
 			}
 		}
-		#ifdef ALLEGRO_GTK_TOPLEVEL
-			if(flags & T3F_USE_MENU)
-			{
-				dflags |= ALLEGRO_GTK_TOPLEVEL;
-			}
-		#endif
 		al_set_new_display_flags(dflags);
 		al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
 		cvalue = al_get_config_value(t3f_config, "T3F", "display_width");
@@ -789,10 +774,6 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		al_register_event_source(t3f_queue, al_get_display_event_source(t3f_display));
 		t3f_virtual_display_width = w;
 		t3f_virtual_display_height = h;
-		if(flags & T3F_NO_TRANSFORM)
-		{
-			t3f_flags |= T3F_NO_TRANSFORM;
-		}
 		t3f_get_base_transform();
 		al_set_window_title(t3f_display, t3f_window_title);
 	}
@@ -929,6 +910,7 @@ void t3f_clear_touch_data(void)
 	
 	for(i = 0; i < T3F_MAX_TOUCHES; i++)
 	{
+		t3f_touch[i].active = false;
 		t3f_touch[i].released = false;
 	}
 }
@@ -1247,6 +1229,15 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 /* called when it's time to render */
 void t3f_render(void)
 {
+	/* some video drivers and compositors may leave junk in the buffers, this
+	 * config file setting will work around the issue by clearing the entire
+	 * buffer before drawing anything */
+	if(t3f_always_clear_buffer)
+	{
+		al_set_clipping_rectangle(0, 0, al_get_display_width(t3f_display), al_get_display_height(t3f_display));
+		al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.0));
+		t3f_select_view(t3f_current_view);
+	}
 	al_copy_transform(&t3f_current_transform, &t3f_base_transform);
 	al_use_transform(&t3f_current_transform); // <-- apply additional transformations to t3f_current_transform
 	t3f_render_proc();
