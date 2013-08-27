@@ -15,6 +15,7 @@ float le_loop_start = 0.0;
 float le_loop_end = 0.0;
 float le_loop_range_start = 0.0;
 float le_loop_range_end = 0.0;
+bool le_loop_enabled = true;
 
 void le_logic(void)
 {
@@ -54,6 +55,11 @@ void le_logic(void)
 		al_set_audio_stream_loop_secs(t3f_stream, le_loop_start, le_loop_end);
 		t3f_key[ALLEGRO_KEY_CLOSEBRACE] = 0;
 	}
+	if(t3f_key[ALLEGRO_KEY_L])
+	{
+		le_loop_enabled = !le_loop_enabled;
+		t3f_key[ALLEGRO_KEY_L] = 0;
+	}
 	le_loop_range_start = le_loop_end - 5.0;
 	if(le_loop_range_start < le_loop_start)
 	{
@@ -65,7 +71,7 @@ void le_logic(void)
 		le_loop_range_end = le_loop_end;
 	}
 	le_music_pos = al_get_audio_stream_position_secs(t3f_stream);
-	if(le_music_pos > le_loop_range_end && le_music_pos < le_loop_range_start)
+	if(le_loop_enabled && le_music_pos > le_loop_range_end && le_music_pos < le_loop_range_start)
 	{
 		al_seek_audio_stream_secs(t3f_stream, le_loop_range_start);
 	}
@@ -81,10 +87,16 @@ void le_render(void)
 	/* render overall view */
 	al_draw_filled_rectangle(16.0, LE_PROGRESS_Y - 2.0, 640.0 - 16.0 - 1.0, LE_PROGRESS_Y + 2.0, al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
 	ox = (le_loop_start / le_music_length) * (640.0 - 32.0);
-	al_draw_line(16.0 + ox + 0.5, LE_PROGRESS_Y - 8.0, 16.0 + ox + 0.5, LE_PROGRESS_Y + 8.0, al_map_rgba_f(1.0, 0.0, 0.0, 1.0), 1.0);
+	if(le_loop_enabled)
+	{
+		al_draw_line(16.0 + ox + 0.5, LE_PROGRESS_Y - 8.0, 16.0 + ox + 0.5, LE_PROGRESS_Y + 8.0, al_map_rgba_f(1.0, 0.0, 0.0, 1.0), 1.0);
+	}
 	al_draw_textf(le_font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 16.0 + ox, LE_PROGRESS_Y - 8.0 - al_get_font_line_height(le_font), ALLEGRO_ALIGN_CENTRE, "%3.3f", le_loop_start);
 	ox = (le_loop_end / le_music_length) * (640.0 - 32.0);
-	al_draw_line(16.0 + ox + 0.5, LE_PROGRESS_Y - 8.0, 16.0 + ox + 0.5, LE_PROGRESS_Y + 8.0, al_map_rgba_f(1.0, 0.0, 0.0, 1.0), 1.0);
+	if(le_loop_enabled)
+	{
+		al_draw_line(16.0 + ox + 0.5, LE_PROGRESS_Y - 8.0, 16.0 + ox + 0.5, LE_PROGRESS_Y + 8.0, al_map_rgba_f(1.0, 0.0, 0.0, 1.0), 1.0);
+	}
 	al_draw_textf(le_font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 16.0 + ox, LE_PROGRESS_Y - 8.0 - al_get_font_line_height(le_font), ALLEGRO_ALIGN_CENTRE, "%3.3f", le_loop_end);
 	ox = (le_music_pos / le_music_length) * (640.0 - 32.0);
 	al_draw_line(16.0 + ox + 0.5, LE_PROGRESS_Y - 8.0, 16.0 + ox + 0.5, LE_PROGRESS_Y + 8.0, al_map_rgba_f(0.0, 1.0, 0.0, 1.0), 1.0);
