@@ -220,7 +220,6 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	/* initialize Allegro */
 	if(!al_init())
 	{
-		printf("Allegro failed to initialize!\n");
 		return 0;
 	}
 	
@@ -255,7 +254,6 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	
 	if(!al_init_image_addon())
 	{
-		printf("Failed to initialize Image I/O module!\n");
 		return 0;
 	}
 	al_init_font_addon();
@@ -265,52 +263,28 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	}
 	if(flags & T3F_USE_SOUND)
 	{
-		if(!al_install_audio())
-		{
-			printf("Could not init sound!\n");
-		}
-		else if(!al_reserve_samples(16))
-		{
-			printf("Could not set up voice and mixer.\n");
-		}
-		else if(!al_init_acodec_addon())
-		{
-			printf("Could not initialize codecs\n");
-		}
-		else
+		if(al_install_audio() && al_reserve_samples(16) && al_init_acodec_addon())
 		{
 			t3f_flags |= T3F_USE_SOUND;
 		}
 	}
 	if(flags & T3F_USE_KEYBOARD)
 	{
-		if(!al_install_keyboard())
-		{
-			printf("Failed to initialize keyboard!\n");
-		}
-		else
+		if(al_install_keyboard())
 		{
 			t3f_flags |= T3F_USE_KEYBOARD;
 		}
 	}
 	if(flags & T3F_USE_MOUSE)
 	{
-		if(!al_install_mouse())
-		{
-			printf("Failed to initialize mouse!\n");
-		}
-		else
+		if(al_install_mouse())
 		{
 			t3f_flags |= T3F_USE_MOUSE;
 		}
 	}
 	if(flags & T3F_USE_JOYSTICK)
 	{
-		if(!al_install_joystick())
-		{
-			printf("Failed to initialize joystick!\n");
-		}
-		else
+		if(al_install_joystick())
 		{
 			t3f_flags |= T3F_USE_JOYSTICK;
 		}
@@ -319,11 +293,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	memset(t3f_touch, 0, sizeof(T3F_TOUCH) * T3F_MAX_TOUCHES);
 	if(flags & T3F_USE_TOUCH)
 	{
-		if(!al_install_touch_input())
-		{
-			printf("Failed to initialize touch input!\n");
-		}
-		else
+		if(al_install_touch_input())
 		{
 			t3f_flags |= T3F_USE_TOUCH;
 		}
@@ -335,14 +305,12 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	t3f_timer = al_create_timer(1.000 / fps);
 	if(!t3f_timer)
 	{
-		printf("Failed to create timer!\n");
 		return 0;
 	}
 	
 	t3f_queue = al_create_event_queue();
 	if(!t3f_queue)
 	{
-		printf("Failed to create event queue!\n");
 		return 0;
 	}
 	
@@ -608,7 +576,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	}
 	
 	cvalue = al_get_config_value(t3f_config, "T3F", "always_clear_buffer");
-	if(cvalue && strcmp(cvalue, "true"))
+	if(cvalue && !strcmp(cvalue, "true"))
 	{
 		t3f_always_clear_buffer = true;
 	}
@@ -711,6 +679,12 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		{
 			t3f_flags &= ~T3F_RESIZABLE;
 		}
+		cvalue = al_get_config_value(t3f_config, "T3F", "force_opengl");
+		if((cvalue && !strcmp(cvalue, "true")) || (flags & T3F_USE_OPENGL))
+		{
+			dflags |= ALLEGRO_OPENGL;
+			t3f_flags |= T3F_USE_OPENGL;
+		}
 		cvalue = al_get_config_value(t3f_config, "T3F", "force_aspect_ratio");
 		if(cvalue)
 		{
@@ -756,7 +730,6 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		t3f_display = al_create_display(dw, dh);
 		if(!t3f_display)
 		{
-			printf("Failed to create display! Trying safe mode.\n");
 			dflags = 0;
 			if(flags & T3F_RESIZABLE)
 			{
@@ -1060,6 +1033,13 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			al_set_config_value(t3f_config, "T3F", "display_width", val);
 			sprintf(val, "%d", al_get_display_height(t3f_display));
 			al_set_config_value(t3f_config, "T3F", "display_height", val);
+			break;
+		}
+		
+		case ALLEGRO_EVENT_DISPLAY_FOUND:
+		{
+			t3f_unload_resources();
+			t3f_reload_resources();
 			break;
 		}
 		
