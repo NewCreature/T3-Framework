@@ -612,7 +612,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 	int inpslope = 0;
 	int inpxslope = 0;
 	int pinslope = 1;
-	int pxinslope = 0;
+//	int pxinslope = 0;
 	bool crossed = false;
 	
     if(cp->vy > 0.0)
@@ -774,7 +774,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 		    		{
 			    		printf("fourth\n");
 				    	pinslope = 0;
-				    	pxinslope = 1;
+//				    	pxinslope = 1;
 		    		}
 		    	}
 		    	else if(pp->slope)
@@ -1065,15 +1065,15 @@ float t3f_find_edge_right(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TILEMAP * tmp
    your program is responsible for knowing when the sprite is "walking" */
 float t3f_get_tilemap_walk_position(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TILEMAP * tmp, int flags)
 {
-	int tflags, pflags, bflags, aflags;
-	T3F_COLLISION_TILE * current_tile, * previous_tile, * below_tile, * above_tile;
+	int tflags, bflags, aflags;
+	T3F_COLLISION_TILE * current_tile, * below_tile, * above_tile;
 	
 	if(flags & T3F_COLLISION_FLAG_SOLID_TOP)
 	{
 		current_tile = t3f_get_collision_tile(tmp, cp->x + cp->map.bottom.point[0].x, cp->y + cp->map.bottom.point[0].y);
 		tflags = (current_tile->flags) & (T3F_COLLISION_FLAG_SLOPE_TOP | T3F_COLLISION_FLAG_SOLID_TOP);
-		previous_tile = t3f_get_collision_tile(tmp, cp->ox + cp->map.bottom.point[0].x, cp->oy + cp->map.bottom.point[0].y);
-		pflags = (previous_tile->flags) & (T3F_COLLISION_FLAG_SLOPE_TOP | T3F_COLLISION_FLAG_SOLID_TOP);
+//		previous_tile = t3f_get_collision_tile(tmp, cp->ox + cp->map.bottom.point[0].x, cp->oy + cp->map.bottom.point[0].y);
+//		pflags = (previous_tile->flags) & (T3F_COLLISION_FLAG_SLOPE_TOP | T3F_COLLISION_FLAG_SOLID_TOP);
 		below_tile = t3f_get_collision_tile(tmp, cp->x + cp->map.bottom.point[0].x, cp->y + cp->map.bottom.point[0].y + tmp->tile_height);
 		bflags = (below_tile->flags) & (T3F_COLLISION_FLAG_SLOPE_TOP | T3F_COLLISION_FLAG_SOLID_TOP);
 		above_tile = t3f_get_collision_tile(tmp, cp->x + cp->map.bottom.point[0].x, cp->y + cp->map.bottom.point[0].y - tmp->tile_height);

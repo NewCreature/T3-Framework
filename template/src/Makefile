@@ -22,20 +22,11 @@ endif
 top:
 	$(MAKE) -f makefile.$(SYSTEM)
 
-all:
-	$(MAKE) -f makefile.$(SYSTEM)
-	$(MAKE) -C editors/avatar_editor -f makefile.$(SYSTEM)
-	$(MAKE) -C editors/commentary_editor -f makefile.$(SYSTEM)
-	$(MAKE) -C editors/course_editor -f makefile.$(SYSTEM)
-
 clean:
 	$(MAKE) -f makefile.$(SYSTEM) clean
 
 clean_all:
 	$(MAKE) -f makefile.$(SYSTEM) clean
-	$(MAKE) -C editors/avatar_editor -f makefile.$(SYSTEM) clean
-	$(MAKE) -C editors/commentary_editor -f makefile.$(SYSTEM) clean
-	$(MAKE) -C editors/course_editor -f makefile.$(SYSTEM) clean
 
 package:
 	$(MAKE) -f makefile.$(SYSTEM) clean
@@ -52,3 +43,9 @@ android_repackage:
 
 windows_package:
 	$(MAKE) -f makefile.mingw_cross windows_package
+
+mac_package:
+	$(MAKE) -f makefile.macosx mac_package
+
+demo:
+	$(MAKE) -f makefile.$(SYSTEM) demo

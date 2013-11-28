@@ -258,8 +258,6 @@ void t3f_center_gui(T3F_GUI * pp, float oy, float my)
 	int i;
 	float top = 1000.0;
 	float bottom = 0.0;
-	int top_i;
-	int bottom_i;
 	float dheight = my - oy;
 	float height;
 	float offset;
@@ -269,12 +267,10 @@ void t3f_center_gui(T3F_GUI * pp, float oy, float my)
 		if(pp->element[i].oy < top)
 		{
 			top = pp->element[i].oy;
-			top_i = i;
 		}
 		if(pp->element[i].oy + t3f_gui_current_driver->get_element_height(&pp->element[i]) > bottom)
 		{
 			bottom = pp->element[i].oy + t3f_gui_current_driver->get_element_height(&pp->element[i]);
-			bottom_i = i;
 		}
 	}
 	height = bottom - top;
@@ -371,6 +367,7 @@ void t3f_process_gui(T3F_GUI * pp)
 	int i;
 	bool mouse_moved = false;
 	bool touched = false;
+	bool touching = false;
 	int touch_id = 0;
 	int x, y;
 	float mouse_x = 0.0, mouse_y = 0.0;
@@ -395,6 +392,7 @@ void t3f_process_gui(T3F_GUI * pp)
 			mouse_x = t3f_touch[i].x;
 			mouse_y = t3f_touch[i].y;
 			mouse_moved = true;
+			touching = true;
 			break;
 		}
 		else if(t3f_touch[i].released)
@@ -425,7 +423,7 @@ void t3f_process_gui(T3F_GUI * pp)
 		{
 			t3f_gui_hover_y = pp->oy + pp->element[pp->hover_element].oy;
 		}
-		if((t3f_mouse_button[0] || touched) && !t3f_gui_left_clicked && pp->hover_element >= 0)
+		if((t3f_mouse_button[0] || touched || (touching && pp->element[pp->hover_element].flags & T3F_GUI_ELEMENT_ON_TOUCH)) && !t3f_gui_left_clicked && pp->hover_element >= 0)
 		{
 			t3f_activate_selected_gui_element(pp);
 			t3f_gui_left_clicked = true;

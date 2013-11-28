@@ -257,7 +257,6 @@ bool t3f_bind_controller(T3F_CONTROLLER * cp, int binding)
 	ALLEGRO_EVENT_QUEUE * queue;
 	ALLEGRO_EVENT event;
 	const char * val;
-	float ppos = 0.0;
 	int i, jn;
 	
 	queue = al_create_event_queue();
@@ -348,11 +347,11 @@ bool t3f_bind_controller(T3F_CONTROLLER * cp, int binding)
 				}
 				if(event.joystick.pos >= -T3F_CONTROLLER_AXIS_THRESHOLD && event.joystick.pos <= T3F_CONTROLLER_AXIS_THRESHOLD)
 				{
-					ppos = event.joystick.pos;
+//					ppos = event.joystick.pos;
 				}
 				if(al_get_joystick_stick_flags(event.joystick.id, event.joystick.stick) & ALLEGRO_JOYFLAG_DIGITAL)
 				{
-					ppos = 0.1;
+//					ppos = 0.1;
 				}
 				break;
 			}

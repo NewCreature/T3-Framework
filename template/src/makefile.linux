@@ -5,5 +5,6 @@ PLATFORM_LIBS = $(LINUX_PLATFORM_LIBS)
 DEPEND_LIBS = -lm
 DEL_COMMAND = rm -f
 DEL_FOLDER_COMMAND = rm -rf
+SED_COMMAND = sed -i
 
 include makefile.common

@@ -19,6 +19,7 @@
 #include "t3f/t3f.h"
 #include "t3f/memory.h"
 #include "resource.h"
+#include "view.h"
 
 /* display data */
 int t3f_virtual_display_width = 0;
@@ -62,6 +63,7 @@ int t3f_state_stack_size = 0;
 bool t3f_quit = false;
 int t3f_requested_flags = 0;
 int t3f_flags = 0;
+int t3f_option[T3F_MAX_OPTIONS] = {0};
 
 void (*t3f_logic_proc)() = NULL;
 void (*t3f_render_proc)() = NULL;
@@ -78,11 +80,6 @@ ALLEGRO_PATH * t3f_temp_path = NULL;
 static char t3f_config_filename[1024] = {0};
 static char t3f_return_filename[1024] = {0};
 
-/* view data */
-/* internal state of the 3d engine */
-static T3F_VIEW * t3f_current_view = NULL;
-T3F_VIEW * t3f_default_view = NULL;
-
 /* colors */
 ALLEGRO_COLOR t3f_color_white;
 ALLEGRO_COLOR t3f_color_black;
@@ -91,13 +88,9 @@ ALLEGRO_COLOR t3f_color_black;
 static bool t3f_need_redraw = false;
 static int t3f_halted = 0;
 static void (*t3f_event_handler_proc)(ALLEGRO_EVENT * event) = NULL;
-static T3F_ATLAS * t3f_atlas[T3F_MAX_ATLASES] = {NULL};
-static int t3f_atlases = 0;
 
 static char * t3f_developer_name = NULL;
 static char * t3f_package_name = NULL; // used to locate resources
-
-static bool t3f_always_clear_buffer = false;
 
 static bool t3f_is_path_present(ALLEGRO_PATH * pp)
 {
@@ -195,11 +188,29 @@ ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp)
 	return bp;
 }
 
+static void t3f_get_options(void)
+{
+	const char * val;
+	char buf[64];
+	int i;
+	
+	for(i = 0; i < T3F_MAX_OPTIONS; i++)
+	{
+		snprintf(buf, 64, "Key %d", i);
+		val = al_get_config_value(t3f_config, "Options", buf);
+		if(val)
+		{
+			t3f_option[i] = atoi(val);
+		}
+	}
+}
+
 /* this gets Allegro ready */
 int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(), void (*render_proc)(), int flags)
 {
 	int i;
 	ALLEGRO_PATH * temp_path = NULL;
+	const ALLEGRO_FILE_INTERFACE * old_interface;
 	
 	// compile time configuration
 	#ifdef T3F_DEVELOPER_NAME
@@ -223,11 +234,6 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		return 0;
 	}
 	
-	/* setup memory debugger */
-	#ifdef T3F_DEBUG
-		t3f_setup_memory_interface();
-	#endif
-	
 	al_set_app_name(name);
 	if(t3f_developer_name)
 	{
@@ -241,16 +247,26 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	t3f_setup_directories(t3f_config_path);
 	t3f_setup_directories(t3f_data_path);
 	
+	/* set default options */
+	#ifdef T3F_ANDROID
+		t3f_option[T3F_OPTION_RENDER_MODE] = T3F_RENDER_MODE_ALWAYS_CLEAR;
+	#endif
+	
+
 	/* set up configuration file */
 	temp_path = al_clone_path(t3f_config_path);
 	al_set_path_filename(temp_path, "settings.ini");
 	strcpy(t3f_config_filename, al_path_cstr(temp_path, '/'));
 	al_destroy_path(temp_path);
+	old_interface = al_get_new_file_interface();
+	al_set_standard_file_interface();
 	t3f_config = al_load_config_file(t3f_config_filename);
+	al_set_new_file_interface(old_interface);
 	if(!t3f_config)
 	{
 		t3f_config = al_create_config();
 	}
+	t3f_get_options();
 	
 	if(!al_init_image_addon())
 	{
@@ -364,10 +380,21 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	return 1;
 }
 
+void t3f_set_option(int option, int value)
+{
+	char buf[64] = {0};
+	char vbuf[64] = {0};
+	
+	t3f_option[option] = value;
+	snprintf(buf, 64, "Key %d", option);
+	snprintf(vbuf, 64, "%d", value);
+	al_set_config_value(t3f_config, "Options", buf, vbuf);
+}
+
 /* function to ease the burden of having resources located in different places
  * on different platforms, changes to the directory where it finds the specified
  * resource */
-bool t3f_locate_resource(char * argv, const char * filename)
+bool t3f_locate_resource(const char * filename)
 {
 	ALLEGRO_PATH * path;
 	ALLEGRO_PATH * file_path;
@@ -378,11 +405,11 @@ bool t3f_locate_resource(char * argv, const char * filename)
 	
 		int ret;
 		
-		/* try to use PHYSFS to access data */
-		if(PHYSFS_init(argv))
+		path = al_get_standard_path(ALLEGRO_EXENAME_PATH);
+		if(path)
 		{
-			path = al_get_standard_path(ALLEGRO_EXENAME_PATH);
-			if(path)
+			/* try to use PHYSFS to access data */
+			if(PHYSFS_init(al_path_cstr(path, '/')))
 			{
 				ret = PHYSFS_addToSearchPath(al_path_cstr(path, '/'), 1);
 				al_destroy_path(path);
@@ -573,12 +600,6 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	if(cvalue && !strcmp(cvalue, "true"))
 	{
 		flags |= T3F_RESIZABLE;
-	}
-	
-	cvalue = al_get_config_value(t3f_config, "T3F", "always_clear_buffer");
-	if(cvalue && !strcmp(cvalue, "true"))
-	{
-		t3f_always_clear_buffer = true;
 	}
 	
 	if(t3f_display)
@@ -790,7 +811,12 @@ void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event))
 
 void t3f_exit(void)
 {
+	const ALLEGRO_FILE_INTERFACE * old_interface;
+	
+	old_interface = al_get_new_file_interface();
+	al_set_standard_file_interface();
 	al_save_config_file(t3f_config_filename, t3f_config);
+	al_set_new_file_interface(old_interface);
 	t3f_quit = true;
 }
 
@@ -799,17 +825,6 @@ float t3f_distance(float x1, float y1, float x2, float y2)
 	float dx = x2 - x1;
 	float dy = y2 - y1;
 	return sqrt(dx * dx + dy * dy);
-}
-
-#define T3F_RS_SCALE (1.0 / (1.0 + RAND_MAX))
-double t3f_drand(void)
-{
-	double d;
-	do
-	{
-		d = (((rand () * T3F_RS_SCALE) + rand ()) * T3F_RS_SCALE + rand ()) * T3F_RS_SCALE;
-	} while (d >= 1); /* Round off */
-	return d;
 }
 
 void t3f_clear_keys(void)
@@ -1038,8 +1053,10 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		
 		case ALLEGRO_EVENT_DISPLAY_FOUND:
 		{
+			t3f_unload_atlases();
 			t3f_unload_resources();
 			t3f_reload_resources();
+			t3f_rebuild_atlases();
 			break;
 		}
 		
@@ -1103,8 +1120,11 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
 
-			t3f_touch[0].x = t3f_mouse_x;
-			t3f_touch[0].y = t3f_mouse_y;
+			if(t3f_touch[0].active)
+			{
+				t3f_touch[0].x = t3f_mouse_x;
+				t3f_touch[0].y = t3f_mouse_y;
+			}
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_WARPED:
@@ -1112,8 +1132,11 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 
-			t3f_touch[0].x = t3f_mouse_x;
-			t3f_touch[0].y = t3f_mouse_y;
+			if(t3f_touch[0].active)
+			{
+				t3f_touch[0].x = t3f_mouse_x;
+				t3f_touch[0].y = t3f_mouse_y;
+			}
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY:
@@ -1169,6 +1192,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
 		{
 			al_stop_timer(t3f_timer);
+			t3f_unload_atlases();
 			t3f_unload_resources();
 			t3f_halted = 1;
 			if(t3f_stream)
@@ -1212,7 +1236,7 @@ void t3f_render(void)
 	/* some video drivers and compositors may leave junk in the buffers, this
 	 * config file setting will work around the issue by clearing the entire
 	 * buffer before drawing anything */
-	if(t3f_always_clear_buffer)
+	if(t3f_option[T3F_OPTION_RENDER_MODE] == T3F_RENDER_MODE_ALWAYS_CLEAR)
 	{
 		al_set_clipping_rectangle(0, 0, al_get_display_width(t3f_display), al_get_display_height(t3f_display));
 		al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.0));
@@ -1306,379 +1330,4 @@ void t3f_store_state(T3F_VIEW * sp)
 void t3f_restore_state(T3F_VIEW * sp)
 {
 	memcpy(t3f_current_view, sp, sizeof(T3F_VIEW));
-}
-
-void t3f_select_view(T3F_VIEW * sp)
-{
-	float sx, sy;
-	float dsx, dsy;
-	
-	if(sp != NULL)
-	{
-		t3f_current_view = sp;
-	}
-	else
-	{
-		t3f_current_view = t3f_default_view;
-	}
-	dsx = (float)t3f_display_width / t3f_virtual_display_width;
-	dsy = (float)t3f_display_height / t3f_virtual_display_height;
-	sx = t3f_current_view->width / t3f_virtual_display_width;
-	sy = t3f_current_view->height / t3f_virtual_display_height;
-	
-	/* apply additional transformations */
-	al_build_transform(&t3f_current_transform, t3f_display_offset_x + (t3f_current_view->offset_x * dsx), t3f_display_offset_y + (t3f_current_view->offset_y * dsy), dsx * sx, dsy * sy, 0.0);
-	al_use_transform(&t3f_current_transform);
-	t3f_set_clipping_rectangle(0, 0, 0, 0);
-}
-
-/* get the x coordinate of the pixel at the given (x, z) coordinate
-   takes current projection state into account */
-float t3f_project_x(float x, float z)
-{
-	float rx;
-	
-//	if(z + t3f_current_view->width > 0)
-	if(z + t3f_virtual_display_width > 0)
-	{
-//		rx = (((x - t3f_current_view->vp_x) * t3f_current_view->width) / (z + t3f_current_view->width) + t3f_current_view->vp_x);
-		rx = (((x - t3f_current_view->vp_x) * t3f_virtual_display_width) / (z + t3f_virtual_display_width) + t3f_current_view->vp_x);
-		return rx;
-	}
-	else
-	{
-		return -65536;
-	}
-}
-
-/* get the y coordinate of the pixel at the given (y, z) coordinate
-   takes current projection state into account */
-float t3f_project_y(float y, float z)
-{
-	float ry;
-	
-//	if(z + t3f_current_view->height > 0)
-	if(z + t3f_virtual_display_width > 0)
-	{
-//		ry = (((y - t3f_current_view->vp_y) * t3f_current_view->width) / (z + t3f_current_view->width) + t3f_current_view->vp_y);
-		ry = (((y - t3f_current_view->vp_y) * t3f_virtual_display_width) / (z + t3f_virtual_display_width) + t3f_current_view->vp_y);
-		return ry;
-	}
-	else
-	{
-		return -65536;
-	}
-}
-
-static ALLEGRO_BITMAP * t3f_create_bitmap(int w, int h)
-{
-	ALLEGRO_STATE old_state;
-	ALLEGRO_BITMAP * bp;
-
-	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
-	bp = al_create_bitmap(w, h);
-	al_restore_state(&old_state);
-	return bp;
-}
-
-/* create an empty atlas of the specified type and size */
-T3F_ATLAS * t3f_create_atlas(int w, int h)
-{
-	T3F_ATLAS * ap;
-	ALLEGRO_STATE old_state;
-	
-	ap = al_malloc(sizeof(T3F_ATLAS));
-	if(!ap)
-	{
-		return NULL;
-	}
-	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
-	ap->page = t3f_create_bitmap(w, h);
-	al_restore_state(&old_state);
-	if(!ap->page)
-	{
-		al_free(ap);
-		return NULL;
-	}
-	ap->x = 1; // start at 1 so we get consistency with filtered bitmaps
-	ap->y = 1;
-	ap->width = w;
-	ap->height = h;
-	ap->line_height = 0;
-	ap->bitmaps = 0;
-	
-	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
-	al_set_target_bitmap(ap->page);
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
-	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 0.0));
-	al_restore_state(&old_state);
-	
-	t3f_atlas[t3f_atlases] = ap;
-	t3f_atlases++;
-	return ap;
-}
-
-/* destroy the atlas */
-void t3f_destroy_atlas(T3F_ATLAS * ap)
-{
-	int i, j;
-	
-	al_destroy_bitmap(ap->page);
-	al_free(ap);
-	for(i = 0; i < t3f_atlases; i++)
-	{
-		if(t3f_atlas[i] == ap)
-		{
-			for(j = i; j < t3f_atlases - 1; j++)
-			{
-				t3f_atlas[j] = t3f_atlas[j + 1];
-			}
-			t3f_atlases--;
-			break;
-		}
-	}
-}
-
-ALLEGRO_BITMAP * t3f_put_bitmap_on_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int type)
-{
-	ALLEGRO_STATE old_state;
-	ALLEGRO_BITMAP * retbp = NULL;
-	ALLEGRO_TRANSFORM identity_transform;
-	
-	if(ap->y >= al_get_bitmap_height(ap->page))
-	{
-		return NULL;
-	}
-	
-	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TRANSFORM);
-	al_set_target_bitmap(ap->page);
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
-	al_identity_transform(&identity_transform);
-	al_use_transform(&identity_transform);
-	switch(type)
-	{
-		case T3F_ATLAS_TILE:
-		{
-			
-			/* go to next line if it doesn't fit */
-			if(ap->x + al_get_bitmap_width(*bp) + 2 >= al_get_bitmap_width(ap->page))
-			{
-				ap->x = 1; // start at 1 so we get consistency with filtered bitmaps
-				ap->y += ap->line_height;
-				
-				/* if it still doesn't fit, fail */
-				if(ap->y  + al_get_bitmap_height(*bp) + 2 >= al_get_bitmap_height(ap->page))
-				{
-					al_restore_state(&old_state);
-					return NULL;
-				}
-			}
-			
-//			retbp = _t3f_add_bitmap_to_region(t3f_ss_working_bitmap, bp, t3f_ss_working_pos_x + 1, t3f_ss_working_pos_y + 1);
-			/* need to extend edges of tiles so they don't have soft edges */
-			al_draw_bitmap(*bp, ap->x, ap->y, 0);
-			al_draw_bitmap(*bp, ap->x + 2, ap->y, 0);
-			al_draw_bitmap(*bp, ap->x, ap->y + 2, 0);
-			al_draw_bitmap(*bp, ap->x + 2, ap->y + 2, 0);
-			al_draw_bitmap(*bp, ap->x + 1, ap->y, 0);
-			al_draw_bitmap(*bp, ap->x + 1, ap->y + 2, 0);
-			al_draw_bitmap(*bp, ap->x, ap->y + 1, 0);
-			al_draw_bitmap(*bp, ap->x + 2, ap->y + 1, 0);
-			al_draw_bitmap(*bp, ap->x + 1, ap->y + 1, 0);
-			
-			retbp = al_create_sub_bitmap(ap->page, ap->x + 1, ap->y + 1, al_get_bitmap_width(*bp), al_get_bitmap_height(*bp));
-			
-			ap->x += al_get_bitmap_width(*bp) + 2;
-			if(al_get_bitmap_height(*bp) + 2 > ap->line_height)
-			{
-				ap->line_height = al_get_bitmap_height(*bp) + 2;
-			}
-			break;
-		}
-		case T3F_ATLAS_SPRITE:
-		{
-			/* go to next line if it doesn't fit */
-			if(ap->x + al_get_bitmap_width(*bp) + 2 >= al_get_bitmap_width(ap->page))
-			{
-				ap->x = 1;
-				ap->y += ap->line_height;
-				
-				/* if it still doesn't fit, fail */
-				if(ap->y + al_get_bitmap_height(*bp) + 2 >= al_get_bitmap_height(ap->page))
-				{
-					al_restore_state(&old_state);
-					return NULL;
-				}
-			}
-//			retbp = _t3f_add_bitmap_to_region(t3f_ss_working_bitmap, bp, t3f_ss_working_pos_x, t3f_ss_working_pos_y);
-			al_draw_bitmap(*bp, ap->x + 1, ap->y + 1, 0);
-			
-			retbp = al_create_sub_bitmap(ap->page, ap->x + 1, ap->y + 1, al_get_bitmap_width(*bp), al_get_bitmap_height(*bp));
-			
-			ap->x += al_get_bitmap_width(*bp) + 2;
-			if(al_get_bitmap_height(*bp) + 1 > ap->line_height)
-			{
-				ap->line_height = al_get_bitmap_height(*bp) + 2;
-			}
-			break;
-		}
-	}
-	al_restore_state(&old_state);
-	return retbp;
-}
-
-/* fix for when you have exceeded the size of the sprite sheet */
-ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int type)
-{
-	ALLEGRO_BITMAP * retbp = NULL;
-	
-	retbp = t3f_put_bitmap_on_atlas(ap, bp, type);
-	if(retbp)
-	{
-		ap->bitmap[ap->bitmaps] = bp;
-		ap->bitmap_type[ap->bitmaps] = type;
-		ap->bitmaps++;
-	}
-		
-	return retbp;
-}
-
-bool t3f_rebuild_atlases(void)
-{
-	ALLEGRO_STATE old_state;
-	int i, j;
-	
-	for(i = 0; i < t3f_atlases; i++)
-	{
-		al_destroy_bitmap(t3f_atlas[i]->page);
-		al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-		al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
-		t3f_atlas[i]->page = t3f_create_bitmap(t3f_atlas[i]->width, t3f_atlas[i]->height);
-		al_restore_state(&old_state);
-		if(!t3f_atlas[i]->page)
-		{
-			return false;
-		}
-		al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
-		al_set_target_bitmap(t3f_atlas[i]->page);
-		al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
-		al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 0.0));
-		al_restore_state(&old_state);
-		t3f_atlas[i]->x = 1; // start at 1 so we get consistency with filtered bitmaps
-		t3f_atlas[i]->y = 1;
-		t3f_atlas[i]->line_height = 0;
-		for(j = 0; j < t3f_atlas[i]->bitmaps; j++)
-		{
-			*t3f_atlas[i]->bitmap[j] = t3f_put_bitmap_on_atlas(t3f_atlas[i], t3f_atlas[i]->bitmap[j], t3f_atlas[i]->bitmap_type[j]);
-		}
-	}
-	return true;
-}
-
-void t3f_draw_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float x, float y, float z, int flags)
-{
-	/* upper left and bottom right points in 3d */
-	float obj_x[2], obj_y[2], obj_z[2];
-	
-	/* upper left and bottom right points in 2d */
-	float screen_w, screen_h;
-
-	obj_x[0] = t3f_project_x(x, z);
-	obj_x[1] = t3f_project_x(x + al_get_bitmap_width(bp), z);
-	obj_y[0] = t3f_project_y(y, z);
-	obj_y[1] = t3f_project_y(y + al_get_bitmap_height(bp), z);
-	obj_z[0] = z + t3f_current_view->width;
-	obj_z[1] = z + t3f_virtual_display_width;
-	
-	/* clip sprites at z = 0 */
-	if(obj_z[0] > 0)
-	{
-		screen_w = obj_x[1] - obj_x[0];
-		screen_h = obj_y[1] - obj_y[0];
-		al_draw_tinted_scaled_bitmap(bp, color, 0, 0, al_get_bitmap_width(bp), al_get_bitmap_height(bp), obj_x[0], obj_y[0], screen_w, screen_h, flags);
-	}
-}
-
-void t3f_draw_rotated_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float cx, float cy, float x, float y, float z, float angle, int flags)
-{
-	/* upper left and bottom right points in 3d */
-	float obj_x[2], obj_y[2], obj_z[2], obj_cx, obj_cy;
-	float rx, ry;
-	
-	/* upper left and bottom right points in 2d */
-	float screen_w, screen_h;
-
-	obj_x[0] = t3f_project_x(x - cx, z);
-	obj_x[1] = t3f_project_x(x - cx + al_get_bitmap_width(bp), z);
-	obj_y[0] = t3f_project_y(y - cy, z);
-	obj_y[1] = t3f_project_y(y - cy + al_get_bitmap_height(bp), z);
-	obj_z[0] = z + t3f_current_view->width;
-	obj_z[1] = z + t3f_virtual_display_width;
-	obj_cx = t3f_project_x(x, z);
-	obj_cy = t3f_project_y(y, z);
-	
-	/* clip sprites at z = 0 */
-	if(obj_z[0] > 0)
-	{
-		screen_w = obj_x[1] - obj_x[0];
-		screen_h = obj_y[1] - obj_y[0];
-		rx = screen_w / al_get_bitmap_width(bp);
-		ry = screen_h / al_get_bitmap_height(bp);
-		al_draw_tinted_scaled_rotated_bitmap(bp, color, cx, cy, obj_cx, obj_cy, rx, ry, angle, flags);
-	}
-}
-
-void t3f_draw_scaled_rotated_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float cx, float cy, float x, float y, float z, float angle, float scale_x, float scale_y, int flags)
-{
-	/* upper left and bottom right points in 3d */
-	float obj_x[2], obj_y[2], obj_z[2], obj_cx, obj_cy;
-	float rx, ry;
-	
-	/* upper left and bottom right points in 2d */
-	float screen_w, screen_h;
-
-	obj_x[0] = t3f_project_x(0, z);
-	obj_x[1] = t3f_project_x((float)al_get_bitmap_width(bp) * scale_x, z);
-	obj_y[0] = t3f_project_y(0, z);
-	obj_y[1] = t3f_project_y((float)al_get_bitmap_height(bp) * scale_y, z);
-	obj_z[0] = z + t3f_current_view->width;
-	obj_z[1] = z + t3f_virtual_display_width;
-	obj_cx = t3f_project_x(x, z);
-	obj_cy = t3f_project_y(y, z);
-	
-	/* clip sprites at z = 0 */
-	if(obj_z[0] > 0)
-	{
-		screen_w = obj_x[1] - obj_x[0];
-		screen_h = obj_y[1] - obj_y[0];
-		rx = screen_w / al_get_bitmap_width(bp);
-		ry = screen_h / al_get_bitmap_height(bp);
-		al_draw_tinted_scaled_rotated_bitmap(bp, color, cx, cy, obj_cx, obj_cy, rx, ry, angle, flags);
-	}
-}
-
-void t3f_draw_scaled_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float x, float y, float z, float w, float h, int flags)
-{
-	/* upper left and bottom right points in 3d */
-	float obj_x[2], obj_y[2], obj_z[2];
-	
-	/* upper left and bottom right points in 2d */
-	float screen_w, screen_h;
-
-	obj_x[0] = t3f_project_x(x, z);
-	obj_x[1] = t3f_project_x(x + w, z);
-	obj_y[0] = t3f_project_y(y, z);
-	obj_y[1] = t3f_project_y(y + h, z);
-	obj_z[0] = z + t3f_current_view->width;
-	obj_z[1] = z + t3f_virtual_display_width;
-	
-	/* clip sprites at z = 0 */
-	if(obj_z[0] > 0)
-	{
-		screen_w = obj_x[1] - obj_x[0];
-		screen_h = obj_y[1] - obj_y[0];
-		al_draw_tinted_scaled_bitmap(bp, color, 0, 0, al_get_bitmap_width(bp), al_get_bitmap_height(bp), obj_x[0], obj_y[0], screen_w, screen_h, flags);
-	}
 }

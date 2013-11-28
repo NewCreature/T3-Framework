@@ -20,6 +20,7 @@
 #define T3F_GUI_ELEMENT_SHADOW    4 // element has shadow
 #define T3F_GUI_ELEMENT_AUTOHIDE  8 // element is hidden unless mouse pointer is close
 #define T3F_GUI_ELEMENT_COPY     16 // element maintains its own copy of the data
+#define T3F_GUI_ELEMENT_ON_TOUCH 32 // active upon touch
 
 /* GUI flags */
 #define T3F_GUI_DISABLED          1 // GUI is disabled

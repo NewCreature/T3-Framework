@@ -7,6 +7,7 @@ LIB_SUFFIX = -static
 DEPEND_LIBS = -lz -lpng -lvorbis -logg -lvorbisfile -ldumb -lfreetype $(MACOSX_DEPEND_LIBS)
 DEL_COMMAND = rm -f
 DEL_FOLDER_COMMAND = rm -rf
+SED_COMMAND = sed -i ''
 PLATFORM_CLEAN = rm -rf ../$(APP_BUNDLE_NAME).app
 
 include makefile.common
@@ -26,3 +27,7 @@ include makefile.common
 	@sed -i '' "s|T3F_APP_EXECUTABLE|$(APP_BUNDLE_NAME)|" ../$(APP_BUNDLE_NAME).app/Contents/Info.plist
 	@sed -i '' "s|T3F_APP_ICON|$(APP_BUNDLE_NAME).icns|" ../$(APP_BUNDLE_NAME).app/Contents/Info.plist
 	@echo Application bundle created!
+
+mac_package: ../$(APP_BUNDLE_NAME).app
+	rm -rf ../$(APP_PACKAGE_NAME)-macosx.dmg
+	../macosx/create-dmg --volname $(APP_BUNDLE_NAME) --volicon ../icons/macosx_icon.icns --window-size 400 232 --icon-size 96 --icon "WordLeap" 110 100 --app-drop-link 280 100 ../$(APP_PACKAGE_NAME)-macosx.dmg ../$(APP_BUNDLE_NAME).app

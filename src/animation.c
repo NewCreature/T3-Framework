@@ -4,6 +4,7 @@
 #include "t3f/t3f.h"
 #include "t3f/animation.h"
 #include "t3f/bitmap.h"
+#include "t3f/draw.h"
 #include "resource.h"
 
 static char ani_header[12] = {'O', 'C', 'D', 'A', 'S', 0};

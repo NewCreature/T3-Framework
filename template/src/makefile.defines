@@ -9,6 +9,7 @@ APP_COMPANY = t3-i
 APP_NAME = app-name
 APP_BUNDLE_NAME = App\ Display\ Name
 APP_VERSION = 0.1
+APP_RELEASE = 1
 APP_PUBLISHER = T\^3\ Software
 APP_COPYRIGHT = Copyright\ (C)\ 2013\ T\^3\ Software
 APP_ANDROID_PACKAGE = com.t3i.t3f_app
@@ -20,7 +21,7 @@ APP_OBJECTS = main.o
 ################
 # global stuff #
 ################
-GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall -I. -DT3F_DEVELOPER_NAME="\"$(APP_COMPANY)\"" -DT3F_PACKAGE_NAME="\"$(DEBIAN_APP_NAME)\""
+GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall -I. -DT3F_DEVELOPER_NAME="\"$(APP_COMPANY)\"" -DT3F_PACKAGE_NAME="\"$(APP_NAME)\"" -DT3F_APP_VERSION="\"$(APP_VERSION)\""
 
 ##################
 # Mac OS X stuff #

@@ -17,78 +17,71 @@ LOCAL_PATH := $(call my-dir)
 TARGET_ARCH_ABI := armeabi-v7a
 
 include $(CLEAR_VARS)
+
 LOCAL_MODULE := liballegro-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro-debug.so
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro.so
 include $(PREBUILT_SHARED_LIBRARY)
-
 include $(CLEAR_VARS)
-LOCAL_MODULE := liballegro_color-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_color-debug.so
-include $(PREBUILT_SHARED_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := liballegro_memfile-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_memfile-debug.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
 LOCAL_MODULE := liballegro_primitives-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_primitives-debug.so
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_primitives.so
 include $(PREBUILT_SHARED_LIBRARY)
-
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := liballegro_image-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_image-debug.so
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_image.so
 include $(PREBUILT_SHARED_LIBRARY)
-
 include $(CLEAR_VARS)
+
 LOCAL_MODULE := liballegro_font-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_font-debug.so
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_font.so
 include $(PREBUILT_SHARED_LIBRARY)
-
 include $(CLEAR_VARS)
+
 LOCAL_MODULE := liballegro_ttf-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_ttf-debug.so
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_ttf.so
 include $(PREBUILT_SHARED_LIBRARY)
-
 include $(CLEAR_VARS)
+
 LOCAL_MODULE := liballegro_audio-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_audio-debug.so
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_audio.so
 include $(PREBUILT_SHARED_LIBRARY)
-
 include $(CLEAR_VARS)
+
 LOCAL_MODULE := liballegro_acodec-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_acodec-debug.so
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_acodec.so
 include $(PREBUILT_SHARED_LIBRARY)
-
 include $(CLEAR_VARS)
-LOCAL_MODULE := liballegro_physfs-prebuilt
-LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_physfs-debug.so
-include $(PREBUILT_SHARED_LIBRARY)
 
+LOCAL_MODULE := liballegro_physfs-prebuilt
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_physfs.so
+include $(PREBUILT_SHARED_LIBRARY)
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := liballegro_memfile-prebuilt
+LOCAL_SRC_FILES := $(TARGET_ARCH_ABI)/liballegro_memfile.so
+include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_ALLOW_UNDEFINED_SYMBOLS := true
 LOCAL_MODULE    := allegro-example
 LOCAL_SRC_FILES := main.c
-LOCAL_CFLAGS    := -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/$(TARGET_ARCH_ABI)/include -I../../src -DT3F_ANDROID
+LOCAL_CFLAGS    := -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/$(TARGET_ARCH_ABI)/include -DT3F_ANDROID
 LOCAL_CFLAGS    += -DDEBUGMODE
 LOCAL_CFLAGS    += -W -Wall
 
 LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/$(TARGET_ARCH_ABI)/lib
 LOCAL_LDLIBS    += -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI)
 LOCAL_LDLIBS    += -llog $(APP_LIBS) $(ANDROID_PLATFORM_LIBS)
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro-debug.so
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_color-debug.so
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_memfile-debug.so
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_primitives-debug.so
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_image-debug.so
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_font-debug.so
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_ttf-debug.so
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_audio-debug.so
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_acodec-debug.so
-LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_physfs-debug.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_primitives.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_image.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_font.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_ttf.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_audio.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_acodec.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_physfs.so
+LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_memfile.so
 
 include $(BUILD_SHARED_LIBRARY)
 

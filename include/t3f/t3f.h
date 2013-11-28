@@ -6,6 +6,7 @@
 #endif
 
 #include <allegro5/allegro5.h>
+#include <allegro5/allegro_memfile.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
@@ -28,6 +29,11 @@
 #define T3F_USE_OPENGL    512
 #define T3F_DEFAULT (T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_JOYSTICK | T3F_USE_TOUCH | T3F_USE_SOUND | T3F_FORCE_ASPECT)
 
+#define T3F_MAX_OPTIONS                 64
+#define T3F_OPTION_RENDER_MODE           0
+	#define T3F_RENDER_MODE_NORMAL       0
+	#define T3F_RENDER_MODE_ALWAYS_CLEAR 1
+
 #define T3F_KEY_BUFFER_MAX 256
 #define T3F_KEY_BUFFER_FORCE_LOWER 1
 #define T3F_KEY_BUFFER_FORCE_UPPER 2
@@ -37,41 +43,6 @@
 #define T3F_MAX_TOUCHES   64
 
 #define T3F_MAX_STACK     16
-
-#define T3F_ATLAS_TILE     0
-#define T3F_ATLAS_SPRITE   1
-#define T3F_ATLAS_MAX_BITMAPS 1024
-#define T3F_MAX_ATLASES   32
-
-/* structure holds information about a 3D viewport usually used to represent
-   one player's screen, split screen games will have multiple viewports */
-typedef struct
-{
-	
-	/* offset of viewport */
-	float offset_x;
-	float offset_y;
-	float width;
-	float height;
-	
-	/* vanishing point */
-	float vp_x;
-	float vp_y;
-
-} T3F_VIEW;
-
-typedef struct
-{
-
-	ALLEGRO_BITMAP * page;
-	int x, y;
-	int width, height;
-	int line_height;
-	ALLEGRO_BITMAP ** bitmap[T3F_ATLAS_MAX_BITMAPS];
-	int bitmap_type[T3F_ATLAS_MAX_BITMAPS];
-	int bitmaps;
-	
-} T3F_ATLAS;
 
 typedef struct
 {
@@ -97,10 +68,15 @@ typedef struct
 
 extern int t3f_virtual_display_width;
 extern int t3f_virtual_display_height;
+extern int t3f_display_offset_x;
+extern int t3f_display_offset_y;
+extern int t3f_display_width;
+extern int t3f_display_height;
 
 extern bool t3f_key[ALLEGRO_KEY_MAX];
 extern bool t3f_quit;
 extern int t3f_flags;
+extern int t3f_option[T3F_MAX_OPTIONS];
 
 extern int t3f_mouse_x;
 extern int t3f_mouse_y;
@@ -124,12 +100,12 @@ extern ALLEGRO_PATH * t3f_config_path;
 extern ALLEGRO_TRANSFORM t3f_base_transform;
 extern ALLEGRO_TRANSFORM t3f_current_transform;
 
-extern T3F_VIEW * t3f_default_view;
 extern ALLEGRO_COLOR t3f_color_white;
 extern ALLEGRO_COLOR t3f_color_black;
 
 int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(), void (*render_proc)(), int flags);
-bool t3f_locate_resource(char * argv, const char * filename);
+void t3f_set_option(int option, int value);
+bool t3f_locate_resource(const char * filename);
 int t3f_set_gfx_mode(int w, int h, int flags);
 void t3f_set_clipping_rectangle(int x, int y, int w, int h);
 void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event));
@@ -139,7 +115,6 @@ void t3f_render(void);
 void t3f_run(void);
 
 float t3f_distance(float x1, float y1, float x2, float y2);
-double t3f_drand(void);
 
 /* keyboard */
 void t3f_clear_keys(void);
@@ -167,27 +142,6 @@ void t3f_setup_directories(ALLEGRO_PATH * final);
 const char * t3f_get_filename(ALLEGRO_PATH * path, const char * fn);
 bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp);
 ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp);
-
-/* 3D projection */
-T3F_VIEW * t3f_create_view(float ox, float oy, float w, float h, float vpx, float vpy);
-void t3f_destroy_view(T3F_VIEW * vp);
-void t3f_store_state(T3F_VIEW * sp);
-void t3f_restore_state(T3F_VIEW * sp);
-void t3f_select_view(T3F_VIEW * sp);
-float t3f_project_x(float x, float z);
-float t3f_project_y(float y, float z);
-
-/* sprite atlas functions */
-T3F_ATLAS * t3f_create_atlas(int w, int h);
-void t3f_destroy_atlas(T3F_ATLAS * ap);
-ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int type);
-bool t3f_rebuild_atlases(void);
-
-/* drawing functions */
-void t3f_draw_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float x, float y, float z, int flags);
-void t3f_draw_rotated_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float cx, float cy, float x, float y, float z, float angle, int flags);
-void t3f_draw_scaled_rotated_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float cx, float cy, float x, float y, float z, float angle, float scale_x, float scale_y, int flags);
-void t3f_draw_scaled_bitmap(ALLEGRO_BITMAP * bp, ALLEGRO_COLOR color, float x, float y, float z, float w, float h, int flags);
 
 #ifdef __cplusplus
    }

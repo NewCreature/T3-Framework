@@ -19,19 +19,17 @@ SolidCompression=yes
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "T3F_APP_EXECUTABLE"; Destdir: "{app}"
+Source: "..\bin\T3F_APP_EXECUTABLE"; Destdir: "{app}"
 Source: "T3F_APP_LIBS_DIR\*.dll"; Destdir: "{app}"
 Source: "T3F_APP_USER_LIBS_DIR\*.dll"; Destdir: "{app}"; Flags: skipifsourcedoesntexist
 Source: "T3F_APP_DATA_DIR\*.*"; DestDir: "{app}\data"; Flags: recursesubdirs
-
-;[UninstallDelete]
-;Type: files; Name: "{app}\alleg42.dll"
-;Type: files; Name: "{app}\readme.txt"
-;Type: files; Name: "{app}\soup.dat"
-;Type: files; Name: "{app}\soup.exe"
+Source: "T3F_APP_DOCS_DIR\README"; DestDir: "{app}\docs"; DestName: readme.txt
+Source: "T3F_APP_DOCS_DIR\copyright"; DestDir: "{app}\docs"; DestName: license.txt
+Source: "T3F_APP_DOCS_DIR\changelog"; DestDir: "{app}\docs"; DestName: history.txt
 
 [Icons]
 Name: "{group}\T3F_APP_NAME"; Filename: "{app}\T3F_APP_EXECUTABLE"; WorkingDir: "{app}"
-Name: "{group}\Readme"; Filename: "{app}\readme.txt"; WorkingDir: "{app}"
+Name: "{group}\License"; Filename: "{app}\docs\license.txt"; WorkingDir: "{app}"
+Name: "{group}\Readme"; Filename: "{app}\docs\readme.txt"; WorkingDir: "{app}"
 Name: "{group}\Uninstall"; Filename: "{uninstallexe}"; WorkingDir: "{app}"
 Name: "{userdesktop}\T3F_APP_NAME"; Filename: "{app}\T3F_APP_EXECUTABLE"; WorkingDir: "{app}"

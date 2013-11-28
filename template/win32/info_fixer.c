@@ -5,6 +5,8 @@ int main(int argc, char * argv[])
 	FILE * fp;
 	FILE * out;
 	int c, next;
+	int newline_count = 0;
+	int line_pos = 0;
 	
 	fp = fopen(argv[1], "rb");
 	if(!fp)
@@ -24,23 +26,36 @@ int main(int argc, char * argv[])
 		{
 			break;
 		}
+		else if(c == '\r')
+		{
+		}
 		else if(c == '\n')
 		{
-			next = fgetc(fp);
-			if(next == '\n')
-			{
-				fputc('\n', out);
-				fputc('\n', out);
-			}
-			else
-			{
-				fputc(' ', out);
-				c = next;
-			}
+			newline_count++;
+			line_pos = 0;
 		}
 		else
 		{
-			fputc(c, out);
+			if(newline_count > 1)
+			{
+				fputc('\r', out);
+				fputc('\n', out);
+				fputc('\r', out);
+				fputc('\n', out);
+			}
+			else if(newline_count == 1)
+			{
+				fputc(' ', out);
+			}
+			newline_count = 0;
+			if(c == '-' && line_pos == 0)
+			{
+			}
+			else
+			{
+				fputc(c, out);
+				line_pos++;
+			}
 		}
 	}
 	fclose(fp);

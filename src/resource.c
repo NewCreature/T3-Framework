@@ -114,17 +114,10 @@ void * t3f_t3f_font_resource_handler_proc(ALLEGRO_FILE * fp, const char * filena
 {
 	void * ptr = NULL;
 	ALLEGRO_STATE old_state;
-	bool openfp = false;
 	
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
-	if(fp)
-	{
-		openfp = true;
-	}
-	
-	/* load file directly if offset is 0 and open file not passed */
-	else if(offset == 0)
+	if(!fp && offset == 0)
 	{
 		ptr = t3f_load_font(filename, option, flags);
 	}
