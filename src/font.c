@@ -84,7 +84,7 @@ static bool t3f_font_file_is_true_type(const char * fn)
 }
 
 /* detect bitmap/ttf and load accordingly */
-T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
+T3F_FONT * t3f_generate_font(const char * fn, int size, int flags)
 {
 	T3F_FONT * fp;
 	ALLEGRO_FONT * font = NULL;
@@ -119,7 +119,7 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 		}
 		if(font)
 		{
-			fp->character_sheet = al_create_bitmap(1024, 1024);
+			fp->character_sheet = al_create_bitmap(512, 512);
 			if(fp->character_sheet)
 			{
 				h = al_get_font_line_height(font) + space;
@@ -140,7 +140,7 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 						w -= cx;
 						cox = -cx;
 					}
-					if(ox + w > 1024)
+					if(ox + w > al_get_bitmap_width(fp->character_sheet))
 					{
 						ox = 1;
 						oy += h;
@@ -153,8 +153,12 @@ T3F_FONT * t3f_load_font(const char * fn, int size, int flags)
 						al_draw_text(font, al_map_rgba_f(0.0, 0.0, 0.0, 1.0), ox + 2, oy + 1, 0, buf);
 					}
 					al_draw_text(font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), ox + 1, oy + 1, 0, buf);
-					fp->character[i] = al_create_sub_bitmap(fp->character_sheet, ox - cox, oy, w - 2, h - 2);
-					if(!fp->character[i])
+					fp->character[i].x = ox - cox;
+					fp->character[i].y = oy;
+					fp->character[i].width = w - 2;
+					fp->character[i].height = h - 2;
+					fp->character[i].bitmap = al_create_sub_bitmap(fp->character_sheet, fp->character[i].x, fp->character[i].y, fp->character[i].width, fp->character[i].height);
+					if(!fp->character[i].bitmap)
 					{
 						printf("could not create sub-bitmap\n");
 						return NULL;
@@ -193,10 +197,117 @@ void t3f_destroy_font(T3F_FONT * fp)
 	
 	for(i = 0; i < 256; i++)
 	{
-		al_destroy_bitmap(fp->character[i]);
+		al_destroy_bitmap(fp->character[i].bitmap);
 	}
 	al_destroy_bitmap(fp->character_sheet);
 	al_free(fp);
+}
+
+T3F_FONT * t3f_load_font(const char * fn, int flags)
+{
+	T3F_FONT * fp;
+	ALLEGRO_PATH * pp;
+	ALLEGRO_CONFIG * cp;
+	int i;
+	char buf[64] = {0};
+	const char * val;
+
+	fp = al_malloc(sizeof(T3F_FONT));
+	if(fp)
+	{
+		pp = al_create_path(fn);
+		if(pp)
+		{
+			fp->character_sheet = al_load_bitmap(al_path_cstr(pp, '/'));
+			if(fp->character_sheet)
+			{
+				al_set_path_extension(pp, ".ini");
+				cp = al_load_config_file(al_path_cstr(pp, '/'));
+				if(cp)
+				{
+					val = al_get_config_value(cp, "Settings", "adjust");
+					if(val)
+					{
+						fp->adjust = atof(val);
+					}
+					val = al_get_config_value(cp, "Settings", "scale");
+					if(val)
+					{
+						fp->scale = atof(val);
+					}
+					for(i = 0; i < T3F_FONT_MAX_CHARACTERS; i++)
+					{
+						snprintf(buf, 64, "glyph %d", i);
+						val = al_get_config_value(cp, buf, "x");
+						if(val)
+						{
+							fp->character[i].x = atoi(val);
+						}
+						val = al_get_config_value(cp, buf, "y");
+						if(val)
+						{
+							fp->character[i].y = atoi(val);
+						}
+						val = al_get_config_value(cp, buf, "width");
+						if(val)
+						{
+							fp->character[i].width = atoi(val);
+						}
+						val = al_get_config_value(cp, buf, "height");
+						if(val)
+						{
+							fp->character[i].height = atoi(val);
+						}
+						fp->character[i].bitmap = al_create_sub_bitmap(fp->character_sheet, fp->character[i].x, fp->character[i].y, fp->character[i].width, fp->character[i].height);
+					}
+					al_destroy_config(cp);
+				}
+			}
+			al_destroy_path(pp);
+		}
+	}
+	return fp;
+}
+
+bool t3f_save_font(T3F_FONT * fp, const char * fn)
+{
+	ALLEGRO_PATH * pp;
+	ALLEGRO_CONFIG * cp;
+	int i;
+	char buf[2][64] = {{0}};
+	bool ret = false;
+	
+	pp = al_create_path(fn);
+	if(pp)
+	{
+		al_save_bitmap(al_path_cstr(pp, '/'), fp->character_sheet);
+		cp = al_create_config();
+		if(cp)
+		{
+			snprintf(buf[0], 64, "%f", fp->adjust);
+			al_set_config_value(cp, "Settings", "adjust", buf[0]);
+			snprintf(buf[0], 64, "%f", fp->scale);
+			al_set_config_value(cp, "Settings", "scale", buf[0]);
+			for(i = 0; i < T3F_FONT_MAX_CHARACTERS; i++)
+			{
+				snprintf(buf[0], 64, "glyph %d", i);
+				snprintf(buf[1], 64, "%d", fp->character[i].x);
+				al_set_config_value(cp, buf[0], "x", buf[1]);
+				snprintf(buf[1], 64, "%d", fp->character[i].y);
+				al_set_config_value(cp, buf[0], "y", buf[1]);
+				snprintf(buf[1], 64, "%d", fp->character[i].width);
+				al_set_config_value(cp, buf[0], "width", buf[1]);
+				snprintf(buf[1], 64, "%d", fp->character[i].height);
+				al_set_config_value(cp, buf[0], "height", buf[1]);
+			}
+			al_set_path_extension(pp, ".ini");
+			al_save_config_file(al_path_cstr(pp, '/'), cp);
+			ret = true;
+			al_destroy_config(cp);
+		}
+		al_destroy_path(pp);
+	}
+	return ret;
 }
 
 float t3f_get_text_width(T3F_FONT * fp, const char * text)
@@ -206,7 +317,7 @@ float t3f_get_text_width(T3F_FONT * fp, const char * text)
 	
 	for(i = 0; i < strlen(text); i++)
 	{
-		w += ((float)al_get_bitmap_width(fp->character[(int)text[i]]) - fp->adjust) * fp->scale;
+		w += ((float)al_get_bitmap_width(fp->character[(int)text[i]].bitmap) - fp->adjust) * fp->scale;
 	}
 	w += 2.0; // include outline pixels
 	return w;
@@ -216,7 +327,7 @@ float t3f_get_font_line_height(T3F_FONT * fp)
 {
 	float h = 0.0;
 	
-	h = ((float)al_get_bitmap_height(fp->character[' ']) - fp->adjust * 2.0) * fp->scale;
+	h = ((float)al_get_bitmap_height(fp->character[' '].bitmap) - fp->adjust * 2.0) * fp->scale;
 	return h;
 }
 
@@ -333,9 +444,9 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 	{
 		for(i = 0; i < strlen(text); i++)
 		{
-			fw = (float)al_get_bitmap_width(fp->character[(int)text[i]]) * fp->scale;
-			fh = (float)al_get_bitmap_height(fp->character[(int)text[i]]) * fp->scale;
-			t3f_draw_scaled_bitmap(fp->character[(int)text[i]], color, pos, posy, z, fw, fh, 0);
+			fw = (float)al_get_bitmap_width(fp->character[(int)text[i]].bitmap) * fp->scale;
+			fh = (float)al_get_bitmap_height(fp->character[(int)text[i]].bitmap) * fp->scale;
+			t3f_draw_scaled_bitmap(fp->character[(int)text[i]].bitmap, color, pos, posy, z, fw, fh, 0);
 //			pos += fw - ((fp->adjust * 2.0) * fp->scale);
 			pos += fw - fp->adjust * fp->scale;
 //			pos += ((float)al_get_bitmap_width(fp->character[(int)text[i]]) - fp->adjust * 2.0) * fp->scale;

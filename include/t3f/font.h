@@ -11,8 +11,16 @@
 typedef struct
 {
 	
+	ALLEGRO_BITMAP * bitmap;
+	int x, y, width, height;
+	
+} T3F_FONT_CHARACTER;
+
+typedef struct
+{
+	
 	ALLEGRO_BITMAP * character_sheet;
-	ALLEGRO_BITMAP * character[T3F_FONT_MAX_CHARACTERS];
+	T3F_FONT_CHARACTER character[T3F_FONT_MAX_CHARACTERS];
 	float adjust;
 	float scale;
 	
@@ -37,8 +45,11 @@ typedef struct
 
 ALLEGRO_FONT * t3f_load_bitmap_font(const char * fn);
 
-T3F_FONT * t3f_load_font_f(ALLEGRO_FILE * fp, int size, int flags);
-T3F_FONT * t3f_load_font(const char * fn, int size, int flags);
+T3F_FONT * t3f_generate_font_f(ALLEGRO_FILE * fp, int size, int flags);
+T3F_FONT * t3f_generate_font(const char * fn, int size, int flags);
+T3F_FONT * t3f_load_font_f(ALLEGRO_FILE * fp, int flags);
+T3F_FONT * t3f_load_font(const char * fn, int flags);
+bool t3f_save_font(T3F_FONT * fp, const char * fn);
 void t3f_destroy_font(T3F_FONT * fp);
 float t3f_get_text_width(T3F_FONT * fp, const char * text);
 float t3f_get_font_line_height(T3F_FONT * fp);
