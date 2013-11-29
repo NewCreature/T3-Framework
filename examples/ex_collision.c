@@ -1,5 +1,6 @@
 #include "t3f/t3f.h"
 #include "t3f/collision.h"
+#include "t3f/rng.h"
 
 #define MAX_SPRITES 32
 
@@ -14,6 +15,7 @@ typedef struct
 
 SPRITE sprite[MAX_SPRITES];
 ALLEGRO_BITMAP * sprite_image = NULL;
+T3F_RNG_STATE rng_state;
 
 void logic(void)
 {
@@ -121,6 +123,7 @@ bool initialize(void)
 	{
 		return false;
 	}
+	t3f_srand(&rng_state, time(0));
 	sprite_image = al_load_bitmap("data/listener.png");
 	if(!sprite_image)
 	{
@@ -130,7 +133,7 @@ bool initialize(void)
 	{
 		sprite[i].x = (i % 8) * (640 / 8);
 		sprite[i].y = (i / 8) * (480 / 4);
-		sprite[i].angle = t3f_drand() * (ALLEGRO_PI * 2);
+		sprite[i].angle = t3f_drand(&rng_state) * (ALLEGRO_PI * 2);
 		sprite[i].vx = 2 * cos(sprite[i].angle);
 		sprite[i].vy = 2 * sin(sprite[i].angle);
 		sprite[i].object = t3f_create_collision_object(0, 0, 16, 16, 32, 32, 0);

@@ -1,5 +1,6 @@
 #include "t3f/t3f.h"
 #include "t3f/vector.h"
+#include "t3f/view.h"
 
 /* vector object creation */
 T3F_VECTOR_OBJECT * t3f_create_vector_object(void)

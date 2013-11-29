@@ -2,6 +2,7 @@
 #include "t3f/music.h"
 #include "t3f/gui.h"
 #include "t3f/collision.h"
+#include "t3f/rng.h"
 #include "paddle.h"
 
 /* program data (defines in "example.h") */
@@ -9,6 +10,7 @@ ALLEGRO_BITMAP * paddle_bitmap[EXAMPLE_MAX_BITMAPS] = {NULL};
 ALLEGRO_FONT * paddle_font[EXAMPLE_MAX_FONTS] = {NULL};
 ALLEGRO_SAMPLE * paddle_sample[EXAMPLE_MAX_SAMPLES] = {NULL};
 T3F_GUI * paddle_menu = NULL;
+T3F_RNG_STATE rng_state;
 
 /* program state
    used to tell if we are playing, in the menu, etc. (defines in "example.h") */
@@ -52,7 +54,7 @@ float paddle_ai_predict_y(void)
 
 void paddle_init_ball(float dir)
 {
-	float angle = t3f_drand() * ALLEGRO_PI;
+	float angle = t3f_drand(&rng_state) * ALLEGRO_PI;
 	ball.x = 320.0 - 16.0 / 2.0;
 	ball.y = 240.0 - 16.0 / 2.0;
 	t3f_move_collision_object_xy(ball.object, ball.x, ball.y);
@@ -72,7 +74,7 @@ void paddle_init_ball(float dir)
 	if(ball.vx > 0)
 	{
 		paddle[1].dy = paddle_ai_predict_y() - 32 + 8.0;
-		paddle[1].dvy = t3f_drand() * 6.0 - 3.0;
+		paddle[1].dvy = t3f_drand(&rng_state) * 6.0 - 3.0;
 	}
 }
 
@@ -99,6 +101,8 @@ void paddle_game_init(void)
 	/* reset scores */
 	score[0] = 0;
 	score[1] = 0;
+	
+	t3f_srand(&rng_state, time(0));
 	
 	paddle_state = EXAMPLE_STATE_GAME;
 	t3f_play_music("data/music/game.xm");
@@ -209,7 +213,7 @@ void paddle_logic(void)
 					ball.vy = 3.0;
 				}
 				paddle[1].dy = paddle_ai_predict_y() - 32 + 8.0;
-				paddle[1].dvy = t3f_drand() * 6.0 - 3.0;
+				paddle[1].dvy = t3f_drand(&rng_state) * 6.0 - 3.0;
 			}
 			else if(ball.vx > 0 && t3f_check_object_collision(paddle[1].object, ball.object))
 			{
@@ -333,7 +337,7 @@ void paddle_render(void)
 			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], 0.0, 0.0, 0);
 			
 			/* draw results */
-			al_draw_filled_circle(640.0 * t3f_drand(), 480.0 * t3f_drand(), 10.0 + 32.0 * t3f_drand(), al_map_rgba(0, 0, 192, 128));
+			al_draw_filled_circle(640.0 * t3f_drand(&rng_state), 480.0 * t3f_drand(&rng_state), 10.0 + 32.0 * t3f_drand(&rng_state), al_map_rgba(0, 0, 192, 128));
 			al_draw_filled_rectangle(220.0, 192.0, 420.0, 280.0, al_map_rgba(0, 192, 0, 128));
 			al_draw_rectangle(220.0, 192.0, 420.0, 280.0, al_map_rgba(0, 0, 0, 255), 2.0);
 			al_draw_textf(paddle_font[EXAMPLE_FONT_MENU], al_map_rgba(0, 0, 0, 255), 320.0, 200.0, ALLEGRO_ALIGN_CENTRE, "Player %d Wins!", score[0] > score[1] ? 1 : 2);

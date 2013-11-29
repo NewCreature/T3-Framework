@@ -4,6 +4,7 @@
 #include "t3f/t3f.h"
 #include "t3f/animation.h"
 #include "t3f/tilemap.h"
+#include "t3f/view.h"
 
 T3F_TILE * t3f_create_tile(void)
 {

@@ -1,5 +1,6 @@
 #include "t3f/t3f.h"
 #include "t3f/animation.h"
+#include "t3f/rng.h"
 
 typedef struct
 {
@@ -56,11 +57,13 @@ int main(int argc, char * argv[])
 {
 	int i;
 	char fn[1024] = {0};
+	T3F_RNG_STATE rng_state;
 	
 	if(!t3f_initialize("ex_animation", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
 	{
 		return 1;
 	}
+	t3f_srand(&rng_state, time(0));
 	
 	/* load bitmaps */
 	for(i = 0; i < 8; i++)
@@ -92,11 +95,11 @@ int main(int argc, char * argv[])
 	
 	for(i = 0; i < 1024; i++)
 	{
-		object[i].x = t3f_drand() * 640.0;
-		object[i].y = t3f_drand() * 480.0;
-		object[i].vx = t3f_drand() * 4.0 - 2.0;
-		object[i].vy = t3f_drand() * 4.0 - 2.0;
-		object[i].tick = rand() % 256;
+		object[i].x = t3f_drand(&rng_state) * 640.0;
+		object[i].y = t3f_drand(&rng_state) * 480.0;
+		object[i].vx = t3f_drand(&rng_state) * 4.0 - 2.0;
+		object[i].vy = t3f_drand(&rng_state) * 4.0 - 2.0;
+		object[i].tick = t3f_rand(&rng_state) % 256;
 	}
 	t3f_run();
 	return 0;

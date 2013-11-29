@@ -1,5 +1,6 @@
 #include "t3f/t3f.h"
 #include "t3f/tilemap.h"
+#include "t3f/view.h"
 #include <allegro5/allegro_native_dialog.h>
 
 #define MAPPER_MAX_SPRITES  256

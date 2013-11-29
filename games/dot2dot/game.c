@@ -1,8 +1,12 @@
 #include <math.h>
 #include "t3f/t3f.h"
 #include "t3f/sound.h"
+#include "t3f/rng.h"
+#include "t3f/draw.h"
 #include "main.h"
 #include "game.h"
+
+T3F_RNG_STATE rng_state;
 
 /* initialize player (done once per turn and at new level) */
 void dot_game_drop_player(int type)
@@ -54,11 +58,11 @@ void dot_game_setup_level(int level)
 	/* initialize balls */
 	for(i = 0; i < level_balls[dot_game.level]; i++)
 	{
-		dot_game.ball[i].x = rand() % (480 - 16);
-		dot_game.ball[i].y = rand() % (480 - 16);
+		dot_game.ball[i].x = t3f_rand(&rng_state) % (480 - 16);
+		dot_game.ball[i].y = t3f_rand(&rng_state) % (480 - 16);
 		dot_game.ball[i].z = 0;
-		dot_game.ball[i].a = t3f_drand() * ALLEGRO_PI * 2.0;
-		dot_game.ball[i].s = t3f_drand() * 0.75 + 0.25;
+		dot_game.ball[i].a = t3f_drand(&rng_state) * ALLEGRO_PI * 2.0;
+		dot_game.ball[i].s = t3f_drand(&rng_state) * 0.75 + 0.25;
 		dot_game.ball[i].vx = cos(dot_game.ball[i].a) * dot_game.ball[i].s;
 		dot_game.ball[i].vy = sin(dot_game.ball[i].a) * dot_game.ball[i].s;
 		dot_game.ball[i].type = col;
@@ -73,11 +77,11 @@ void dot_game_setup_level(int level)
 	/* add black balls */
 	for(j = i; j < i + dot_game.level + 3; j++)
 	{
-		dot_game.ball[j].x = rand() % (480 - 16);
-		dot_game.ball[j].y = rand() % (480 - 16);
+		dot_game.ball[j].x = t3f_rand(&rng_state) % (480 - 16);
+		dot_game.ball[j].y = t3f_rand(&rng_state) % (480 - 16);
 		dot_game.ball[j].z = 0;
-		dot_game.ball[j].a = t3f_drand() * ALLEGRO_PI * 2.0;
-		dot_game.ball[j].s = t3f_drand() * 0.75 + 0.25;
+		dot_game.ball[j].a = t3f_drand(&rng_state) * ALLEGRO_PI * 2.0;
+		dot_game.ball[j].s = t3f_drand(&rng_state) * 0.75 + 0.25;
 		dot_game.ball[j].vx = cos(dot_game.ball[j].a) * dot_game.ball[j].s;
 		dot_game.ball[j].vy = sin(dot_game.ball[j].a) * dot_game.ball[j].s;
 		dot_game.ball[j].type = 6;
@@ -85,7 +89,7 @@ void dot_game_setup_level(int level)
 	}
 	
 	/* drop the player with a random color */
-	dot_game_drop_player(rand() % 6);
+	dot_game_drop_player(t3f_rand(&rng_state) % 6);
 	
 	dot_game.timer = 0;
 }
@@ -98,6 +102,7 @@ void dot_game_initialize(void)
 	dot_game.score = 0;
 	dot_game.combo = 0;
 	dot_game.lives = 3;
+	t3f_srand(&rng_state, time(0));
 	dot_state = DOT_STATE_GAME;
 }
 

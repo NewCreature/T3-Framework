@@ -1,4 +1,5 @@
 #include "t3f/t3f.h"
+#include "t3f/rng.h"
 
 typedef struct
 {
@@ -13,6 +14,7 @@ ALLEGRO_BITMAP * bitmap[8] = {NULL};
 T3F_ATLAS * atlas = NULL;
 ALLEGRO_BITMAP * sprite_sheet = NULL;
 OBJECT object[1024];
+T3F_RNG_STATE rng_state;
 
 void logic(void)
 {
@@ -60,6 +62,7 @@ int main(int argc, char * argv[])
 	{
 		return 1;
 	}
+	t3f_srand(&rng_state, time(0));
 	
 	/* load bitmaps into sprite sheet */
 	atlas = t3f_create_atlas(512, 512);
@@ -76,7 +79,7 @@ int main(int argc, char * argv[])
 		{
 			return 1;
 		}
-		bitmap[i] = t3f_add_bitmap_to_atlas(atlas, bp, T3F_ATLAS_SPRITE);
+		bitmap[i] = t3f_add_bitmap_to_atlas(atlas, &bp, T3F_ATLAS_SPRITE);
 		if(!bitmap[i])
 		{
 			return 1;
@@ -86,11 +89,11 @@ int main(int argc, char * argv[])
 	
 	for(i = 0; i < 1024; i++)
 	{
-		object[i].x = t3f_drand() * 640.0;
-		object[i].y = t3f_drand() * 480.0;
-		object[i].vx = t3f_drand() * 4.0 - 2.0;
-		object[i].vy = t3f_drand() * 4.0 - 2.0;
-		object[i].bitmap = rand() % 8;
+		object[i].x = t3f_drand(&rng_state) * 640.0;
+		object[i].y = t3f_drand(&rng_state) * 480.0;
+		object[i].vx = t3f_drand(&rng_state) * 4.0 - 2.0;
+		object[i].vy = t3f_drand(&rng_state) * 4.0 - 2.0;
+		object[i].bitmap = t3f_rand(&rng_state) % 8;
 	}
 	t3f_run();
 	return 0;
