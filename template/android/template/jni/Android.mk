@@ -66,13 +66,13 @@ include $(CLEAR_VARS)
 LOCAL_ALLOW_UNDEFINED_SYMBOLS := true
 LOCAL_MODULE    := allegro-example
 LOCAL_SRC_FILES := main.c
-LOCAL_CFLAGS    := -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/$(TARGET_ARCH_ABI)/include -DT3F_ANDROID
+LOCAL_CFLAGS    := -I$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/$(TARGET_ARCH_ABI)/include -I/Users/toddcope/vgdx/src/joynet/enet-1.3.1/include -DT3F_ANDROID $(PLATFORM_CFLAGS)
 LOCAL_CFLAGS    += -DDEBUGMODE
 LOCAL_CFLAGS    += -W -Wall
 
 LOCAL_LDLIBS    := -L$(ANDROID_NDK_TOOLCHAIN_ROOT)/user/$(TARGET_ARCH_ABI)/lib
 LOCAL_LDLIBS    += -L$(LOCAL_PATH)/$(TARGET_ARCH_ABI)
-LOCAL_LDLIBS    += -llog $(APP_LIBS) $(ANDROID_PLATFORM_LIBS)
+LOCAL_LDLIBS    += -llog $(APP_LIBS) $(PLATFORM_LIBS)
 LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro.so
 LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_primitives.so
 LOCAL_LDLIBS    += libs/$(TARGET_ARCH_ABI)/liballegro_image.so
