@@ -67,4 +67,9 @@ demo: very_clean
 	$(SED_COMMAND) 's|"$(APP_BUNDLE_NAME)"|"$(APP_BUNDLE_NAME) Demo"|' $(DEMO_DIR)/src/init.c
 	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/src/makefile.defines
 	$(SED_COMMAND) 's|$(subst $(SPACE),\$(SPACE),$(APP_BUNDLE_NAME))|$(subst $(SPACE),\$(SPACE),$(APP_BUNDLE_NAME))\\$(SPACE)Demo|' $(DEMO_DIR)/src/makefile.defines
-	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/docs/changelog
+	$(SED_COMMAND) 's|com.t3i.wordleap-demo|com.t3i.wordleapdemo|' $(DEMO_DIR)/src/makefile.defines
+	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/changelog
+
+demo_gp: demo
+	$(SED_COMMAND) 's|-DT3F_ANDROID|-DT3F_ANDROID -DT3F_ANDROID_GP|' $(DEMO_DIR)/android/template/jni/Android.mk
+	mv $(DEMO_DIR) $(DEMO_DIR)_gp

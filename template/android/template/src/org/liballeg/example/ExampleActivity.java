@@ -26,7 +26,7 @@ public class ExampleActivity extends AllegroActivity {
 	}
 	public ExampleActivity()
 	{
-		super("libwordleap.so");
+		super("libAPP_NAME.so");
 	}
 /*	public void showSoftInput(boolean toggle)
 	{

@@ -49,3 +49,6 @@ mac_package:
 
 demo:
 	$(MAKE) -f makefile.$(SYSTEM) demo
+
+demo_gp:
+	$(MAKE) -f makefile.$(SYSTEM) demo_gp
