@@ -27,6 +27,7 @@
 #define T3F_NO_DISPLAY    128
 #define T3F_USE_TOUCH     256
 #define T3F_USE_OPENGL    512
+#define T3F_FILL_SCREEN  1024
 #define T3F_DEFAULT (T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_JOYSTICK | T3F_USE_TOUCH | T3F_USE_SOUND | T3F_FORCE_ASPECT)
 
 #define T3F_MAX_OPTIONS                 64
@@ -72,6 +73,10 @@ extern int t3f_display_offset_x;
 extern int t3f_display_offset_y;
 extern int t3f_display_width;
 extern int t3f_display_height;
+extern float t3f_display_top;
+extern float t3f_display_bottom;
+extern float t3f_display_left;
+extern float t3f_display_right;
 
 extern bool t3f_key[ALLEGRO_KEY_MAX];
 extern bool t3f_quit;

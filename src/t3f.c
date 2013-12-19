@@ -30,6 +30,10 @@ int t3f_display_width = 0;
 int t3f_display_height = 0;
 float t3f_mouse_scale_x = 1.0;
 float t3f_mouse_scale_y = 1.0;
+float t3f_display_top;
+float t3f_display_bottom;
+float t3f_display_left;
+float t3f_display_right;
 
 /* keyboard data */
 bool t3f_key[ALLEGRO_KEY_MAX] = {false};
@@ -503,7 +507,7 @@ bool t3f_locate_resource(const char * filename)
 
 static void t3f_get_base_transform(void)
 {
-	float r, vr;
+	float r, vr, scalex = 1.0, scaley = 1.0;
 	const char * value;
 	bool override_setup = false;
 	
@@ -538,37 +542,85 @@ static void t3f_get_base_transform(void)
 	/* if we encounter any overrides in the config file, switch to manual mode */
 	if(override_setup)
 	{
-		al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, (float)t3f_display_width / (float)t3f_virtual_display_width, (float)t3f_display_height / (float)t3f_virtual_display_height, 0.0);
+		scalex = (float)t3f_display_width / (float)t3f_virtual_display_width;
+		scaley = (float)t3f_display_height / (float)t3f_virtual_display_height;
+		al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, scalex, scaley, 0.0);
 	}
 	else if(t3f_flags & T3F_FORCE_ASPECT)
 	{
 		r = (float)al_get_display_height(t3f_display) / (float)al_get_display_width(t3f_display);
 		vr = (float)t3f_virtual_display_height / (float)t3f_virtual_display_width;
-		/* need to adjust y */
-		if(r > vr)
+		if(t3f_flags & T3F_FILL_SCREEN)
 		{
-			t3f_display_offset_x = 0;
-			t3f_display_width = al_get_display_width(t3f_display);
-			t3f_display_offset_y = ((float)al_get_display_height(t3f_display) - (float)al_get_display_width(t3f_display) * vr) / 2.0;
-			t3f_display_height = (float)al_get_display_width(t3f_display) * vr;
+			/* need to adjust y */
+			if(r <= vr)
+			{
+				t3f_display_offset_x = 0;
+				t3f_display_width = al_get_display_width(t3f_display);
+				t3f_display_offset_y = ((float)al_get_display_height(t3f_display) - (float)al_get_display_width(t3f_display) * vr) / 2.0;
+				t3f_display_height = (float)al_get_display_width(t3f_display) * vr;
+			}
+			else
+			{
+				t3f_display_offset_x = ((float)al_get_display_width(t3f_display) - (float)al_get_display_height(t3f_display) / vr) / 2.0;
+				t3f_display_width = (float)al_get_display_height(t3f_display) / vr;
+				t3f_display_offset_y = 0;
+				t3f_display_height = al_get_display_height(t3f_display);
+			}
+			scalex = (float)t3f_display_width / (float)t3f_virtual_display_width;
+			scaley = (float)t3f_display_height / (float)t3f_virtual_display_height;
+			al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, scalex, scaley, 0.0);
 		}
 		else
 		{
-			t3f_display_offset_x = ((float)al_get_display_width(t3f_display) - (float)al_get_display_height(t3f_display) / vr) / 2.0;
-			t3f_display_width = (float)al_get_display_height(t3f_display) / vr;
-			t3f_display_offset_y = 0;
-			t3f_display_height = al_get_display_height(t3f_display);
+			/* need to adjust y */
+			if(r > vr)
+			{
+				t3f_display_offset_x = 0;
+				t3f_display_width = al_get_display_width(t3f_display);
+				t3f_display_offset_y = ((float)al_get_display_height(t3f_display) - (float)al_get_display_width(t3f_display) * vr) / 2.0;
+				t3f_display_height = (float)al_get_display_width(t3f_display) * vr;
+			}
+			else
+			{
+				t3f_display_offset_x = ((float)al_get_display_width(t3f_display) - (float)al_get_display_height(t3f_display) / vr) / 2.0;
+				t3f_display_width = (float)al_get_display_height(t3f_display) / vr;
+				t3f_display_offset_y = 0;
+				t3f_display_height = al_get_display_height(t3f_display);
+			}
+			scalex = (float)t3f_display_width / (float)t3f_virtual_display_width;
+			scaley = (float)t3f_display_height / (float)t3f_virtual_display_height;
+			al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, scalex, scaley, 0.0);
 		}
-		al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, (float)t3f_display_width / (float)t3f_virtual_display_width, (float)t3f_display_height / (float)t3f_virtual_display_height, 0.0);
 	}
 	else
 	{
 		t3f_display_width = al_get_display_width(t3f_display);
 		t3f_display_height = al_get_display_height(t3f_display);
-		al_build_transform(&t3f_base_transform, 0.0, 0.0, (float)al_get_display_width(t3f_display) / (float)t3f_virtual_display_width, (float)al_get_display_height(t3f_display) / (float)t3f_virtual_display_height, 0.0);
+		scalex = (float)t3f_display_width / (float)t3f_virtual_display_width;
+		scaley = (float)t3f_display_height / (float)t3f_virtual_display_height;
+		al_build_transform(&t3f_base_transform, 0.0, 0.0, scalex, scaley, 0.0);
 	}
+	
+	/* scale mouse coordinates */
 	t3f_mouse_scale_x = (float)t3f_virtual_display_width / (float)t3f_display_width;
 	t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)t3f_display_height;
+	
+	/* set up edge coordinates for use with T3F_FILL_SCREEN */
+	if(t3f_display_offset_x == 0)
+	{
+		t3f_display_left = 0;
+		t3f_display_right = t3f_virtual_display_width;
+		t3f_display_top = -t3f_display_offset_y / scaley;
+		t3f_display_bottom = t3f_virtual_display_height - t3f_display_top;
+	}
+	else
+	{
+		t3f_display_top = 0;
+		t3f_display_bottom = t3f_virtual_display_height;
+		t3f_display_left = -t3f_display_offset_x / scalex;
+		t3f_display_right = t3f_virtual_display_width - t3f_display_left;
+	}
 }
 
 /* returns 1 on success, 0 on failure, 2 if toggling fullscreen/window failed */
@@ -729,6 +781,20 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				t3f_flags &= ~T3F_FORCE_ASPECT;
 			}
 		}
+
+		if(flags & T3F_FILL_SCREEN)
+		{
+			t3f_flags |= T3F_FILL_SCREEN;
+		}
+		cvalue = al_get_config_value(t3f_config, "T3F", "force_letterbox");
+		if(cvalue)
+		{
+			if(!strcmp(cvalue, "true"))
+			{
+				t3f_flags &= ~T3F_FILL_SCREEN;
+			}
+		}
+
 		al_set_new_display_flags(dflags);
 		al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST);
 		cvalue = al_get_config_value(t3f_config, "T3F", "display_width");
