@@ -33,6 +33,23 @@ T3F_VIEW * t3f_get_current_view(void)
 	return t3f_current_view;
 }
 
+bool t3f_project_coordinates(float vw, float vpx, float vpy, float * x, float * y, float z)
+{
+	if(z + vw > 0)
+	{
+		if(x)
+		{
+			*x = (((*x - vpx) * vw) / (z + vw) + vpx);
+		}
+		if(y)
+		{
+			*y = (((*y - vpy) * vw) / (z + vw) + vpy);
+		}
+		return true;
+	}
+	return false;
+}
+
 /* get the x coordinate of the pixel at the given (x, z) coordinate
    takes current projection state into account */
 float t3f_project_x(float x, float z)

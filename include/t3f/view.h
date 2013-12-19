@@ -27,6 +27,7 @@ void t3f_store_state(T3F_VIEW * sp);
 void t3f_restore_state(T3F_VIEW * sp);
 void t3f_select_view(T3F_VIEW * sp);
 T3F_VIEW * t3f_get_current_view(void);
+bool t3f_project_coordinates(float vw, float vpx, float vpy, float * x, float * y, float z);
 float t3f_project_x(float x, float z);
 float t3f_project_y(float y, float z);
 
