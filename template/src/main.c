@@ -50,18 +50,6 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 		return false;
 	}
 	
-	/* You must call this to locate one of your resources if you want your app
-	 * to work on all platforms. Your app won't be able to find your resources
-	 * if you don't tell it what to locate. I may put a placeholder graphic in
-	 * the 'data' folder at some point to help automate this. For the moment,
-	 * you must manually call this. (replace "alexlogo.png" with a file that
-	 * your project has) */
-	if(!t3f_locate_resource("alexlogo.png"))
-	{
-		printf("Cannot locate resources!\n");
-		return false;
-	}
-	
 	app->state = 0;
 	return true;
 }

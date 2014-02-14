@@ -210,6 +210,116 @@ static void t3f_get_options(void)
 	}
 }
 
+/* function to ease the burden of having resources located in different places
+ * on different platforms, changes to the directory where it finds the specified
+ * resource */
+static bool t3f_locate_resource(const char * filename)
+{
+	ALLEGRO_PATH * path;
+	ALLEGRO_PATH * file_path;
+	bool found = false;
+	
+	/* handle Android first so we don't do unnecessary checks */
+	#ifdef T3F_ANDROID
+	
+		int ret;
+		
+		path = al_get_standard_path(ALLEGRO_EXENAME_PATH);
+		if(path)
+		{
+			/* try to use PHYSFS to access data */
+			if(PHYSFS_init(al_path_cstr(path, '/')))
+			{
+				ret = PHYSFS_addToSearchPath(al_path_cstr(path, '/'), 1);
+				al_destroy_path(path);
+				if(ret)
+				{
+					al_set_physfs_file_interface();
+					al_change_directory("assets");
+					if(al_filename_exists(filename))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		
+		/* if PHYSFS setup failed, use APK file interface instead */
+		al_android_set_apk_file_interface();
+		return true;
+
+	#endif
+	
+	/* if we are already in the correct directory */
+	if(al_filename_exists(filename))
+	{
+		return true;
+	}
+	
+	/* look in resources path */
+	file_path = al_create_path(filename);
+	if(!file_path)
+	{
+		return false;
+	}
+	path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+	if(path)
+	{
+		al_join_paths(path, file_path);
+		if(al_filename_exists(al_path_cstr(path, '/')))
+		{
+			found = true;
+		}
+//		printf("%s\n", al_path_cstr(path, '/'));
+		al_destroy_path(path);
+	}
+	al_destroy_path(file_path);
+	if(found)
+	{
+		path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+		al_change_directory(al_path_cstr(path, '/'));
+		al_destroy_path(path);
+		return true;
+	}
+
+	/* look in "/usr/share" if a package name is defined */
+	if(t3f_package_name)
+	{
+		file_path = al_create_path(filename);
+		if(!file_path)
+		{
+			return false;
+		}
+		path = al_create_path("/usr/share/");
+		if(path)
+		{
+			al_append_path_component(path, t3f_package_name);
+			al_join_paths(path, file_path);
+			if(al_filename_exists(al_path_cstr(path, '/')))
+			{
+				al_change_directory(al_path_cstr(path, '/'));
+				found = true;
+			}
+//			printf("%s\n", al_path_cstr(path, '/'));
+			al_destroy_path(path);
+		}
+		al_destroy_path(file_path);
+	}
+	
+	if(found)
+	{
+		path = al_create_path("/usr/share/");
+		if(path)
+		{
+			al_append_path_component(path, t3f_package_name);
+			al_change_directory(al_path_cstr(path, '/'));
+			al_destroy_path(path);
+			return true;
+		}
+	}
+	return false;
+}
+
 /* this gets Allegro ready */
 int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(void * data), void (*render_proc)(void * data), int flags, void * data)
 {
@@ -383,6 +493,9 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	t3f_render_proc = render_proc;
 	t3f_user_data = data;
 	
+	/* locate user resources */
+	t3f_locate_resource("data/t3f.dat");
+	
 	return 1;
 }
 
@@ -395,116 +508,6 @@ void t3f_set_option(int option, int value)
 	snprintf(buf, 64, "Key %d", option);
 	snprintf(vbuf, 64, "%d", value);
 	al_set_config_value(t3f_config, "Options", buf, vbuf);
-}
-
-/* function to ease the burden of having resources located in different places
- * on different platforms, changes to the directory where it finds the specified
- * resource */
-bool t3f_locate_resource(const char * filename)
-{
-	ALLEGRO_PATH * path;
-	ALLEGRO_PATH * file_path;
-	bool found = false;
-	
-	/* handle Android first so we don't do unnecessary checks */
-	#ifdef T3F_ANDROID
-	
-		int ret;
-		
-		path = al_get_standard_path(ALLEGRO_EXENAME_PATH);
-		if(path)
-		{
-			/* try to use PHYSFS to access data */
-			if(PHYSFS_init(al_path_cstr(path, '/')))
-			{
-				ret = PHYSFS_addToSearchPath(al_path_cstr(path, '/'), 1);
-				al_destroy_path(path);
-				if(ret)
-				{
-					al_set_physfs_file_interface();
-					al_change_directory("assets");
-					if(al_filename_exists(filename))
-					{
-						return true;
-					}
-				}
-			}
-		}
-		
-		/* if PHYSFS setup failed, use APK file interface instead */
-		al_android_set_apk_file_interface();
-		return true;
-
-	#endif
-	
-	/* if we are already in the correct directory */
-	if(al_filename_exists(filename))
-	{
-		return true;
-	}
-	
-	/* look in resources path */
-	file_path = al_create_path(filename);
-	if(!file_path)
-	{
-		return false;
-	}
-	path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-	if(path)
-	{
-		al_join_paths(path, file_path);
-		if(al_filename_exists(al_path_cstr(path, '/')))
-		{
-			found = true;
-		}
-//		printf("%s\n", al_path_cstr(path, '/'));
-		al_destroy_path(path);
-	}
-	al_destroy_path(file_path);
-	if(found)
-	{
-		path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-		al_change_directory(al_path_cstr(path, '/'));
-		al_destroy_path(path);
-		return true;
-	}
-
-	/* look in "/usr/share" if a package name is defined */
-	if(t3f_package_name)
-	{
-		file_path = al_create_path(filename);
-		if(!file_path)
-		{
-			return false;
-		}
-		path = al_create_path("/usr/share/");
-		if(path)
-		{
-			al_append_path_component(path, t3f_package_name);
-			al_join_paths(path, file_path);
-			if(al_filename_exists(al_path_cstr(path, '/')))
-			{
-				al_change_directory(al_path_cstr(path, '/'));
-				found = true;
-			}
-//			printf("%s\n", al_path_cstr(path, '/'));
-			al_destroy_path(path);
-		}
-		al_destroy_path(file_path);
-	}
-	
-	if(found)
-	{
-		path = al_create_path("/usr/share/");
-		if(path)
-		{
-			al_append_path_component(path, t3f_package_name);
-			al_change_directory(al_path_cstr(path, '/'));
-			al_destroy_path(path);
-			return true;
-		}
-	}
-	return false;
 }
 
 static void t3f_get_base_transform(void)
@@ -1354,6 +1357,7 @@ void t3f_run(void)
 	{
 		free(t3f_package_name);
 	}
+	al_destroy_display(t3f_display);
 }
 
 const char * t3f_get_filename(ALLEGRO_PATH * path, const char * fn)
