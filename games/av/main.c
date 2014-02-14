@@ -8,7 +8,7 @@ bool paused = false;
 int keys[8] = {0};
 T3F_ATLAS * av_atlas = NULL;
 
-void av_logic(void)
+void av_logic(void * data)
 {
 	if(!paused)
 	{
@@ -79,7 +79,7 @@ void show_game_over(void)
 	al_hold_bitmap_drawing(false);
 }
 
-void av_render(void)
+void av_render(void * data)
 {
 	int y = 314;
 	
@@ -166,7 +166,7 @@ bool av_initialize(void)
 	int i;
 	
 	/* initialize the game with a 640x480 display at 100fps using keyboard and sound */
-	if(!t3f_initialize("Anti-Virus", 640, 480, 100.0, av_logic, av_render, T3F_USE_KEYBOARD | T3F_USE_SOUND))
+	if(!t3f_initialize("Anti-Virus", 640, 480, 100.0, av_logic, av_render, T3F_USE_KEYBOARD | T3F_USE_SOUND, NULL))
 	{
 		return false;
 	}

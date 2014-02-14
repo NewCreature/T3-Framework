@@ -6,7 +6,7 @@ ALLEGRO_SAMPLE * sample = NULL;
 ALLEGRO_SAMPLE * queue_sample = NULL;
 bool was_clicked = false;
 
-void logic(void)
+void logic(void * data)
 {
 	float vol, pan;
 	
@@ -36,7 +36,7 @@ void logic(void)
 	t3f_poll_sound_queue();
 }
 
-void render(void)
+void render(void * data)
 {
 	al_clear_to_color(al_map_rgba_f(1.0, 1.0, 1.0, 1.0));
 	al_draw_bitmap(bitmap, 320 - al_get_bitmap_width(bitmap) / 2, 240 - al_get_bitmap_height(bitmap) / 2, 0);
@@ -44,7 +44,7 @@ void render(void)
 
 int main(int argc, char * argv[])
 {
-	if(!t3f_initialize("ex_sound", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND))
+	if(!t3f_initialize("ex_sound", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND, NULL))
 	{
 		return 1;
 	}

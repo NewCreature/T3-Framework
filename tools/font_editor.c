@@ -7,7 +7,7 @@ T3F_VECTOR_FONT * vector_font = NULL;
 int character = 0;
 float scale = 8.0;
 
-void vfe_logic(void)
+void vfe_logic(void * data)
 {
 	if(t3f_key[ALLEGRO_KEY_F2] && vector_font)
 	{
@@ -129,7 +129,7 @@ void vfe_logic(void)
 	}
 }
 
-void vfe_render(void)
+void vfe_render(void * data)
 {
 	al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.0));
 	
@@ -152,7 +152,7 @@ void vfe_render(void)
 
 int main(int argc, char * argv[])
 {
-	if(!t3f_initialize("T3F Vector Object Editor", 640, 480, 60.0, vfe_logic, vfe_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
+	if(!t3f_initialize("T3F Vector Object Editor", 640, 480, 60.0, vfe_logic, vfe_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		printf("failed to initialize\n");
 		return -1;

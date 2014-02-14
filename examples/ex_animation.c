@@ -16,7 +16,7 @@ T3F_ATLAS * atlas = NULL;
 T3F_ANIMATION * animation = NULL;
 OBJECT object[1024];
 
-void logic(void)
+void logic(void * data)
 {
 	int i;
 	
@@ -40,7 +40,7 @@ void logic(void)
 	}
 }
 
-void render(void)
+void render(void * data)
 {
 	int i;
 	
@@ -59,7 +59,7 @@ int main(int argc, char * argv[])
 	char fn[1024] = {0};
 	T3F_RNG_STATE rng_state;
 	
-	if(!t3f_initialize("ex_animation", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
+	if(!t3f_initialize("ex_animation", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return 1;
 	}

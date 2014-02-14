@@ -24,7 +24,7 @@ void dot_shadow_text(ALLEGRO_FONT * font, ALLEGRO_COLOR color, ALLEGRO_COLOR sha
 	al_draw_text(font, color, x, y, flags, text);
 }
 
-void dot_logic(void)
+void dot_logic(void * data)
 {
 	switch(dot_state)
 	{
@@ -41,7 +41,7 @@ void dot_logic(void)
 	}
 }
 
-void dot_render(void)
+void dot_render(void * data)
 {
 	switch(dot_state)
 	{
@@ -65,7 +65,7 @@ bool dot_initialize(int argc, char * argv[])
 	int i;
 	
 	/* initialize framework */
-	if(!t3f_initialize("Dot to Dot Sweep", 640, 480, 60.0, dot_logic, dot_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND))
+	if(!t3f_initialize("Dot to Dot Sweep", 640, 480, 60.0, dot_logic, dot_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND, NULL))
 	{
 		return false;
 	}

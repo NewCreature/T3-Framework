@@ -4,7 +4,7 @@
 ALLEGRO_FONT * font = NULL;
 bool playing = false;
 
-void logic(void)
+void logic(void * data)
 {
 	if(t3f_key[ALLEGRO_KEY_ESCAPE])
 	{
@@ -26,7 +26,7 @@ void logic(void)
 	}
 }
 
-void render(void)
+void render(void * data)
 {
 	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
 	al_draw_text(font, al_map_rgba_f(1.0, 0.0, 0.0, 0.75), 0, 448, 0, "Playing \"data/music.xm\"");
@@ -34,7 +34,7 @@ void render(void)
 
 int main(int argc, char * argv[])
 {
-	if(!t3f_initialize("ex_music", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_SOUND))
+	if(!t3f_initialize("ex_music", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_SOUND, NULL))
 	{
 		return 1;
 	}

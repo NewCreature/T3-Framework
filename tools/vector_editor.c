@@ -18,7 +18,7 @@ int drawing_width = 32;
 int drawing_height = 32;
 bool grid_snap = true;
 
-void ve_logic(void)
+void ve_logic(void * data)
 {
 	int i, j;
 	
@@ -188,7 +188,7 @@ void ve_logic(void)
 	}
 }
 
-void ve_render(void)
+void ve_render(void * data)
 {
 	int i;
 	
@@ -218,7 +218,7 @@ void ve_render(void)
 
 int main(int argc, char * argv[])
 {
-	if(!t3f_initialize("T3F Vector Object Editor", 640, 480, 60.0, ve_logic, ve_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
+	if(!t3f_initialize("T3F Vector Object Editor", 640, 480, 60.0, ve_logic, ve_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return -1;
 	}

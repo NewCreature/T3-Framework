@@ -69,8 +69,9 @@ int t3f_requested_flags = 0;
 int t3f_flags = 0;
 int t3f_option[T3F_MAX_OPTIONS] = {0};
 
-void (*t3f_logic_proc)() = NULL;
-void (*t3f_render_proc)() = NULL;
+void (*t3f_logic_proc)(void * data) = NULL;
+void (*t3f_render_proc)(void * data) = NULL;
+static void * t3f_user_data = NULL;
 
 ALLEGRO_DISPLAY * t3f_display = NULL;
 ALLEGRO_TIMER * t3f_timer = NULL;
@@ -91,7 +92,7 @@ ALLEGRO_COLOR t3f_color_black;
 /* internal variables */
 static bool t3f_need_redraw = false;
 static int t3f_halted = 0;
-static void (*t3f_event_handler_proc)(ALLEGRO_EVENT * event) = NULL;
+static void (*t3f_event_handler_proc)(ALLEGRO_EVENT * event, void * data) = NULL;
 
 static char * t3f_developer_name = NULL;
 static char * t3f_package_name = NULL; // used to locate resources
@@ -210,7 +211,7 @@ static void t3f_get_options(void)
 }
 
 /* this gets Allegro ready */
-int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(), void (*render_proc)(), int flags)
+int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(void * data), void (*render_proc)(void * data), int flags, void * data)
 {
 	int i;
 	ALLEGRO_PATH * temp_path = NULL;
@@ -380,6 +381,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	
 	t3f_logic_proc = logic_proc;
 	t3f_render_proc = render_proc;
+	t3f_user_data = data;
 	
 	return 1;
 }
@@ -870,7 +872,7 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 	al_set_clipping_rectangle(tx, ty, twx - ox, twy - oy);
 }
 
-void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event))
+void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event, void * data))
 {
 	t3f_event_handler_proc = proc;
 }
@@ -1289,7 +1291,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		/* this keeps your program running */
 		case ALLEGRO_EVENT_TIMER:
 		{
-			t3f_logic_proc();
+			t3f_logic_proc(t3f_user_data);
 			t3f_need_redraw = true;
 			break;
 		}
@@ -1310,7 +1312,7 @@ void t3f_render(void)
 	}
 	al_copy_transform(&t3f_current_transform, &t3f_base_transform);
 	al_use_transform(&t3f_current_transform); // <-- apply additional transformations to t3f_current_transform
-	t3f_render_proc();
+	t3f_render_proc(t3f_user_data);
 	al_flip_display();
 	t3f_need_redraw = false;
 }
@@ -1327,7 +1329,7 @@ void t3f_run(void)
 		al_wait_for_event(t3f_queue, &event);
 		if(t3f_event_handler_proc)
 		{
-			t3f_event_handler_proc(&event);
+			t3f_event_handler_proc(&event, t3f_user_data);
 		}
 		else
 		{

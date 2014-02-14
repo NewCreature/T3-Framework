@@ -13,7 +13,7 @@ float camera_x = 0.0;
 float camera_z = 0.0;
 OBJECT object[20];
 
-void logic(void)
+void logic(void * data)
 {
 	if(t3f_key[ALLEGRO_KEY_ESCAPE])
 	{
@@ -23,7 +23,7 @@ void logic(void)
 	camera_z = t3f_mouse_y * 2 - 480;
 }
 
-void render(void)
+void render(void * data)
 {
 	int i;
 	float alpha;
@@ -58,7 +58,7 @@ int main(int argc, char * argv[])
 {
 	int i;
 	
-	if(!t3f_initialize("ex_3d", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
+	if(!t3f_initialize("ex_3d", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return 1;
 	}

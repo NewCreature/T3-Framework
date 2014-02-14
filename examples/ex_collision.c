@@ -17,7 +17,7 @@ SPRITE sprite[MAX_SPRITES];
 ALLEGRO_BITMAP * sprite_image = NULL;
 T3F_RNG_STATE rng_state;
 
-void logic(void)
+void logic(void * data)
 {
 	int i, j;
 	
@@ -102,7 +102,7 @@ void logic(void)
 	}
 }
 
-void render(void)
+void render(void * data)
 {
 	int i;
 	
@@ -119,7 +119,7 @@ bool initialize(void)
 {
 	int i;
 	
-	if(!t3f_initialize("ex_collision", 640, 480, 60, logic, render, T3F_USE_KEYBOARD))
+	if(!t3f_initialize("ex_collision", 640, 480, 60, logic, render, T3F_USE_KEYBOARD, NULL))
 	{
 		return false;
 	}

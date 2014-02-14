@@ -2,11 +2,11 @@
 
 ALLEGRO_BITMAP * bitmap = NULL;
 
-void logic(void)
+void logic(void * data)
 {
 }
 
-void render(void)
+void render(void * data)
 {
 	int i;
 	
@@ -22,7 +22,7 @@ void render(void)
 
 int main(int argc, char * argv[])
 {
-	if(!t3f_initialize("ex_touch", 640, 480, 60.0, logic, render, T3F_USE_MOUSE | T3F_USE_TOUCH))
+	if(!t3f_initialize("ex_touch", 640, 480, 60.0, logic, render, T3F_USE_MOUSE | T3F_USE_TOUCH, NULL))
 	{
 		return 1;
 	}

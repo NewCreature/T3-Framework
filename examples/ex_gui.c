@@ -11,7 +11,7 @@ int text_pos = 0;
 
 ALLEGRO_COLOR bgcolor;
 
-void logic(void)
+void logic(void * data)
 {
 	if(t3f_key[ALLEGRO_KEY_ESCAPE])
 	{
@@ -20,7 +20,7 @@ void logic(void)
 	t3f_process_gui(page);
 }
 
-void render(void)
+void render(void * data)
 {
 	al_clear_to_color(bgcolor);
 	t3f_render_gui(page);
@@ -52,7 +52,7 @@ int black_proc(int i, void * p)
 
 int main(int argc, char * argv[])
 {
-	if(!t3f_initialize("ex_gui", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
+	if(!t3f_initialize("ex_gui", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return 1;
 	}

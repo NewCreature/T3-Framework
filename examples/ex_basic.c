@@ -7,7 +7,7 @@ float y = 0.0;
 char text[1024] = {0};
 int text_pos = 0;
 
-void logic(void)
+void logic(void * data)
 {
 	if(t3f_key[ALLEGRO_KEY_ESCAPE])
 	{
@@ -58,7 +58,7 @@ void logic(void)
 	}
 }
 
-void render(void)
+void render(void * data)
 {
 	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
 	al_draw_bitmap(bitmap, x, y, 0);
@@ -69,7 +69,7 @@ void render(void)
 
 int main(int argc, char * argv[])
 {
-	if(!t3f_initialize("ex_basic", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD))
+	if(!t3f_initialize("ex_basic", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD, NULL))
 	{
 		return 1;
 	}

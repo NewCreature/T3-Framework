@@ -340,7 +340,7 @@ void frame_logic(void)
 	}
 }
 
-void logic(void)
+void logic(void * data)
 {
 	global_logic();
 	if(animation)
@@ -425,7 +425,7 @@ void frame_render(void)
 	t3f_draw_scaled_animation(animation, t3f_color_white, tick, 320 + 32, 32, 0, zoom, 0);
 }
 
-void render(void)
+void render(void * data)
 {
 	al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.1));
 	al_hold_bitmap_drawing(true);
@@ -458,7 +458,7 @@ void render(void)
 
 bool initialize(void)
 {
-	if(!t3f_initialize("T3F Animator", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
+	if(!t3f_initialize("T3F Animator", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		printf("Failed to initialize T3F.\n");
 		return false;

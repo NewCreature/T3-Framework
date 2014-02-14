@@ -17,7 +17,7 @@ float le_loop_range_start = 0.0;
 float le_loop_range_end = 0.0;
 bool le_loop_enabled = true;
 
-void le_logic(void)
+void le_logic(void * data)
 {
 	float amount = 0.001;
 	
@@ -77,7 +77,7 @@ void le_logic(void)
 	}
 }
 
-void le_render(void)
+void le_render(void * data)
 {
 	float ox, time;
 	int i, ticks;
@@ -108,7 +108,7 @@ bool le_initialize(void)
 	ALLEGRO_CONFIG * config = NULL;
 	const char * val;
 	
-	if(!t3f_initialize("T3F Loop Editor", 640, 240, 60.0, le_logic, le_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND))
+	if(!t3f_initialize("T3F Loop Editor", 640, 240, 60.0, le_logic, le_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND, NULL))
 	{
 		return false;
 	}

@@ -16,7 +16,7 @@ ALLEGRO_BITMAP * sprite_sheet = NULL;
 OBJECT object[1024];
 T3F_RNG_STATE rng_state;
 
-void logic(void)
+void logic(void * data)
 {
 	int i;
 	
@@ -39,7 +39,7 @@ void logic(void)
 	}
 }
 
-void render(void)
+void render(void * data)
 {
 	int i;
 	
@@ -58,7 +58,7 @@ int main(int argc, char * argv[])
 	char fn[1024] = {0};
 	ALLEGRO_BITMAP * bp;
 	
-	if(!t3f_initialize("ex_atlas", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
+	if(!t3f_initialize("ex_atlas", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return 1;
 	}

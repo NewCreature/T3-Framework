@@ -37,7 +37,7 @@ bool ge_save_gain(void)
 	return false;
 }
 
-void ge_logic(void)
+void ge_logic(void * data)
 {
 	ALLEGRO_PATH * path = NULL;
 	ALLEGRO_CONFIG * config = NULL;
@@ -106,7 +106,7 @@ void ge_logic(void)
 	}
 }
 
-void ge_render(void)
+void ge_render(void * data)
 {
 	float ox;
 	
@@ -122,7 +122,7 @@ void ge_render(void)
 
 bool ge_initialize(void)
 {
-	if(!t3f_initialize("T3F Gain Editor", 640, 240, 60.0, ge_logic, ge_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND))
+	if(!t3f_initialize("T3F Gain Editor", 640, 240, 60.0, ge_logic, ge_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND, NULL))
 	{
 		return false;
 	}

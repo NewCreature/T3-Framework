@@ -19,7 +19,7 @@ CAMERA camera;
 
 int tick = 0;
 
-void logic(void)
+void logic(void * data)
 {
 	int mx, my, mz;
 	
@@ -37,7 +37,7 @@ void logic(void)
 	tick++;
 }
 
-void render(void)
+void render(void * data)
 {
 	int i;
 	
@@ -51,7 +51,7 @@ void render(void)
 
 int main(int argc, char * argv[])
 {
-	if(!t3f_initialize("ex_tilemap", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
+	if(!t3f_initialize("ex_tilemap", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return 1;
 	}

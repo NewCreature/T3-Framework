@@ -119,7 +119,7 @@ void paddle_game_exit(void)
 }
 
 /* logic routines, passed to T^3 Framework */
-void paddle_logic(void)
+void paddle_logic(void * data)
 {
 	/* logic switch, use different logic for each state */
 	switch(paddle_state)
@@ -282,7 +282,7 @@ void paddle_logic(void)
 }
 
 /* render routines, passed to T^3 Framework */
-void paddle_render(void)
+void paddle_render(void * data)
 {
 	/* render switch, render graphics according to which state we are in */
 	switch(paddle_state)
@@ -369,7 +369,7 @@ bool paddle_initialize(void)
 	   - name the program "Paper Paddle" (displayed as window title when in windowed mode)
 	   - use paddle_logic() and paddle_render() to handle logic and rendering
 	   - use keyboard (T3F_USE_KEYBOARD), mouse (T3F_USE_MOUSE), sound (T3F_USE_SOUND), and fullscreen mode (T3F_USE_FULLSCREEN) */
-	if(!t3f_initialize("Paper Paddle", 640, 480, 60.0, paddle_logic, paddle_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND))
+	if(!t3f_initialize("Paper Paddle", 640, 480, 60.0, paddle_logic, paddle_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND, NULL))
 	{
 		printf("Failed to initialize T^3 Framework!\n");
 		return false;

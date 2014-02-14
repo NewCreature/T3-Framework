@@ -824,7 +824,7 @@ void mapper_tilemap_logic(void)
 	}
 }
 
-void mapper_logic(void)
+void mapper_logic(void * data)
 {
 	mapper_global_logic();
 	switch(mapper_view)
@@ -984,7 +984,7 @@ void mapper_help_render(void)
 	al_draw_textf(mapper_font, t3f_color_white, 0, 432, 0, "Delete: Delete layer");
 }
 
-void mapper_render(void)
+void mapper_render(void * data)
 {
 	if(mapper_bg_color == 0)
 	{
@@ -1024,7 +1024,7 @@ bool mapper_initialize(void)
 {
 	const char * val = NULL;
 	
-	if(!t3f_initialize("T3F Mapper", 640, 480, 60.0, mapper_logic, mapper_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE))
+	if(!t3f_initialize("T3F Mapper", 640, 480, 60.0, mapper_logic, mapper_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return false;
 	}

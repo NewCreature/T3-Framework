@@ -1,11 +1,19 @@
 #include "t3f/t3f.h"
 
-int app_state = 0;
+/* structure to hold all of our app-specific data */
+typedef struct
+{
+	
+	int state;
+	
+} APP_INSTANCE;
 
 /* main logic routine */
-void app_logic(void)
+void app_logic(void * data)
 {
-	switch(app_state)
+	APP_INSTANCE * app = (APP_INSTANCE *)data;
+
+	switch(app->state)
 	{
 		default:
 		{
@@ -18,9 +26,11 @@ void app_logic(void)
 }
 
 /* main rendering routine */
-void app_render(void)
+void app_render(void * data)
 {
-	switch(app_state)
+	APP_INSTANCE * app = (APP_INSTANCE *)data;
+
+	switch(app->state)
 	{
 		default:
 		{
@@ -31,10 +41,10 @@ void app_render(void)
 }
 
 /* initialize our app, load graphics, etc. */
-bool app_initialize(int argc, char * argv[])
+bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 {
 	/* initialize T3F */
-	if(!t3f_initialize("My App", 640, 480, 60.0, app_logic, app_render, T3F_DEFAULT))
+	if(!t3f_initialize("My App", 640, 480, 60.0, app_logic, app_render, T3F_DEFAULT, app))
 	{
 		printf("Error initializing T3F\n");
 		return false;
@@ -51,12 +61,16 @@ bool app_initialize(int argc, char * argv[])
 		printf("Cannot locate resources!\n");
 		return false;
 	}
+	
+	app->state = 0;
 	return true;
 }
 
 int main(int argc, char * argv[])
 {
-	if(app_initialize(argc, argv))
+	APP_INSTANCE app;
+	
+	if(app_initialize(&app, argc, argv))
 	{
 		t3f_run();
 	}
