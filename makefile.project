@@ -14,6 +14,7 @@ else
 	@cp template/src/* $(DIR)/src
 	@cp template/docs/* $(DIR)/docs
 	@cp template/changelog $(DIR)
+	@cp template/bin/data/* $(DIR)/bin/data
 	@cp -a template/debian $(DIR)
 	@cp -a template/android $(DIR) 
 	@cp -a template/win32 $(DIR) 
