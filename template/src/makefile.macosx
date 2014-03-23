@@ -30,4 +30,4 @@ include makefile.common
 
 mac_package: ../$(APP_BUNDLE_NAME).app
 	rm -rf ../$(APP_PACKAGE_NAME)-macosx.dmg
-	../macosx/create-dmg --volname $(APP_BUNDLE_NAME) --volicon ../icons/macosx_icon.icns --window-size 400 232 --icon-size 96 --icon "WordLeap" 110 100 --app-drop-link 280 100 ../$(APP_PACKAGE_NAME)-macosx.dmg ../$(APP_BUNDLE_NAME).app
+	../macosx/create-dmg --volname $(APP_BUNDLE_NAME) --volicon ../icons/macosx_icon.icns --window-size 400 232 --icon-size 96 --icon "$(APP_BUNDLE_NAME)" 110 100 --app-drop-link 280 100 ../$(APP_PACKAGE_NAME)-macosx.dmg ../$(APP_BUNDLE_NAME).app
