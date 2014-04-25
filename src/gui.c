@@ -369,7 +369,7 @@ void t3f_process_gui(T3F_GUI * pp)
 	bool touched = false;
 	bool touching = false;
 	int touch_id = 0;
-	int x, y;
+	float x, y;
 	float mouse_x = 0.0, mouse_y = 0.0;
 	
 	/* check if the mouse has been moved */

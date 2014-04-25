@@ -83,8 +83,8 @@ extern bool t3f_quit;
 extern int t3f_flags;
 extern int t3f_option[T3F_MAX_OPTIONS];
 
-extern int t3f_mouse_x;
-extern int t3f_mouse_y;
+extern float t3f_mouse_x;
+extern float t3f_mouse_y;
 extern int t3f_mouse_z;
 extern int t3f_mouse_dx;
 extern int t3f_mouse_dy;
@@ -126,7 +126,7 @@ bool t3f_add_key(int key);
 char t3f_read_key(int flags);
 
 /* mouse */
-void t3f_get_mouse_mickeys(int * x, int * y, int * z);
+void t3f_get_mouse_mickeys(float * x, float * y, int * z);
 void t3f_set_mouse_xy(float x, float y);
 
 /* touch */
