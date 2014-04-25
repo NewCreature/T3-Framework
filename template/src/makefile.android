@@ -2,7 +2,7 @@
 #CFLAGS = $(GLOBAL_CFLAGS) $(APP_CFLAGS) $(ANDROID_CFLAGS)
 PLATFORM_CFLAGS = $(ANDROID_CFLAGS)
 PLATFORM_OBJECTS = $(ANDROID_PLATFORM_OBJECTS)
-PLATFORM_LIBS = $(ANDROID_PLATFORM_LIBS)
+PLATFORM_LIBS = $(ANDROID_PLATFORM_LIBS) -lpng
 DEPEND_LIBS = $(ANDROID_DEPEND_LIBS)
 #LIB_SUFFIX = -static
 #DEL_COMMAND = rm -f
@@ -34,7 +34,7 @@ build_android:
 	mkdir -p ../temp/android/template/jni/$(ANDROID_ARCHITECTURE)
 	mkdir -p ../temp/android/template/jni/include
 	mkdir -p ../temp/android/template/libs
-	cp -a $(ANDROID_NDK_ROOT)/user/$(ANDROID_ARCHITECTURE)/lib/liballegro*.so ../temp/android/template/jni/$(ANDROID_ARCHITECTURE)
+	cp -a $(ANDROID_TOOLCHAIN_ROOT)/user/$(ANDROID_ARCHITECTURE)/lib/liballegro*.so ../temp/android/template/jni/$(ANDROID_ARCHITECTURE)
 	cp ../Allegro5.jar ../temp/android/template/libs
 	@echo Copying data to Android project...
 	cp -a ../bin/data ../temp/android/template/assets
@@ -62,11 +62,11 @@ build_android:
 	sed -i '' "s|APP_VERSION_STRING|$(APP_VERSION)|" ../temp/android/template/AndroidManifest.xml
 	sed -i '' "s|APP_RELEASE_NUMBER|$(APP_RELEASE)|" ../temp/android/template/AndroidManifest.xml
 	@echo Building Android project
-	cd ../temp/android/template; export T3F_APP_LIBS='$(APP_LIBS)'; export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT); export APP_LIBS='$(APP_LIBS)'; export PLATFORM_LIBS='$(PLATFORM_LIBS)'; export PLATFORM_CFLAGS='$(PLATFORM_CFLAGS)'; $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant release; cp bin/alandroid-project-release-unsigned.apk ../../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
+	cd ../temp/android/template; export T3F_APP_LIBS='$(APP_LIBS)'; export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT); export APP_LIBS='$(APP_LIBS)'; export PLATFORM_LIBS='$(PLATFORM_LIBS)'; export PLATFORM_CFLAGS='$(PLATFORM_CFLAGS)'; $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant release; cp bin/alandroid-project-release-unsigned.apk ../../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
 
 build_allegro:
 	@echo Building Allegro...
-	cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT) -DWANT_ANDROID=on -DWANT_RELEASE_LOGGING=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_FFMPEG=ON; make install
+	cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT) -DWANT_ANDROID=on -DWANT_RELEASE_LOGGING=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DWANT_TESTS=OFF -DWANT_VIDEO=OFF -DWANT_FLAC=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_NATIVE_IMAGE_LOADER=OFF -DFREETYPE_INCLUDE_DIR_freetype2=$ANDROID_TOOLCHAIN_ROOT/user/armeabi-v7a/include/freetype2; make install
 #	cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT) -DWANT_ANDROID=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_FFMPEG=ON; make install; cp lib/Allegro5.jar ../../
 	
 build_temp:
