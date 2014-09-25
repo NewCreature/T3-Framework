@@ -357,7 +357,7 @@ void mapper_tileset_logic(void)
 			mapper_view = MAPPER_VIEW_TILE_ANI;
 			t3f_key[ALLEGRO_KEY_A] = 0;
 		}
-		mapper_hover_tile = (t3f_mouse_y / mapper_tile_height) * (t3f_virtual_display_width / mapper_tile_width) + (t3f_mouse_x / mapper_tile_width) % (t3f_virtual_display_width / mapper_tile_width);
+		mapper_hover_tile = ((int)t3f_mouse_y / mapper_tile_height) * (t3f_virtual_display_width / mapper_tile_width) + ((int)t3f_mouse_x / mapper_tile_width) % (t3f_virtual_display_width / mapper_tile_width);
 		if(t3f_mouse_button[0] && mapper_hover_tile < mapper_tileset->tiles)
 		{
 			mapper_current_tile = mapper_hover_tile;
@@ -422,7 +422,7 @@ void mapper_tile_ani_logic(void)
 		}
 		t3f_key[ALLEGRO_KEY_EQUALS] = 0;
 	}
-	hover_frame = (t3f_mouse_y / mapper_tile_height) * (t3f_virtual_display_width / mapper_tile_width) + (t3f_mouse_x / mapper_tile_width) % (t3f_virtual_display_width / mapper_tile_width);
+	hover_frame = ((int)t3f_mouse_y / mapper_tile_height) * (t3f_virtual_display_width / mapper_tile_width) + ((int)t3f_mouse_x / mapper_tile_width) % (t3f_virtual_display_width / mapper_tile_width);
 	if(t3f_mouse_button[0] && hover_frame < mapper_tileset->tile[mapper_current_tile]->frame_list_total)
 	{
 		mapper_current_frame = hover_frame;
