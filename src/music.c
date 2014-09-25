@@ -17,6 +17,8 @@ static float t3f_music_gain = 1.0;
 static char t3f_music_thread_fn[4096] = {0};
 static const ALLEGRO_FILE_INTERFACE * t3f_music_thread_file_interface = NULL;
 
+ALLEGRO_DEBUG_CHANNEL("android");
+
 static bool t3f_set_music_state(int state)
 {
 	
@@ -61,12 +63,14 @@ static void * t3f_play_music_thread(void * arg)
 	const char * val = NULL;
 	ALLEGRO_CONFIG * config = NULL;
 	
+	ALLEGRO_DEBUG("music thread start\n");
 	t3f_music_gain = 1.0;
 	al_lock_mutex(t3f_music_mutex);
 	if(t3f_stream)
 	{
 		t3f_stop_music();
 	}
+	ALLEGRO_DEBUG("setting file interface\n");
 	al_set_new_file_interface(t3f_music_thread_file_interface);
 	t3f_stream = al_load_audio_stream(t3f_music_thread_fn, 4, 4096);
 	if(!t3f_stream)
@@ -76,6 +80,7 @@ static void * t3f_play_music_thread(void * arg)
 		return NULL;
 	}
 	
+	ALLEGRO_DEBUG("configuring music\n");
 	/* look for loop data */
 	path = al_create_path(t3f_music_thread_fn);
 	if(path)
@@ -144,6 +149,7 @@ static void * t3f_play_music_thread(void * arg)
 			al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_LOOP);
 		}
 	}
+	ALLEGRO_DEBUG("start the music\n");
 	t3f_music_volume = t3f_new_music_volume;
 	al_set_audio_stream_gain(t3f_stream, t3f_music_volume * t3f_music_gain);
 	al_attach_audio_stream_to_mixer(t3f_stream, al_get_default_mixer());
@@ -189,6 +195,7 @@ static void * t3f_fade_music_thread(void * arg)
  * see if there is a corresponding INI file and read loop data from that */
 bool t3f_play_music(const char * fn)
 {
+	ALLEGRO_DEBUG("attempting to play %s\n", fn);
 	if(!(t3f_flags & T3F_USE_SOUND))
 	{
 		return false;

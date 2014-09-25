@@ -199,7 +199,7 @@ void t3f_destroy_gui(T3F_GUI * pp)
 	al_free(pp);
 }
 
-int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *), void * bp, int ox, int oy, int flags)
+int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(void *, int, void *), void * bp, int ox, int oy, int flags)
 {
 	pp->element[pp->elements].type = T3F_GUI_ELEMENT_IMAGE;
 	pp->element[pp->elements].proc = proc;
@@ -212,7 +212,7 @@ int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *), void * bp,
 	return 1;
 }
 
-int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(int, void *), char * text, void * fp, int ox, int oy, ALLEGRO_COLOR color, int flags)
+int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(void *, int, void *), char * text, void * fp, int ox, int oy, ALLEGRO_COLOR color, int flags)
 {
 	pp->element[pp->elements].type = T3F_GUI_ELEMENT_TEXT;
 	pp->element[pp->elements].proc = proc;
@@ -351,25 +351,25 @@ void t3f_select_next_gui_element(T3F_GUI * pp)
 	}
 }
 
-void t3f_activate_selected_gui_element(T3F_GUI * pp)
+void t3f_activate_selected_gui_element(T3F_GUI * pp, void * data)
 {
 	if(pp->hover_element >= 0 && pp->hover_element < pp->elements)
 	{
 		if(pp->element[pp->hover_element].proc)
 		{
-			pp->element[pp->hover_element].proc(0, pp);
+			pp->element[pp->hover_element].proc(data, pp->hover_element, pp);
 		}
 	}
 }
 
-void t3f_process_gui(T3F_GUI * pp)
+void t3f_process_gui(T3F_GUI * pp, void * data)
 {
 	int i;
 	bool mouse_moved = false;
 	bool touched = false;
 	bool touching = false;
 	int touch_id = 0;
-	float x, y;
+	int x, y;
 	float mouse_x = 0.0, mouse_y = 0.0;
 	
 	/* check if the mouse has been moved */
@@ -425,7 +425,7 @@ void t3f_process_gui(T3F_GUI * pp)
 		}
 		if((t3f_mouse_button[0] || touched || (touching && pp->element[pp->hover_element].flags & T3F_GUI_ELEMENT_ON_TOUCH)) && !t3f_gui_left_clicked && pp->hover_element >= 0)
 		{
-			t3f_activate_selected_gui_element(pp);
+			t3f_activate_selected_gui_element(pp, data);
 			t3f_gui_left_clicked = true;
 			t3f_touch[touch_id].released = false;
 		}

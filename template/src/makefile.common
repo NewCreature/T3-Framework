@@ -5,7 +5,7 @@ include makefile.config
 NOTHING:=
 SPACE:=$(NOTHING) $(NOTHING)
 
-T3F_OBJECTS = t3f/t3f.o t3f/bitmap.o t3f/animation.o t3f/sound.o t3f/music.o t3f/collision.o t3f/controller.o t3f/font.o t3f/gui.o t3f/resource.o t3f/rng.o t3f/android.o t3f/atlas.o t3f/draw.o t3f/view.o t3f/debug.o
+T3F_OBJECTS = t3f/t3f.o t3f/bitmap.o t3f/animation.o t3f/sound.o t3f/music.o t3f/collision.o t3f/controller.o t3f/font.o t3f/gui.o t3f/resource.o t3f/rng.o t3f/android.o t3f/atlas.o t3f/draw.o t3f/view.o t3f/debug.o t3f/primitives.o
 T3F_DEPEND_LIBS = -lallegro_image$(LIB_SUFFIX) -lallegro_font$(LIB_SUFFIX) -lallegro_ttf$(LIB_SUFFIX) -lallegro_primitives$(LIB_SUFFIX) -lallegro_audio$(LIB_SUFFIX) -lallegro_acodec$(LIB_SUFFIX) -lallegro_memfile$(LIB_SUFFIX) -lallegro$(LIB_SUFFIX)
 
 DEMO_DIR = ../../$(APP_NAME)_demo
@@ -56,7 +56,7 @@ very_clean: clean
 #create tar.gz package for source code distribution
 package:
 	make -f Makefile clean_all
-	$(shell rm -rf ../../$(APP_PACKAGE_NAME); mkdir ../../$(APP_PACKAGE_NAME); cp -a "../bin" ../../$(APP_PACKAGE_NAME); cp -a "../src" ../../$(APP_PACKAGE_NAME); cp -a "../docs" ../../$(APP_PACKAGE_NAME); cp -a "../icons" ../../$(APP_PACKAGE_NAME); cp -a "../android" ../../$(APP_PACKAGE_NAME); cp -a "../debian" ../../$(APP_PACKAGE_NAME); cp -a "../macosx" ../../$(APP_PACKAGE_NAME); cp -a "../win32" ../../$(APP_PACKAGE_NAME); cp "../build.txt" ../../$(APP_PACKAGE_NAME); cp "../changelog" ../../$(APP_PACKAGE_NAME); cd ../../; rm -f $(APP_PACKAGE_FILENAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="old" --dereference -czf $(APP_PACKAGE_FILENAME) $(APP_PACKAGE_NAME))
+	$(shell rm -rf ../../$(APP_PACKAGE_NAME); mkdir ../../$(APP_PACKAGE_NAME); cp -a "../bin" ../../$(APP_PACKAGE_NAME); cp -a "../src" ../../$(APP_PACKAGE_NAME); cp -a "../docs" ../../$(APP_PACKAGE_NAME); cp -a "../icons" ../../$(APP_PACKAGE_NAME); cp -a "../win32" ../../$(APP_PACKAGE_NAME); cp -a "../macosx" ../../$(APP_PACKAGE_NAME); cp -a "../debian" ../../$(APP_PACKAGE_NAME); cp -a "../android" ../../$(APP_PACKAGE_NAME); cp "../build.txt" ../../$(APP_PACKAGE_NAME); cp "../changelog" ../../$(APP_PACKAGE_NAME); cd ../../; rm -f $(APP_PACKAGE_FILENAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="old" --dereference -czf $(APP_PACKAGE_FILENAME) $(APP_PACKAGE_NAME))
 	@echo Package successfully created!
 
 #make a copy of the source tree with non-demo data deleted

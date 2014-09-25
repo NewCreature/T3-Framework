@@ -41,8 +41,8 @@ int t3f_key_buffer[T3F_KEY_BUFFER_MAX] = {0};
 int t3f_key_buffer_keys = 0;
 
 /* mouse data */
-float t3f_mouse_x = 0;
-float t3f_mouse_y = 0;
+int t3f_mouse_x = 0;
+int t3f_mouse_y = 0;
 int t3f_mouse_z = 0;
 int t3f_mouse_dx = 0;
 int t3f_mouse_dy = 0;
@@ -346,6 +346,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	/* initialize Allegro */
 	if(!al_init())
 	{
+		printf("Could not initialize Allegro!\n");
 		return 0;
 	}
 	
@@ -385,12 +386,14 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	
 	if(!al_init_image_addon())
 	{
+		printf("Failed to initialize image add-on!\n");
 		return 0;
 	}
 	al_init_font_addon();
 	if(!al_init_ttf_addon())
 	{
-		return false;
+		printf("Failed to initialize TTF add-on!\n");
+		return 0;
 	}
 	if(flags & T3F_USE_SOUND)
 	{
@@ -436,12 +439,14 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	t3f_timer = al_create_timer(1.000 / fps);
 	if(!t3f_timer)
 	{
+		printf("Failed to create timer!\n");
 		return 0;
 	}
 	
 	t3f_queue = al_create_event_queue();
 	if(!t3f_queue)
 	{
+		printf("Failed to create event queue!\n");
 		return 0;
 	}
 	
@@ -450,6 +455,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	{
 		if(!t3f_set_gfx_mode(w, h, flags))
 		{
+			printf("Failed to create display!\n");
 			return 0;
 		}
 	}
@@ -480,6 +486,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	t3f_default_view = t3f_create_view(0, 0, w, h, w / 2, h / 2);
 	if(!t3f_default_view)
 	{
+		printf("Failed to create default view!\n");
 		return 0;
 	}
 	t3f_select_view(t3f_default_view);
@@ -716,10 +723,6 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 				}
 			}
 		}
-		if(flags & T3F_FILL_SCREEN)
-		{
-			t3f_flags |= T3F_FILL_SCREEN;
-		}
 		sprintf(val, "%d", w);
 		al_set_config_value(t3f_config, "T3F", "display_width", val);
 		sprintf(val, "%d", h);
@@ -918,9 +921,9 @@ bool t3f_add_key(int key)
 	return false;
 }
 
-char t3f_read_key(int flags)
+int t3f_read_key(int flags)
 {
-	char rkey = 0;
+	int rkey = 0;
 	if(t3f_key_buffer_keys > 0)
 	{
 		t3f_key_buffer_keys--;
@@ -943,7 +946,12 @@ char t3f_read_key(int flags)
 	return rkey;
 }
 
-void t3f_get_mouse_mickeys(float * x, float * y, int * z)
+bool t3f_key_pressed(void)
+{
+	return t3f_key_buffer_keys > 0;
+}
+
+void t3f_get_mouse_mickeys(int * x, int * y, int * z)
 {
 	if(x)
 	{
@@ -1055,15 +1063,18 @@ unsigned long t3f_checksum_file(const char * fn)
 	int c;
 	
 	fp = al_fopen(fn, "rb");
-	while(!al_feof(fp))
+	if(fp)
 	{
-		c = al_fgetc(fp);
-		if(c != EOF)
+		while(!al_feof(fp))
 		{
-			sum += c;
+			c = al_fgetc(fp);
+			if(c != EOF)
+			{
+				sum += c;
+			}
 		}
+		al_fclose(fp);
 	}
-	al_fclose(fp);
 	return sum;
 }
 

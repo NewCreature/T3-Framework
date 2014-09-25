@@ -1,10 +1,10 @@
 CC = gcc
-CFLAGS = $(GLOBAL_CFLAGS) -arch i386 -arch x86_64 -mmacosx-version-min=10.5 $(APP_CFLAGS) $(MACOSX_CFLAGS)
+CFLAGS = $(GLOBAL_CFLAGS) $(MACOSX_ARCHITECURES) -mmacosx-version-min=$(MACOSX_MIN_VERSION) $(APP_CFLAGS) $(MACOSX_CFLAGS)
 PLATFORM_OBJECTS = $(MACOSX_PLATFORM_OBJECTS)
 PLATFORM_LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_main-static $(MACOSX_PLATFORM_LIBS)
 PLATFORM_TARGET = ../$(APP_BUNDLE_NAME).app $(MACOSX_PLATFORM_TARGET)
 LIB_SUFFIX = -static
-DEPEND_LIBS = -lz -lpng -ljpeg -lvorbis -logg -lvorbisfile -lFLAC -ldumb -lfreetype $(MACOSX_DEPEND_LIBS)
+DEPEND_LIBS = -lz -lpng -ljpeg -lFLAC -lvorbis -logg -lvorbisfile -ldumb -lfreetype $(MACOSX_DEPEND_LIBS)
 DEL_COMMAND = rm -f
 DEL_FOLDER_COMMAND = rm -rf
 SED_COMMAND = sed -i ''
