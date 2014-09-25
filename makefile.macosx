@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -O2 -fomit-frame-pointer -funroll-loops $(CARCH) -mmacosx-version-min=10.5 -Wall -I./include/t3f -I./include -DT3F_COMPANY="\"t3-i\""
-LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_main-static -lallegro_image-static -lallegro_font-static -lallegro_ttf-static -lallegro_primitives-static -lallegro_audio-static -lallegro_acodec-static -lz -lpng -lvorbis -logg -lvorbisfile -ldumb -lallegro_dialog-static -lallegro_memfile-static -lallegro-static -lfreetype
-CARCH = -arch i386 -arch ppc
+LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_main-static -lallegro_image-static -lallegro_font-static -lallegro_ttf-static -lallegro_primitives-static -lallegro_audio-static -lallegro_acodec-static -lz -lpng -lvorbis -logg -lvorbisfile -ldumb -lallegro_dialog-static -lallegro_memfile-static -lallegro-static -lfreetype -lFLAC -ljpeg
+CARCH = -arch i386 -arch x86_64
 
 include makefile.common
 
