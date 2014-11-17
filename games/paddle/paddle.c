@@ -127,7 +127,7 @@ void paddle_logic(void * data)
 		
 		case EXAMPLE_STATE_TITLE:
 		{
-			t3f_process_gui(paddle_menu);
+			t3f_process_gui(paddle_menu, data);
 			break;
 		}
 		
@@ -348,13 +348,13 @@ void paddle_render(void * data)
 	}
 }
 
-int paddle_menu_play_proc(int i, void * p)
+int paddle_menu_play_proc(void * d, int i, void * p)
 {
 	paddle_game_init();
 	return 1;
 }
 
-int paddle_menu_quit_proc(int i, void * p)
+int paddle_menu_quit_proc(void * d, int i, void * p)
 {
 	t3f_exit();
 	return 1;

@@ -37,6 +37,7 @@ else
 	@cp -f template/src/makefile.macosx $(DIR)/src
 	@cp -f template/src/makefile.mingw $(DIR)/src
 	@cp -f template/src/makefile.mingw_cross $(DIR)/src
+	@cp -f template/src/makefile.config $(DIR)/src
 	@cp -a template/debian $(DIR)
 	@cp -a template/android $(DIR) 
 	@cp -a template/win32 $(DIR) 

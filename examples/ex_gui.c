@@ -17,7 +17,7 @@ void logic(void * data)
 	{
 		t3f_exit();
 	}
-	t3f_process_gui(page);
+	t3f_process_gui(page, data);
 }
 
 void render(void * data)
@@ -26,25 +26,25 @@ void render(void * data)
 	t3f_render_gui(page);
 }
 
-int red_proc(int i, void * p)
+int red_proc(void * d, int i, void * p)
 {
 	bgcolor = al_map_rgba_f(1.0, 0.0, 0.0, 1.0);
 	return 1;
 }
 
-int green_proc(int i, void * p)
+int green_proc(void * d, int i, void * p)
 {
 	bgcolor = al_map_rgba_f(0.0, 1.0, 0.0, 1.0);
 	return 1;
 }
 
-int blue_proc(int i, void * p)
+int blue_proc(void * d, int i, void * p)
 {
 	bgcolor = al_map_rgba_f(0.0, 0.0, 1.0, 1.0);
 	return 1;
 }
 
-int black_proc(int i, void * p)
+int black_proc(void * d, int i, void * p)
 {
 	bgcolor = al_map_rgba_f(0.0, 0.0, 0.0, 1.0);
 	return 1;
