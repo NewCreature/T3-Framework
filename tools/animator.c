@@ -319,6 +319,11 @@ void frame_logic(void)
 			animation->frame[current_frame]->x = (animation->frame[current_frame]->height - animation->frame[current_frame]->width) / 2;
 			t3f_key[ALLEGRO_KEY_H] = 0;
 		}
+		if(t3f_key[ALLEGRO_KEY_F])
+		{
+			animation->frame[current_frame]->flags = 0;
+			t3f_key[ALLEGRO_KEY_F] = 0;
+		}
 		
 		if(t3f_mouse_button[0])
 		{
