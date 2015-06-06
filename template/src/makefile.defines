@@ -20,6 +20,8 @@ APP_OBJECTS = main.o
 #APP_LIBS =
 #APP_CFLAGS =
 #APP_EXTRA_TARGET =
+app_clean:
+#	@
 
 ################
 # global stuff #
