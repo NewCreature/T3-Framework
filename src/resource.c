@@ -10,7 +10,7 @@ void * t3f_bitmap_resource_handler_proc(ALLEGRO_FILE * fp, const char * filename
 	ALLEGRO_STATE old_state;
 	bool openfp = false; // operating on already open file
 	int old_flags;
-	
+
 	old_flags = al_get_new_bitmap_flags();
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE | (old_flags & ALLEGRO_NO_PREMULTIPLIED_ALPHA));
@@ -52,14 +52,14 @@ void * t3f_font_resource_handler_proc(ALLEGRO_FILE * fp, const char * filename, 
 	void * ptr = NULL;
 	ALLEGRO_STATE old_state;
 	bool openfp = false;
-	
+
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
 	if(fp)
 	{
 		openfp = true;
 	}
-	
+
 	/* load file directly if offset is 0 and open file not passed */
 	else if(offset == 0)
 	{
@@ -97,7 +97,7 @@ void * t3f_bitmap_font_resource_handler_proc(ALLEGRO_FILE * fp, const char * fil
 {
 	void * ptr = NULL;
 	ALLEGRO_STATE old_state;
-	
+
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
 	ptr = al_load_bitmap_font_flags(filename, flags);
@@ -114,7 +114,7 @@ void * t3f_t3f_font_gen_resource_handler_proc(ALLEGRO_FILE * fp, const char * fi
 {
 	void * ptr = NULL;
 	ALLEGRO_STATE old_state;
-	
+
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
 	if(!fp && offset == 0)
@@ -134,7 +134,7 @@ void * t3f_t3f_font_load_resource_handler_proc(ALLEGRO_FILE * fp, const char * f
 {
 	void * ptr = NULL;
 	ALLEGRO_STATE old_state;
-	
+
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
 	if(!fp && offset == 0)
@@ -150,13 +150,13 @@ void t3f_t3f_font_load_resource_handler_destroy_proc(void * ptr)
 	t3f_destroy_font(ptr);
 }
 
-static T3F_RESOURCE_HANDLER t3f_resource_handler[T3F_MAX_RESOURCE_HANDLERS] = 
+static T3F_RESOURCE_HANDLER t3f_resource_handler[T3F_MAX_RESOURCE_HANDLERS] =
 {
-	{t3f_bitmap_resource_handler_proc, t3f_bitmap_resource_handler_destroy_proc, 0},	
-	{t3f_font_resource_handler_proc, t3f_font_resource_handler_destroy_proc, 0},	
-	{t3f_bitmap_font_resource_handler_proc, t3f_bitmap_font_resource_handler_destroy_proc, 0},	
-	{t3f_t3f_font_gen_resource_handler_proc, t3f_t3f_font_gen_resource_handler_destroy_proc, 0},	
-	{t3f_t3f_font_load_resource_handler_proc, t3f_t3f_font_load_resource_handler_destroy_proc, 0},	
+	{t3f_bitmap_resource_handler_proc, t3f_bitmap_resource_handler_destroy_proc, 0},
+	{t3f_font_resource_handler_proc, t3f_font_resource_handler_destroy_proc, 0},
+	{t3f_bitmap_font_resource_handler_proc, t3f_bitmap_font_resource_handler_destroy_proc, 0},
+	{t3f_t3f_font_gen_resource_handler_proc, t3f_t3f_font_gen_resource_handler_destroy_proc, 0},
+	{t3f_t3f_font_load_resource_handler_proc, t3f_t3f_font_load_resource_handler_destroy_proc, 0},
 };
 
 void t3f_register_resource_handler(int type, void * (*proc)(ALLEGRO_FILE * fp, const char * filename, int option, int flags, unsigned long offset), void (*destroy_proc)(void * ptr))
@@ -165,7 +165,7 @@ void t3f_register_resource_handler(int type, void * (*proc)(ALLEGRO_FILE * fp, c
 	t3f_resource_handler[type].destroy_proc = destroy_proc;
 }
 
-static bool t3f_add_resource(int type, void ** ptr, const char * filename, int option, int flags, unsigned long offset)
+static bool t3f_add_resource(int type, void ** ptr, const char * filename, int option, int flags, unsigned long offset, const ALLEGRO_FILE_INTERFACE * fi)
 {
 	if(t3f_resources < T3F_MAX_RESOURCES)
 	{
@@ -178,6 +178,7 @@ static bool t3f_add_resource(int type, void ** ptr, const char * filename, int o
 			t3f_resource[t3f_resources]->offset = offset;
 			t3f_resource[t3f_resources]->option = option;
 			t3f_resource[t3f_resources]->flags = flags;
+			t3f_resource[t3f_resources]->fi = fi;
 			t3f_resources++;
 			return true;
 		}
@@ -188,7 +189,7 @@ static bool t3f_add_resource(int type, void ** ptr, const char * filename, int o
 void t3f_remove_resource(int i)
 {
 	int j;
-	
+
 	al_free(t3f_resource[i]);
 	for(j = i; j < t3f_resources - 1; j++)
 	{
@@ -204,7 +205,7 @@ void * t3f_load_resource(void ** ptr, int type, const char * filename, int optio
 		*ptr = t3f_resource_handler[type].proc(NULL, filename, option, flags, offset);
 		if(*ptr)
 		{
-			t3f_add_resource(type, ptr, filename, option, flags, offset);
+			t3f_add_resource(type, ptr, filename, option, flags, offset, al_get_new_file_interface());
 		}
 	}
 	return *ptr;
@@ -219,7 +220,7 @@ void * t3f_load_resource_f(void ** ptr, int type, ALLEGRO_FILE * fp, const char 
 		*ptr = t3f_resource_handler[type].proc(fp, filename, option, flags, offset);
 		if(*ptr)
 		{
-			t3f_add_resource(type, ptr, filename, option, flags, offset);
+			t3f_add_resource(type, ptr, filename, option, flags, offset, al_get_new_file_interface());
 		}
 	}
 	return *ptr;
@@ -237,7 +238,7 @@ static void t3f_actually_unload_resource(int i)
 int t3f_unload_resource(void * ptr)
 {
 	int i;
-	
+
 	for(i = 0; i < t3f_resources; i++)
 	{
 		if(*t3f_resource[i]->ptr == ptr)
@@ -249,21 +250,23 @@ int t3f_unload_resource(void * ptr)
 	return -1;
 }
 
-void t3f_destroy_resource(void * ptr)
+bool t3f_destroy_resource(void * ptr)
 {
 	int i;
-	
+
 	i = t3f_unload_resource(ptr);
 	if(i >= 0)
 	{
 		t3f_remove_resource(i);
+		return true;
 	}
+	return false;
 }
 
 void t3f_unload_resources(void)
 {
 	int i;
-	
+
 	for(i = 0; i < t3f_resources; i++)
 	{
 		if(*t3f_resource[i]->ptr)
@@ -276,12 +279,49 @@ void t3f_unload_resources(void)
 void t3f_reload_resources(void)
 {
 	int i;
-	
+	const ALLEGRO_FS_INTERFACE * old_fs;
+
+	old_fs = al_get_fs_interface();
 	for(i = 0; i < t3f_resources; i++)
 	{
 		if(t3f_resource_handler[t3f_resource[i]->type].proc)
 		{
+			al_set_new_file_interface(t3f_resource[i]->fi);
 			*t3f_resource[i]->ptr = t3f_resource_handler[t3f_resource[i]->type].proc(NULL, t3f_resource[i]->filename, t3f_resource[i]->option, t3f_resource[i]->flags, t3f_resource[i]->offset);
 		}
+	}
+	al_set_fs_interface(old_fs);
+}
+
+void * t3f_clone_resource(void ** dest, void * ptr)
+{
+	int i;
+	const ALLEGRO_FILE_INTERFACE * old_fi;
+
+	for(i = 0; i < t3f_resources; i++)
+	{
+		if(t3f_resource[i]->ptr == ptr)
+		{
+			old_fi = al_get_new_file_interface();
+			al_set_new_file_interface(t3f_resource[i]->fi);
+			*dest = t3f_resource_handler[t3f_resource[i]->type].proc(NULL, t3f_resource[i]->filename, t3f_resource[i]->option, t3f_resource[i]->flags, t3f_resource[i]->offset);
+			if(*dest)
+			{
+				t3f_add_resource(t3f_resource[i]->type, dest, t3f_resource[i]->filename, t3f_resource[i]->option, t3f_resource[i]->flags, t3f_resource[i]->offset, al_get_new_file_interface());
+			}
+			al_set_new_file_interface(old_fi);
+		}
+	}
+	return *dest;
+}
+
+void t3f_show_resources(void)
+{
+	int i;
+
+	t3f_debug_message("Total resources: %d\n", t3f_resources);
+	for(i = 0; i < t3f_resources; i++)
+	{
+		t3f_debug_message("Resource %d: %s\n", i, t3f_resource[i]->filename);
 	}
 }

@@ -20,7 +20,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\bin\T3F_APP_EXECUTABLE"; Destdir: "{app}"
-Source: "T3F_APP_LIBS_DIR\*.dll"; Destdir: "{app}"
+Source: "T3F_APP_LIBS_DIR\*.dll"; Destdir: "{app}"; Flags: skipifsourcedoesntexist
 Source: "T3F_APP_USER_LIBS_DIR\*.dll"; Destdir: "{app}"; Flags: skipifsourcedoesntexist
 Source: "T3F_APP_DATA_DIR\*.*"; DestDir: "{app}\data"; Flags: recursesubdirs
 Source: "T3F_APP_DOCS_DIR\README"; DestDir: "{app}\docs"; DestName: readme.txt

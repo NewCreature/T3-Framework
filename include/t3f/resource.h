@@ -31,6 +31,7 @@ typedef struct
 	char filename[T3F_RESOURCE_MAX_PATH];
 	unsigned long offset;
 	int option, flags;
+	const ALLEGRO_FILE_INTERFACE * fi;
 	void ** ptr;
 
 } T3F_RESOURCE;
@@ -40,8 +41,10 @@ void t3f_register_resource_handler(int type, void * (*proc)(ALLEGRO_FILE * fp, c
 void * t3f_load_resource(void ** ptr, int type, const char * filename, int option, int flags, unsigned long offset);
 void * t3f_load_resource_f(void ** ptr, int type, ALLEGRO_FILE * fp, const char * filename, int option, int flags);
 int t3f_unload_resource(void * ptr);
-void t3f_destroy_resource(void * ptr);
+bool t3f_destroy_resource(void * ptr);
 void t3f_unload_resources(void);
 void t3f_reload_resources(void);
+void * t3f_clone_resource(void ** dest, void * ptr);
+void t3f_show_resources(void);
 
 #endif

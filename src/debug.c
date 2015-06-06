@@ -43,7 +43,7 @@ void t3f_debug_message(const char * format, ...)
 		{
 			#ifdef T3F_ANDROID
 				ALLEGRO_DEBUG_CHANNEL("main");
-				ALLEGRO_DEBUG(buf);
+				ALLEGRO_DEBUG("%s", buf);
 			#else
 				printf("%s", buf);
 			#endif

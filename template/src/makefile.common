@@ -1,28 +1,15 @@
-include makefile.defines
-include makefile.config
-
 #helpers for dealing with spaces
 NOTHING:=
 SPACE:=$(NOTHING) $(NOTHING)
 
-T3F_OBJECTS = t3f/t3f.o t3f/bitmap.o t3f/animation.o t3f/sound.o t3f/music.o t3f/collision.o t3f/controller.o t3f/font.o t3f/gui.o t3f/resource.o t3f/rng.o t3f/android.o t3f/atlas.o t3f/draw.o t3f/view.o t3f/debug.o t3f/primitives.o
 T3F_DEPEND_LIBS = -lallegro_image$(LIB_SUFFIX) -lallegro_font$(LIB_SUFFIX) -lallegro_ttf$(LIB_SUFFIX) -lallegro_primitives$(LIB_SUFFIX) -lallegro_audio$(LIB_SUFFIX) -lallegro_acodec$(LIB_SUFFIX) -lallegro_memfile$(LIB_SUFFIX) -lallegro$(LIB_SUFFIX)
+
+include makefile.defines
+include makefile.config
 
 DEMO_DIR = ../../$(APP_NAME)_demo
 DEMO_DATA = $(DEMO_DIR)/bin/data
-DEMO_DELETE = $(DEMO_DATA)/scripts/ending.script $(DEMO_DATA)/graphics/cinema/ending\ $(DEMO_DATA)/music/ending.ogg $(DEMO_DATA)/music/ending.ini\
-              $(DEMO_DATA)/levels/bg02.png $(DEMO_DATA)/levels/shapes05.ini $(DEMO_DATA)/levels/shape05.png $(DEMO_DATA)/music/unintended_growth.xm $(DEMO_DATA)/music/unintended_growth.ini\
-              $(DEMO_DATA)/levels/bg03.png $(DEMO_DATA)/levels/shapes06.ini $(DEMO_DATA)/levels/shape06.png $(DEMO_DATA)/music/what_lies_beyond.xm $(DEMO_DATA)/music/what_lies_beyond.ini\
-              $(DEMO_DATA)/levels/bg05.png $(DEMO_DATA)/levels/shapes01.ini $(DEMO_DATA)/levels/shape01.png $(DEMO_DATA)/music/nexus.ogg $(DEMO_DATA)/music/nexus.ini\
-              $(DEMO_DATA)/levels/bg07.png $(DEMO_DATA)/levels/shapes03.ini $(DEMO_DATA)/levels/shape03.png $(DEMO_DATA)/music/breaking_through.xm $(DEMO_DATA)/music/breaking_through.ini\
-              $(DEMO_DATA)/levels/bg13.png $(DEMO_DATA)/levels/shapes10.ini $(DEMO_DATA)/levels/shape10.png $(DEMO_DATA)/music/etched_to_life.xm $(DEMO_DATA)/music/etched_to_life.ini\
-              $(DEMO_DATA)/levels/bg09.png $(DEMO_DATA)/levels/shapes14.ini $(DEMO_DATA)/levels/shape14.png $(DEMO_DATA)/music/a_new_day_is_here.xm $(DEMO_DATA)/music/a_new_day_is_here.ini\
-              $(DEMO_DATA)/levels/bonus_bg00.png $(DEMO_DATA)/levels/bonus_shape00.ini $(DEMO_DATA)/levels/bonus_shape00.png $(DEMO_DATA)/music/neon_and_gunfighters.ogg $(DEMO_DATA)/music/neon_and_gunfighters.ini\
-              $(DEMO_DATA)/levels/bonus_bg01.png $(DEMO_DATA)/levels/bonus_shape01.ini $(DEMO_DATA)/levels/bonus_shape01.png $(DEMO_DATA)/music/2.ogg $(DEMO_DATA)/music/2.ini\
-              $(DEMO_DATA)/levels/bonus_bg02.png $(DEMO_DATA)/levels/bonus_shape02.ini $(DEMO_DATA)/levels/bonus_shape02.png $(DEMO_DATA)/music/ethnitica.ogg $(DEMO_DATA)/music/ethnitica.ini\
-              $(DEMO_DATA)/levels/bonus_bg03.png $(DEMO_DATA)/levels/bonus_shape03.ini $(DEMO_DATA)/levels/bonus_shape03.png $(DEMO_DATA)/music/untouched.ogg $(DEMO_DATA)/music/untouched.ini\
-              $(DEMO_DATA)/levels/bonus_bg04.png $(DEMO_DATA)/levels/bonus_shape04.ini $(DEMO_DATA)/levels/bonus_shape04.png $(DEMO_DATA)/music/pushing.xm $(DEMO_DATA)/music/pushing.ini\
-              $(DEMO_DATA)/levels/bonus_bg05.png $(DEMO_DATA)/levels/bonus_shape05.ini $(DEMO_DATA)/levels/bonus_shape05.png $(DEMO_DATA)/music/porous.ogg $(DEMO_DATA)/music/porous.ini
+#DEMO_DELETE = 
 
 PROJECT_OBJECTS = $(T3F_OBJECTS) $(APP_OBJECTS) $(PLATFORM_OBJECTS)
 
@@ -32,7 +19,7 @@ APP_EXE_NAME = ../bin/$(APP_NAME)$(EXE_SUFFIX)
 APP_PACKAGE_NAME = $(APP_NAME)-$(APP_VERSION)
 APP_PACKAGE_FILENAME = $(APP_PACKAGE_NAME)-src.tar.gz
 
-all : $(APP_EXE_NAME) $(PLATFORM_TARGET)
+all : $(APP_EXE_NAME) $(PLATFORM_TARGET) $(APP_EXTRA_TARGET)
 	@echo All targets built!
 
 $(APP_EXE_NAME) : $(PROJECT_OBJECTS) update_changelog
@@ -43,20 +30,20 @@ $(APP_EXE_NAME) : $(PROJECT_OBJECTS) update_changelog
 update_changelog:
 	cp -a ../changelog ../docs
 	$(SED_COMMAND) "s|BUILD_DATE|`date -u +"%a, %d %b %Y %T"`|" ../docs/changelog
+	$(SED_COMMAND) "s|BUILD_VERSION|$(APP_VERSION)|" ../docs/changelog
 
-clean:
+clean: app_clean
 	@$(PLATFORM_CLEAN)
 	@$(DEL_COMMAND) $(PROJECT_OBJECTS)
 	@echo Cleanup complete!
 
 very_clean: clean
-	$(DEL_COMMAND) $(APP_EXE_NAME)
-	$(DEL_COMMAND) $(APP_EXE_NAME).exe
+	$(DEL_COMMAND) $(APP_EXE_NAME) $(APP_EXTRA_TARGET)
 
 #create tar.gz package for source code distribution
 package:
 	make -f Makefile clean_all
-	$(shell rm -rf ../../$(APP_PACKAGE_NAME); mkdir ../../$(APP_PACKAGE_NAME); cp -a "../bin" ../../$(APP_PACKAGE_NAME); cp -a "../src" ../../$(APP_PACKAGE_NAME); cp -a "../docs" ../../$(APP_PACKAGE_NAME); cp -a "../icons" ../../$(APP_PACKAGE_NAME); cp -a "../win32" ../../$(APP_PACKAGE_NAME); cp -a "../macosx" ../../$(APP_PACKAGE_NAME); cp -a "../debian" ../../$(APP_PACKAGE_NAME); cp -a "../android" ../../$(APP_PACKAGE_NAME); cp "../build.txt" ../../$(APP_PACKAGE_NAME); cp "../changelog" ../../$(APP_PACKAGE_NAME); cd ../../; rm -f $(APP_PACKAGE_FILENAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="old" --dereference -czf $(APP_PACKAGE_FILENAME) $(APP_PACKAGE_NAME))
+	$(shell rm -rf ../../$(APP_PACKAGE_NAME); mkdir ../../$(APP_PACKAGE_NAME); cp -a "../bin" ../../$(APP_PACKAGE_NAME); cp -a "../src" ../../$(APP_PACKAGE_NAME); cp -a "../docs" ../../$(APP_PACKAGE_NAME); cp -a "../debian" ../../$(APP_PACKAGE_NAME); cp "../build.txt" ../../$(APP_PACKAGE_NAME); cd ../../; rm -f $(APP_PACKAGE_FILENAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="old" --dereference -czf $(APP_PACKAGE_FILENAME) $(APP_PACKAGE_NAME))
 	@echo Package successfully created!
 
 #make a copy of the source tree with non-demo data deleted
@@ -68,7 +55,7 @@ demo: very_clean
 	$(SED_COMMAND) 's|"$(APP_BUNDLE_NAME)"|"$(APP_BUNDLE_NAME) Demo"|' $(DEMO_DIR)/src/init.c
 	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/src/makefile.defines
 	$(SED_COMMAND) 's|$(subst $(SPACE),\$(SPACE),$(APP_BUNDLE_NAME))|$(subst $(SPACE),\$(SPACE),$(APP_BUNDLE_NAME))\\$(SPACE)Demo|' $(DEMO_DIR)/src/makefile.defines
-	$(SED_COMMAND) 's|com.t3i.wordleap-demo|com.t3i.wordleapdemo|' $(DEMO_DIR)/src/makefile.defines
+	$(SED_COMMAND) 's|com.t3i.vgolfdeluxe|com.t3i.vgolfdeluxedemo|' $(DEMO_DIR)/src/makefile.defines
 	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/changelog
 
 demo_gp: demo

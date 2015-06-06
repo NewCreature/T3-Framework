@@ -7,7 +7,14 @@
 #ifdef T3F_ANDROID
 
 	#include <jni.h>
-	
+
+	#define JNI_FUNC_PASTER(ret, cls, name, params, x) \
+		JNIEXPORT ret JNICALL Java_ ## x ## _ ## cls ## _ ## name params
+	#define JNI_FUNC_EVALUATOR(ret, cls, name, params, x) \
+		JNI_FUNC_PASTER(ret, cls, name, params, x)
+	#define JNI_FUNC(ret, cls, name, params) \
+		JNI_FUNC_EVALUATOR(ret, cls, name, params, com_t3i_vgolfdeluxe)
+
 	JNIEnv *_al_android_get_jnienv();
 	void __jni_checkException(JNIEnv *env, const char *file, const char *fname, int line);
 	jobject _al_android_activity_object();
@@ -80,10 +87,67 @@
 	   jmethodID method_id = _jni_call(env, jmethodID, GetMethodID, class_id, name, sig);
 	   jobject ret = _jni_call(env, jobject, CallObjectMethod, object, method_id);
 	   _jni_callv(env, DeleteLocalRef, class_id);
-	   
+
 	   return ret;
 	}
-	
+
+	static char * t3f_edit_box_text = NULL; // pointer to text currently being edited in edit box
+	static int t3f_edit_box_text_size = 0;
+	static void(*t3f_edit_box_callback)() = NULL;
+	static void(*t3f_edit_box_staged_callback)() = NULL;
+
+JNI_FUNC(void, ExampleActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, jstring returnedS))
+	{
+		(void)obj;
+
+		const char * s;
+
+		s = (*env)->GetStringUTFChars(env, returnedS, 0);
+		if(s)
+		{
+			strncpy(t3f_edit_box_text, s, t3f_edit_box_text_size);
+			(*env)->ReleaseStringUTFChars(env, returnedS, s);
+		}
+		t3f_edit_box_callback = t3f_edit_box_staged_callback;
+		t3f_edit_box_staged_callback = NULL;
+	}
+
+	/* Should be called every logic tick so we can react to calls from Java in
+	   our main thread. We need to do this in case some callback messes with
+	   OpenGL textures or some other thing which must be done on the thread that
+	   has the context. */
+	void t3f_android_support_helper(void)
+	{
+		if(t3f_edit_box_callback)
+		{
+			t3f_edit_box_callback();
+			t3f_edit_box_callback = NULL;
+		}
+	}
+
+	void t3f_open_edit_box(const char * title, char * text, int text_size, const char * flags, void(*callback)())
+	{
+		t3f_edit_box_text = text; // point
+		t3f_edit_box_text_size = text_size;
+		t3f_edit_box_staged_callback = callback;
+		JNIEnv * env = _al_android_get_jnienv();
+		jstring titleS = (*env)->NewStringUTF(env, title);
+		jstring initialS = (*env)->NewStringUTF(env, text);
+		jstring flagsS = (*env)->NewStringUTF(env, flags);
+
+		_jni_callVoidMethodV(
+			_al_android_get_jnienv(),
+			_al_android_activity_object(),
+			"OpenEditBox",
+			"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+			titleS,
+			initialS,
+			flagsS
+		);
+		(*env)->DeleteLocalRef(env, titleS);
+		(*env)->DeleteLocalRef(env, initialS);
+	}
+
 	void t3f_show_soft_keyboard(bool toggle)
 	{
         if(toggle)
@@ -112,6 +176,15 @@
 	}
 
 #else
+
+	void t3f_android_support_helper(void)
+	{
+	}
+
+	void t3f_open_edit_box(const char * title, char * text, int text_size, const char * flags, void(*callback)())
+	{
+	}
+
 	void t3f_show_soft_keyboard(bool toggle)
 	{
 	}

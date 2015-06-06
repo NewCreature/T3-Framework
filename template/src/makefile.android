@@ -1,6 +1,6 @@
 #CC = gcc
 #CFLAGS = $(GLOBAL_CFLAGS) $(APP_CFLAGS) $(ANDROID_CFLAGS)
-PLATFORM_CFLAGS = $(ANDROID_CFLAGS)
+PLATFORM_CFLAGS = $(GLOBAL_CFLAGS) $(ANDROID_CFLAGS) $(APP_CFLAGS)
 PLATFORM_OBJECTS = $(ANDROID_PLATFORM_OBJECTS)
 PLATFORM_LIBS = $(ANDROID_PLATFORM_LIBS)
 DEPEND_LIBS = $(ANDROID_DEPEND_LIBS)
@@ -14,12 +14,16 @@ ANDROID_ARCHITECTURE = armeabi-v7a
 include makefile.common
 
 #generate Android package, rebuilds Allegro first to update package name
-android_package: build_temp build_allegro build_android
+android_package: build_temp build_allegro build_android $(ANDROID_PLATFORM_TARGET)
 	rm -rf ../temp
 
 #generate Android package, doesn't rebuild Allegro
-android_repackage: build_temp build_android
+android_repackage: clean_packages build_temp build_android $(ANDROID_PLATFORM_TARGET)
 	rm -rf ../temp
+
+android_sign: ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
+	@sign ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
+	@rm ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
 
 #sed info: sed -i requires backup extension argument on OS X, should work fine this
 #          way on other Unix platforms, we should do "sed -i '' -original-new- filename"
@@ -55,6 +59,7 @@ build_android:
 	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/template/jni/Application.mk
 	sed -i '' "s|AllegroActivity|$(APP_BUNDLE_NAME)|" ../temp/android/template/res/values/strings.xml
 	sed -i '' "s|org.liballeg.example|$(APP_ANDROID_PACKAGE)|" ../temp/android/template/src/org/liballeg/example/ExampleActivity.java
+	sed -i '' "s|org.liballeg.example|$(APP_ANDROID_PACKAGE)|" ../temp/android/template/src/org/liballeg/example/EditBoxActivity.java
 	sed -i '' "s|APP_NAME|$(APP_NAME)|" ../temp/android/template/src/org/liballeg/example/ExampleActivity.java
 	sed -i '' "s|main.c|$(APP_SOURCE_FILES)|" ../temp/android/template/jni/Android.mk
 	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/template/jni/Android.mk
@@ -68,6 +73,9 @@ build_allegro:
 	@echo Building Allegro...
 	cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT) -DWANT_ANDROID=on -DWANT_RELEASE_LOGGING=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_VIDEO=OFF -DWANT_TTF=ON -DFREETYPE_INCLUDE_DIR_freetype2=$(ANDROID_TOOLCHAIN_ROOT)/user/armeabi-v7a/include/freetype2; make install; cp lib/Allegro5.jar ../../
 #	cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT) -DWANT_ANDROID=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_FFMPEG=ON; make install; cp lib/Allegro5.jar ../../
-	
+
 build_temp:
 	mkdir -p ../temp
+
+clean_packages:
+	rm -rf ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk

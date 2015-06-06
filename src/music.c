@@ -21,7 +21,7 @@ ALLEGRO_DEBUG_CHANNEL("android");
 
 static bool t3f_set_music_state(int state)
 {
-	
+
 	/* create the mutex if necessary */
 	if(!t3f_music_state_mutex)
 	{
@@ -31,7 +31,7 @@ static bool t3f_set_music_state(int state)
 			return false;
 		}
 	}
-	
+
 	al_lock_mutex(t3f_music_state_mutex);
 	t3f_music_state = state;
 	al_unlock_mutex(t3f_music_state_mutex);
@@ -41,7 +41,7 @@ static bool t3f_set_music_state(int state)
 static const char * t3f_get_music_extension(const char * fn)
 {
 	int i;
-	
+
 	for(i = strlen(fn); i >= 0; i--)
 	{
 		if(fn[i] == '.')
@@ -62,7 +62,7 @@ static void * t3f_play_music_thread(void * arg)
 	bool loop_disabled = false;
 	const char * val = NULL;
 	ALLEGRO_CONFIG * config = NULL;
-	
+
 	ALLEGRO_DEBUG("music thread start\n");
 	t3f_music_gain = 1.0;
 	al_lock_mutex(t3f_music_mutex);
@@ -79,7 +79,7 @@ static void * t3f_play_music_thread(void * arg)
 		t3f_set_music_state(T3F_MUSIC_STATE_OFF);
 		return NULL;
 	}
-	
+
 	ALLEGRO_DEBUG("configuring music\n");
 	/* look for loop data */
 	path = al_create_path(t3f_music_thread_fn);
@@ -126,7 +126,7 @@ static void * t3f_play_music_thread(void * arg)
 		}
 		al_destroy_path(path);
 	}
-	
+
 	if(loop_disabled)
 	{
 		al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_ONCE);
@@ -140,6 +140,10 @@ static void * t3f_play_music_thread(void * arg)
 			if(strcmp(ext, ".xm") && strcmp(ext, ".it") && strcmp(ext, ".mod") && strcmp(ext, ".s3m"))
 			{
 				al_set_audio_stream_loop_secs(t3f_stream, 0.0, al_get_audio_stream_length_secs(t3f_stream));
+				al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_LOOP);
+			}
+			else
+			{
 				al_set_audio_stream_playmode(t3f_stream, ALLEGRO_PLAYMODE_LOOP);
 			}
 		}
@@ -165,7 +169,7 @@ static void * t3f_fade_music_thread(void * arg)
 	bool done = false;
 	ALLEGRO_EVENT event;
 	float s = t3f_music_fade_speed / 50.0;
-	
+
 	timer = al_create_timer(1.0 / s);
 	if(!timer)
 	{
@@ -255,6 +259,7 @@ void t3f_resume_music(void)
 void t3f_set_music_volume(float volume)
 {
 	t3f_music_volume = volume;
+	t3f_new_music_volume = volume; // set this here so music new music will start at the desired volume
 	if(t3f_stream)
 	{
 		al_set_audio_stream_gain(t3f_stream, t3f_music_volume * t3f_music_gain);
@@ -283,7 +288,7 @@ void t3f_fade_out_music(float speed)
 int t3f_get_music_state(void)
 {
 	int state;
-	
+
 	if(t3f_music_state_mutex)
 	{
 		al_lock_mutex(t3f_music_state_mutex);
