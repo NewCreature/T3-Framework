@@ -3,11 +3,11 @@
 
 typedef struct
 {
-	
+
 	float x, y;
 	float vx, vy;
 	int bitmap;
-	
+
 } OBJECT;
 
 ALLEGRO_BITMAP * bitmap[8] = {NULL};
@@ -19,7 +19,7 @@ T3F_RNG_STATE rng_state;
 void logic(void * data)
 {
 	int i;
-	
+
 	if(t3f_key[ALLEGRO_KEY_ESCAPE])
 	{
 		t3f_exit();
@@ -42,7 +42,7 @@ void logic(void * data)
 void render(void * data)
 {
 	int i;
-	
+
 	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 0.0));
 	al_hold_bitmap_drawing(true);
 	for(i = 0; i < 1024; i++)
@@ -56,14 +56,13 @@ int main(int argc, char * argv[])
 {
 	int i;
 	char fn[1024] = {0};
-	ALLEGRO_BITMAP * bp;
-	
+
 	if(!t3f_initialize("ex_atlas", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return 1;
 	}
 	t3f_srand(&rng_state, time(0));
-	
+
 	/* load bitmaps into sprite sheet */
 	atlas = t3f_create_atlas(512, 512);
 	if(!atlas)
@@ -74,19 +73,14 @@ int main(int argc, char * argv[])
 	for(i = 0; i < 8; i++)
 	{
 		sprintf(fn, "data/%d.png", i);
-		bp = al_load_bitmap(fn);
-		if(!bp)
-		{
-			return 1;
-		}
-		bitmap[i] = t3f_add_bitmap_to_atlas(atlas, &bp, T3F_ATLAS_SPRITE);
+		bitmap[i] = al_load_bitmap(fn);
 		if(!bitmap[i])
 		{
 			return 1;
 		}
-		al_destroy_bitmap(bp);
+		t3f_add_bitmap_to_atlas(atlas, &bitmap[i], T3F_ATLAS_SPRITE);
 	}
-	
+
 	for(i = 0; i < 1024; i++)
 	{
 		object[i].x = t3f_drand(&rng_state) * 640.0;
