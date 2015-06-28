@@ -9,11 +9,9 @@ void * t3f_bitmap_resource_handler_proc(ALLEGRO_FILE * fp, const char * filename
 	void * ptr = NULL;
 	ALLEGRO_STATE old_state;
 	bool openfp = false; // operating on already open file
-	int old_flags;
 
-	old_flags = al_get_new_bitmap_flags();
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE | (old_flags & ALLEGRO_NO_PREMULTIPLIED_ALPHA));
+	al_set_new_bitmap_flags(al_get_new_bitmap_flags() | ALLEGRO_NO_PRESERVE_TEXTURE);
 	if(fp)
 	{
 		openfp = true;
@@ -54,7 +52,7 @@ void * t3f_font_resource_handler_proc(ALLEGRO_FILE * fp, const char * filename, 
 	bool openfp = false;
 
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(al_get_new_bitmap_flags() | ALLEGRO_NO_PRESERVE_TEXTURE);
 	if(fp)
 	{
 		openfp = true;
@@ -99,7 +97,7 @@ void * t3f_bitmap_font_resource_handler_proc(ALLEGRO_FILE * fp, const char * fil
 	ALLEGRO_STATE old_state;
 
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(al_get_new_bitmap_flags() | ALLEGRO_NO_PRESERVE_TEXTURE);
 	ptr = al_load_bitmap_font_flags(filename, flags);
 	al_restore_state(&old_state);
 	return ptr;
@@ -116,7 +114,7 @@ void * t3f_t3f_font_gen_resource_handler_proc(ALLEGRO_FILE * fp, const char * fi
 	ALLEGRO_STATE old_state;
 
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(al_get_new_bitmap_flags() | ALLEGRO_NO_PRESERVE_TEXTURE);
 	if(!fp && offset == 0)
 	{
 		ptr = t3f_generate_font(filename, option, flags);
@@ -136,7 +134,7 @@ void * t3f_t3f_font_load_resource_handler_proc(ALLEGRO_FILE * fp, const char * f
 	ALLEGRO_STATE old_state;
 
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR | ALLEGRO_NO_PRESERVE_TEXTURE);
+	al_set_new_bitmap_flags(al_get_new_bitmap_flags() | ALLEGRO_NO_PRESERVE_TEXTURE);
 	if(!fp && offset == 0)
 	{
 		ptr = t3f_load_font(filename, flags);
