@@ -292,17 +292,20 @@ int t3f_animation_delete_bitmap(T3F_ANIMATION * ap, int bitmap)
 
 	if(bitmap < ap->bitmaps)
 	{
-		al_destroy_bitmap(ap->bitmap[bitmap]);
+		if(!t3f_destroy_resource(ap->bitmap[bitmap]))
+		{
+			al_destroy_bitmap(ap->bitmap[bitmap]);
+		}
 	}
 	else
 	{
 		return 0;
 	}
-	ap->bitmaps--;
 	for(i = bitmap; i < ap->bitmaps - 1; i++)
 	{
 		ap->bitmap[i] = ap->bitmap[i + 1];
 	}
+	ap->bitmaps--;
 	return 1;
 }
 
@@ -315,8 +318,22 @@ int t3f_animation_add_frame(T3F_ANIMATION * ap, int bitmap, float x, float y, fl
 		ap->frame[ap->frames]->x = x;
 		ap->frame[ap->frames]->y = y;
 		ap->frame[ap->frames]->z = z;
-		ap->frame[ap->frames]->width = w;
-		ap->frame[ap->frames]->height = h;
+		if(w < 0.0)
+		{
+			ap->frame[ap->frames]->width = al_get_bitmap_width(ap->bitmap[bitmap]);
+		}
+		else
+		{
+			ap->frame[ap->frames]->width = w;
+		}
+		if(h < 0.0)
+		{
+			ap->frame[ap->frames]->height = al_get_bitmap_height(ap->bitmap[bitmap]);
+		}
+		else
+		{
+			ap->frame[ap->frames]->height = h;
+		}
 		ap->frame[ap->frames]->angle = angle;
 		ap->frame[ap->frames]->ticks = ticks;
 		ap->frames++;
