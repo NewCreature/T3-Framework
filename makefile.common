@@ -1,4 +1,4 @@
-T3F_OBJECTS = src/t3f.o src/bitmap.o src/animation.o src/sound.o src/music.o src/collision.o src/controller.o src/font.o src/gui.o src/resource.o src/rng.o src/android.o src/atlas.o src/draw.o src/view.o src/debug.o src/tilemap.o src/vector.o
+T3F_OBJECTS = src/t3f.o src/bitmap.o src/animation.o src/sound.o src/music.o src/collision.o src/controller.o src/font.o src/gui.o src/resource.o src/rng.o src/android.o src/atlas.o src/draw.o src/view.o src/debug.o src/tilemap.o src/vector.o src/menu.o
 EX_BASIC_OFILES = $(T3F_OBJECTS) examples/ex_basic.o
 EX_TOUCH_OFILES = $(T3F_OBJECTS) examples/ex_touch.o
 EX_MUSIC_OFILES = $(T3F_OBJECTS) examples/ex_music.o
@@ -12,11 +12,10 @@ EX_TILEMAP_OFILES = $(T3F_OBJECTS) examples/ex_tilemap.o
 EX_COLLISION_OFILES = $(T3F_OBJECTS) examples/ex_collision.o
 PADDLE_OFILES = $(T3F_OBJECTS) games/paddle/paddle.o
 DOT2DOT_OFILES = $(T3F_OBJECTS) games/dot2dot/main.o games/dot2dot/game.o games/dot2dot/intro.o
-AV_OFILES = $(T3F_OBJECTS) games/av/board.o games/av/control.o games/av/pill.o games/av/game.o games/av/main.o 
+AV_OFILES = $(T3F_OBJECTS) games/av/board.o games/av/control.o games/av/pill.o games/av/game.o games/av/main.o
 ANIMATOR_OFILES = $(T3F_OBJECTS) tools/animator.o
 MAPPER_OFILES = $(T3F_OBJECTS) tools/mapper.o
 VECTOR_EDITOR_OFILES = $(T3F_OBJECTS) tools/vector_editor.o
 FONT_EDITOR_OFILES = $(T3F_OBJECTS) tools/font_editor.o
 LOOP_EDITOR_OFILES = $(T3F_OBJECTS) tools/loop_editor.o
 GAIN_EDITOR_OFILES = $(T3F_OBJECTS) tools/gain_editor.o
-

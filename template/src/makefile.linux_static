@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = $(GLOBAL_CFLAGS) $(APP_CFLAGS) $(LINUX_STATIC_CFLAGS)
 PLATFORM_OBJECTS = $(LINUX_STATIC_PLATFORM_OBJECTS)
-PLATFORM_LIBS = $(LINUX_STATIC_PLATFORM_LIBS)
+PLATFORM_LIBS = t3f/menu.o $(LINUX_STATIC_PLATFORM_LIBS)
 DEPEND_LIBS = -lpng -ljpeg -lfreetype -lpulse -lpulse-simple -lasound -ldumb -lvorbisfile -lvorbis -lX11 -lXcursor -lXinerama -lXrandr -lGL -lpthread -lm -lstdc++ $(LINUX_STATIC_DEPEND_LIBS)
 LIB_SUFFIX = -static
 DEL_COMMAND = rm -f
