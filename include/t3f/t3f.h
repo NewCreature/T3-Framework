@@ -13,7 +13,9 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
-
+#ifndef ALLEGRO_ANDROID
+    #include <allegro5/allegro_native_dialog.h>
+#endif
 #include <stdio.h>
 #include <math.h>
 
