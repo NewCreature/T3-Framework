@@ -6,6 +6,9 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_memfile.h>
+#ifndef ALLEGRO_ANDROID
+	#include <allegro5/allegro_native_dialog.h>
+#endif
 
 #ifdef T3F_ANDROID
 	#include <allegro5/allegro_android.h>
@@ -21,6 +24,9 @@
 #include "resource.h"
 #include "view.h"
 #include "android.h"
+#ifndef ALLEGRO_ANDROID
+	#include "menu.h"
+#endif
 
 /* display data */
 int t3f_virtual_display_width = 0;
@@ -64,6 +70,9 @@ ALLEGRO_TRANSFORM t3f_current_transform;
 /* blender data */
 ALLEGRO_STATE t3f_state_stack[T3F_MAX_STACK];
 int t3f_state_stack_size = 0;
+
+/* menu data */
+bool t3f_menu_resize = false; // set at menu->display attach on Windows
 
 bool t3f_quit = false;
 int t3f_requested_flags = 0;
@@ -433,6 +442,9 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		}
 	}
 	al_init_primitives_addon();
+	#ifndef ALLEGRO_ANDROID
+		al_init_native_dialog_addon();
+	#endif
 
 	strcpy(t3f_window_title, name);
 
@@ -742,6 +754,16 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	/* first time creating display */
 	else
 	{
+		/* see if we want a menu */
+		if(flags & T3F_USE_MENU)
+		{
+			/* use GTK on Linux so menus will work */
+			#ifdef ALLEGRO_LINUX
+				dflags |= ALLEGRO_GTK_TOPLEVEL;
+			#endif
+			t3f_flags |= T3F_USE_MENU;
+		}
+
 		/* if we are using console (for a server, for instance) don't create display */
 		al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
 		cvalue = al_get_config_value(t3f_config, "T3F", "force_fullscreen");
@@ -1129,6 +1151,19 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		{
 			char val[8] = {0};
 			al_acknowledge_resize(t3f_display);
+			/* handle resize event caused by attaching menu */
+			#ifdef ALLEGRO_WINDOWS
+				int menu_height;
+				if(t3f_flags & T3F_USE_MENU)
+				{
+					if(t3f_menu_resize)
+					{
+						menu_height = al_get_display_height(t3f_display) - t3f_display_height;
+						al_resize_display(t3f_display, al_get_display_width(t3f_display), al_get_display_height(t3f_display) + menu_height);
+						t3f_menu_resize = false;
+					}
+				}
+			#endif
 			t3f_get_base_transform();
 			al_set_clipping_rectangle(0, 0, al_get_display_width(t3f_display), al_get_display_height(t3f_display));
 			al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.0));
@@ -1308,11 +1343,21 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			al_start_timer(t3f_timer);
 			break;
 		}
+		#ifndef ALLEGRO_ANDROID
+			case ALLEGRO_EVENT_MENU_CLICK:
+			{
+				t3f_process_menu_click(event->user.data1, t3f_user_data);
+				break;
+			}
+		#endif
 
 		/* this keeps your program running */
 		case ALLEGRO_EVENT_TIMER:
 		{
 			t3f_android_support_helper();
+			#ifndef ALLEGRO_ANDROID
+				t3f_update_menus(t3f_user_data);
+			#endif
 			t3f_logic_proc(t3f_user_data);
 			t3f_need_redraw = true;
 			break;

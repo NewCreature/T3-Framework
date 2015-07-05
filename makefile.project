@@ -1,4 +1,4 @@
-project: 
+project:
 ifndef DIR
 	@echo "Usage: make project DIR=location"
 else
@@ -16,30 +16,31 @@ else
 	@cp template/changelog $(DIR)
 	@cp template/bin/data/* $(DIR)/bin/data
 	@cp -a template/debian $(DIR)
-	@cp -a template/android $(DIR) 
-	@cp -a template/win32 $(DIR) 
-	@cp -a template/macosx $(DIR) 
+	@cp -a template/android $(DIR)
+	@cp -a template/win32 $(DIR)
+	@cp -a template/macosx $(DIR)
 	@cp -a template/icons $(DIR)
 endif
 
-upgrade_project: 
+upgrade_project:
 ifndef DIR
 	@echo "Usage: make upgrade_project DIR=location"
 else
 	@echo "Upgrading project in '$(DIR)'..."
-	@cp -f include/t3f/*.h $(DIR)/src/t3f
-	@cp -f src/*.c $(DIR)/src/t3f
-	@cp -f template/src/Makefile $(DIR)/src
-	@cp -f template/src/makefile.common $(DIR)/src
-	@cp -f template/src/makefile.android $(DIR)/src
-	@cp -f template/src/makefile.linux $(DIR)/src
-	@cp -f template/src/makefile.linux_static $(DIR)/src
-	@cp -f template/src/makefile.macosx $(DIR)/src
-	@cp -f template/src/makefile.mingw $(DIR)/src
-	@cp -f template/src/makefile.mingw_cross $(DIR)/src
-	@cp -f template/src/makefile.config $(DIR)/src
+	@cp include/t3f/*.h $(DIR)/src/t3f
+	@cp src/*.c $(DIR)/src/t3f
+	@cp template/src/Makefile $(DIR)/src
+	@cp template/src/makefile.include $(DIR)/src
+	@cp template/src/makefile.common $(DIR)/src
+	@cp template/src/makefile.android $(DIR)/src
+	@cp template/src/makefile.linux $(DIR)/src
+	@cp template/src/makefile.linux_static $(DIR)/src
+	@cp template/src/makefile.macosx $(DIR)/src
+	@cp template/src/makefile.mingw $(DIR)/src
+	@cp template/src/makefile.mingw_cross $(DIR)/src
+	@cp template/src/makefile.config $(DIR)/src
 	@cp -a template/debian $(DIR)
-	@cp -a template/android $(DIR) 
-	@cp -a template/win32 $(DIR) 
-	@cp -a template/macosx $(DIR) 
+	@cp -a template/android $(DIR)
+	@cp -a template/win32 $(DIR)
+	@cp -a template/macosx $(DIR)
 endif
