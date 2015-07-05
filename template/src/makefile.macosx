@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = $(GLOBAL_CFLAGS) $(MACOSX_ARCHITECURES) -mmacosx-version-min=$(MACOSX_MIN_VERSION) $(APP_CFLAGS) $(MACOSX_CFLAGS)
 PLATFORM_OBJECTS = t3f/menu.o $(MACOSX_PLATFORM_OBJECTS)
-PLATFORM_LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_main-static $(MACOSX_PLATFORM_LIBS)
+PLATFORM_LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_dialog$(LIB_SUFFIX) -lallegro_main-static $(MACOSX_PLATFORM_LIBS)
 PLATFORM_TARGET = ../$(APP_BUNDLE_NAME).app
 LIB_SUFFIX = -static
 DEPEND_LIBS = -lz -lpng -ljpeg -lFLAC -lvorbis -logg -lvorbisfile -ldumb -lfreetype $(MACOSX_DEPEND_LIBS)
