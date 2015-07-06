@@ -11,9 +11,9 @@
 
 typedef struct
 {
-	
+
 	float x, y, z;
-	
+
 } MAPPER_CAMERA;
 
 /* main data */
@@ -72,7 +72,7 @@ char * select_file(const char * initial, const char * title, const char * types,
 const char * mapper_get_extension(const char * fn)
 {
 	int i;
-	
+
 	for(i = strlen(fn); i >= 0; i--)
 	{
 		if(fn[i] == '.')
@@ -91,7 +91,7 @@ void mapper_replace_tiles(ALLEGRO_BITMAP * bp)
 	ALLEGRO_STATE old_state;
 	ALLEGRO_TRANSFORM identity;
 	int current_tile = mapper_current_tile;
-	
+
 	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TRANSFORM);
 	al_identity_transform(&identity);
 	al_use_transform(&identity);
@@ -111,7 +111,7 @@ void mapper_replace_tiles(ALLEGRO_BITMAP * bp)
 						al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 						al_draw_bitmap(bp, -j * mapper_tile_width, -i * mapper_tile_height, 0);
 						t3f_animation_add_bitmap(ap, newbp);
-						t3f_animation_add_frame(ap, 0, 0, 0, 0, mapper_tile_width, mapper_tile_height, 0, 1);
+						t3f_animation_add_frame(ap, 0, 0, 0, 0, mapper_tile_width, mapper_tile_height, 0, 1, 0);
 						t3f_destroy_animation(mapper_tileset->tile[current_tile]->ap);
 						mapper_tileset->tile[current_tile]->ap = ap;
 					}
@@ -130,7 +130,7 @@ void mapper_replace_tiles(ALLEGRO_BITMAP * bp)
 						al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 						al_draw_bitmap(bp, -j * mapper_tile_width, -i * mapper_tile_height, 0);
 						t3f_animation_add_bitmap(ap, newbp);
-						t3f_animation_add_frame(ap, 0, 0, 0, 0, mapper_tile_width, mapper_tile_height, 0, 1);
+						t3f_animation_add_frame(ap, 0, 0, 0, 0, mapper_tile_width, mapper_tile_height, 0, 1, 0);
 						t3f_add_tile(mapper_tileset, ap);
 					}
 				}
@@ -147,7 +147,7 @@ void mapper_import_tiles(ALLEGRO_BITMAP * bp)
 	ALLEGRO_BITMAP * newbp = NULL;
 	ALLEGRO_STATE old_state;
 	ALLEGRO_TRANSFORM identity;
-	
+
 	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER | ALLEGRO_STATE_TRANSFORM);
 	al_identity_transform(&identity);
 	al_use_transform(&identity);
@@ -165,7 +165,7 @@ void mapper_import_tiles(ALLEGRO_BITMAP * bp)
 					al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 					al_draw_bitmap(bp, -j * mapper_tile_width, -i * mapper_tile_height, 0);
 					t3f_animation_add_bitmap(ap, newbp);
-					t3f_animation_add_frame(ap, 0, 0, 0, 0, mapper_tile_width, mapper_tile_height, 0, 1);
+					t3f_animation_add_frame(ap, 0, 0, 0, 0, mapper_tile_width, mapper_tile_height, 0, 1, 0);
 					t3f_add_tile(mapper_tileset, ap);
 				}
 			}
@@ -190,7 +190,7 @@ void mapper_global_logic(void)
 void mapper_tilemap_replace_tile(int tile, int new_tile)
 {
 	int i, j, k;
-	
+
 	/* replace tiles in tile animations */
 	for(i = 0; i < mapper_tileset->tiles; i++)
 	{
@@ -202,7 +202,7 @@ void mapper_tilemap_replace_tile(int tile, int new_tile)
 			}
 		}
 	}
-	
+
 	/* replace tiles in tilemap */
 	if(mapper_tilemap)
 	{
@@ -230,7 +230,7 @@ void mapper_tileset_logic(void)
 	ALLEGRO_BITMAP * bp = NULL;
 	ALLEGRO_PATH * temp_path = NULL;
 	int i;
-	
+
 	if(t3f_key[ALLEGRO_KEY_F3])
 	{
 		fn = select_file(mapper_last_level_filename, "Open Tileset", "*.*;*.t3t", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
@@ -368,7 +368,7 @@ void mapper_tileset_logic(void)
 void mapper_tile_ani_logic(void)
 {
 	int i, hover_frame;
-	
+
 	if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
 	{
 		if(!(mapper_tileset->tile[mapper_current_tile]->flags & T3F_TILE_FLAG_ANIMATED))
@@ -452,7 +452,7 @@ float mapper_get_offset_y(float z)
 void mapper_tilemap_insert_row(int layer, int row)
 {
 	int i, j;
-	
+
 	for(i = mapper_tilemap->layer[layer]->height - 1; i > row; i--)
 	{
 		for(j = 0; j < mapper_tilemap->layer[layer]->width; j++)
@@ -465,7 +465,7 @@ void mapper_tilemap_insert_row(int layer, int row)
 void mapper_tilemap_insert_column(int layer, int column)
 {
 	int i, j;
-	
+
 	for(i = mapper_tilemap->layer[layer]->width - 1; i > column; i--)
 	{
 		for(j = 0; j < mapper_tilemap->layer[layer]->height; j++)
@@ -478,7 +478,7 @@ void mapper_tilemap_insert_column(int layer, int column)
 void mapper_tilemap_delete_row(int layer, int row)
 {
 	int i, j;
-	
+
 	for(i = row + 1; i < mapper_tilemap->layer[layer]->height - 1; i++)
 	{
 		for(j = 0; j < mapper_tilemap->layer[layer]->width; j++)
@@ -491,7 +491,7 @@ void mapper_tilemap_delete_row(int layer, int row)
 void mapper_tilemap_delete_column(int layer, int column)
 {
 	int i, j;
-	
+
 	for(i = column; i < mapper_tilemap->layer[layer]->width - 1; i++)
 	{
 		for(j = 0; j < mapper_tilemap->layer[layer]->height; j++)
@@ -564,7 +564,7 @@ void mapper_tilemap_logic(void)
 	ALLEGRO_PATH * temp_path = NULL;
 	const char * fn = NULL;
 	int mx, my;
-	
+
 	if(t3f_key[ALLEGRO_KEY_F3])
 	{
 		fn = select_file(mapper_last_level_filename, "Open Tilemap", "*.*;*.t3m", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
@@ -665,7 +665,7 @@ void mapper_tilemap_logic(void)
 		}
 		if(t3f_key[ALLEGRO_KEY_PAD_ASTERISK])
 		{
-			
+
 			if(t3f_key[ALLEGRO_KEY_LCTRL])
 			{
 				/* reset the scale and offset of the current layer */
@@ -853,7 +853,7 @@ void mapper_tileset_render(void)
 	int i;
 	int prow;
 	int row, col;
-	
+
 	if(mapper_tileset)
 	{
 		prow = (t3f_virtual_display_width / mapper_tileset->width);
@@ -893,7 +893,7 @@ void mapper_tile_ani_render(void)
 	int i;
 	float x, y;
 	bool held = al_is_bitmap_drawing_held();
-	
+
 	if(mapper_tileset->tile[mapper_current_tile]->flags & T3F_TILE_FLAG_ANIMATED)
 	{
 		for(i = 0; i < mapper_tileset->tile[mapper_current_tile]->frame_list_total; i++)
@@ -919,7 +919,7 @@ void mapper_tilemap_render(void)
 {
 	int i;
 	float lx, ty, scale;
-	
+
 	if(mapper_tilemap)
 	{
 		for(i = 0; i < mapper_tilemap->layers; i++)
@@ -966,7 +966,7 @@ void mapper_help_render(void)
 	al_draw_textf(mapper_font, t3f_color_white, 0, 144, 0, "F4: Create new tileset");
 	al_draw_textf(mapper_font, t3f_color_white, 0, 160, 0, "Insert: Add tile");
 	al_draw_textf(mapper_font, t3f_color_white, 0, 176, 0, "Delete: Delete tile");
-	
+
 	al_draw_textf(mapper_font, t3f_color_white, 0, 208, 0, "Tilemap Keys");
 	al_draw_textf(mapper_font, t3f_color_white, 0, 224, 0, "-------------");
 	al_draw_textf(mapper_font, t3f_color_white, 0, 240, 0, "F2: Save tilemap");
@@ -1023,7 +1023,7 @@ void mapper_render(void * data)
 bool mapper_initialize(void)
 {
 	const char * val = NULL;
-	
+
 	if(!t3f_initialize("T3F Mapper", 640, 480, 60.0, mapper_logic, mapper_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return false;
@@ -1035,7 +1035,7 @@ bool mapper_initialize(void)
 	{
 		return false;
 	}
-	
+
 	/* load config */
 	val = al_get_config_value(t3f_config, "tileset", "width");
 	if(val)
@@ -1062,7 +1062,7 @@ bool mapper_initialize(void)
 	{
 		mapper_map_layers = atoi(val);
 	}
-	
+
 	mapper_camera.x = 0;
 	mapper_camera.y = 0;
 	mapper_camera.z = 0;

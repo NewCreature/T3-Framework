@@ -361,7 +361,7 @@ int menu_proc_bitmap_load(void * data)
 
 int menu_proc_frame_add(void * data)
 {
-	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmap[current_bitmap]), 0, 1);
+	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmap[current_bitmap]), 0, 1, 0);
 	current_frame = animation->frames - 1;
 	t3f_animation_build_frame_list(animation);
 	return 0;

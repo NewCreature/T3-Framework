@@ -46,7 +46,7 @@ T3F_ANIMATION * t3f_clone_animation(T3F_ANIMATION * ap)
 		clone->bitmaps = ap->bitmaps;
 		for(i = 0; i < ap->frames; i++)
 		{
-			if(!t3f_animation_add_frame(clone, ap->frame[i]->bitmap, ap->frame[i]->x, ap->frame[i]->y, ap->frame[i]->z, ap->frame[i]->width, ap->frame[i]->height, ap->frame[i]->angle, ap->frame[i]->ticks))
+			if(!t3f_animation_add_frame(clone, ap->frame[i]->bitmap, ap->frame[i]->x, ap->frame[i]->y, ap->frame[i]->z, ap->frame[i]->width, ap->frame[i]->height, ap->frame[i]->angle, ap->frame[i]->ticks, ap->frame[i]->flags))
 			{
 				return NULL;
 			}
@@ -232,7 +232,7 @@ T3F_ANIMATION * t3f_load_animation_from_bitmap(const char * fn)
 		return NULL;
 	}
 	ap->bitmaps = 1;
-	t3f_animation_add_frame(ap, 0, 0.0, 0.0, 0.0, al_get_bitmap_width(ap->bitmap[0]), al_get_bitmap_height(ap->bitmap[0]), 0.0, 1);
+	t3f_animation_add_frame(ap, 0, 0.0, 0.0, 0.0, al_get_bitmap_width(ap->bitmap[0]), al_get_bitmap_height(ap->bitmap[0]), 0.0, 1, 0);
 	return ap;
 }
 
@@ -309,7 +309,7 @@ int t3f_animation_delete_bitmap(T3F_ANIMATION * ap, int bitmap)
 	return 1;
 }
 
-int t3f_animation_add_frame(T3F_ANIMATION * ap, int bitmap, float x, float y, float z, float w, float h, float angle, int ticks)
+int t3f_animation_add_frame(T3F_ANIMATION * ap, int bitmap, float x, float y, float z, float w, float h, float angle, int ticks, int flags)
 {
 	ap->frame[ap->frames] = al_malloc(sizeof(T3F_ANIMATION_FRAME));
 	if(ap->frame[ap->frames])
@@ -336,6 +336,7 @@ int t3f_animation_add_frame(T3F_ANIMATION * ap, int bitmap, float x, float y, fl
 		}
 		ap->frame[ap->frames]->angle = angle;
 		ap->frame[ap->frames]->ticks = ticks;
+		ap->frame[ap->frames]->flags = flags;
 		ap->frames++;
 		t3f_animation_build_frame_list(ap);
 		return 1;

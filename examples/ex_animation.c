@@ -4,11 +4,11 @@
 
 typedef struct
 {
-	
+
 	float x, y;
 	float vx, vy;
 	int tick;
-	
+
 } OBJECT;
 
 ALLEGRO_BITMAP * bitmap[8] = {NULL};
@@ -19,7 +19,7 @@ OBJECT object[1024];
 void logic(void * data)
 {
 	int i;
-	
+
 	if(t3f_key[ALLEGRO_KEY_ESCAPE])
 	{
 		t3f_exit();
@@ -43,7 +43,7 @@ void logic(void * data)
 void render(void * data)
 {
 	int i;
-	
+
 	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 0.0));
 	al_hold_bitmap_drawing(true);
 	for(i = 0; i < 1024; i++)
@@ -58,13 +58,13 @@ int main(int argc, char * argv[])
 	int i;
 	char fn[1024] = {0};
 	T3F_RNG_STATE rng_state;
-	
+
 	if(!t3f_initialize("ex_animation", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return 1;
 	}
 	t3f_srand(&rng_state, time(0));
-	
+
 	/* load bitmaps */
 	for(i = 0; i < 8; i++)
 	{
@@ -75,7 +75,7 @@ int main(int argc, char * argv[])
 			return 1;
 		}
 	}
-	
+
 	animation = t3f_create_animation();
 	if(!animation)
 	{
@@ -84,15 +84,15 @@ int main(int argc, char * argv[])
 	for(i = 0; i < 8; i++)
 	{
 		t3f_animation_add_bitmap(animation, bitmap[i]);
-		t3f_animation_add_frame(animation, i, 0, 0, 0, al_get_bitmap_width(bitmap[i]), al_get_bitmap_height(bitmap[i]), 0, 10);
+		t3f_animation_add_frame(animation, i, 0, 0, 0, al_get_bitmap_width(bitmap[i]), al_get_bitmap_height(bitmap[i]), 0, 10, 0);
 	}
-	
+
 	atlas = t3f_create_atlas(512, 512);
 	if(atlas)
 	{
 		t3f_add_animation_to_atlas(atlas, animation, T3F_ATLAS_SPRITE);
 	}
-	
+
 	for(i = 0; i < 1024; i++)
 	{
 		object[i].x = t3f_drand(&rng_state) * 640.0;
