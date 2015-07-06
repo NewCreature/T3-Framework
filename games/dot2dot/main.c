@@ -60,16 +60,15 @@ void dot_render(void * data)
 
 bool dot_initialize(int argc, char * argv[])
 {
-	ALLEGRO_BITMAP * temp_bitmap = NULL;
 	const char * val;
 	int i;
-	
+
 	/* initialize framework */
 	if(!t3f_initialize("Dot to Dot Sweep", 640, 480, 60.0, dot_logic, dot_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND, NULL))
 	{
 		return false;
 	}
-	
+
 	/* load images */
 	dot_bitmap[DOT_BITMAP_BALL_RED] = al_load_bitmap("data/graphics/ball_red.png");
 	if(!dot_bitmap[DOT_BITMAP_BALL_RED])
@@ -125,7 +124,7 @@ bool dot_initialize(int argc, char * argv[])
 		printf("Failed to load image %d!\n", DOT_BITMAP_HUD);
 		return false;
 	}
-	
+
 	/* load sounds */
 	dot_sample[DOT_SAMPLE_START] = al_load_sample("data/sounds/sfx0005.wav");
 	if(!dot_sample[DOT_SAMPLE_START])
@@ -151,7 +150,7 @@ bool dot_initialize(int argc, char * argv[])
 		printf("Failed to load sound %d!\n", DOT_SAMPLE_GO);
 		return false;
 	}
-	
+
 	printf("break 1\n");
 	dot_font = al_load_font("data/fonts/kongtext.ttf", 16, 0);
 	if(!dot_font)
@@ -159,7 +158,7 @@ bool dot_initialize(int argc, char * argv[])
 		printf("Failed to load font!\n");
 		return false;
 	}
-	
+
 	/* build atlas */
 	dot_atlas = t3f_create_atlas(1024, 1024);
 	if(dot_atlas)
@@ -168,20 +167,11 @@ bool dot_initialize(int argc, char * argv[])
 		{
 			if(dot_bitmap[i])
 			{
-				temp_bitmap = dot_bitmap[i];
-				dot_bitmap[i] = t3f_add_bitmap_to_atlas(dot_atlas, &dot_bitmap[i], T3F_ATLAS_SPRITE);
-				if(dot_bitmap[i])
-				{
-					al_destroy_bitmap(temp_bitmap);
-				}
-				else
-				{
-					dot_bitmap[i] = temp_bitmap;
-				}
+				t3f_add_bitmap_to_atlas(dot_atlas, &dot_bitmap[i], T3F_ATLAS_SPRITE);
 			}
 		}
 	}
-	
+
 	/* load high score */
 	val = al_get_config_value(t3f_config, "Game Data", "High Score");
 	if(val)
