@@ -8,6 +8,7 @@ static int t3f_current_menu_id = 1;
 static ALLEGRO_MENU * t3f_menu[T3F_MAX_MENU_ITEMS] = {NULL}; // keep track of menu each item is attached to
 static int (*t3f_menu_proc[T3F_MAX_MENU_ITEMS])(void * data) = {NULL};
 static int (*t3f_menu_update_proc[T3F_MAX_MENU_ITEMS])(ALLEGRO_MENU * menu, int item, void * data) = {NULL};
+static bool t3f_refresh_menus_needed = false;
 
 void t3f_reset_menus(void)
 {
@@ -47,15 +48,24 @@ int t3f_process_menu_click(int id, void * data)
 
 void t3f_update_menus(void * data)
 {
-    int i;
+  int i;
 
+  if(t3f_refresh_menus_needed)
+  {
     for(i = 0; i < t3f_current_menu_id; i++)
     {
-        if(t3f_menu_update_proc[i])
-        {
-            t3f_menu_update_proc[i](t3f_menu[i], i, data);
-        }
+      if(t3f_menu_update_proc[i])
+      {
+        t3f_menu_update_proc[i](t3f_menu[i], i, data);
+      }
     }
+    t3f_refresh_menus_needed = false;
+  }
+}
+
+void t3f_refresh_menus(void)
+{
+  t3f_refresh_menus_needed = true;
 }
 
 bool t3f_attach_menu(ALLEGRO_MENU * mp)

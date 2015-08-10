@@ -758,7 +758,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		if(flags & T3F_USE_MENU)
 		{
 			/* use GTK on Linux so menus will work */
-			#ifdef ALLEGRO_LINUX
+			#ifdef ALLEGRO_GTK_TOPLEVEL
 				dflags |= ALLEGRO_GTK_TOPLEVEL;
 			#endif
 			t3f_flags |= T3F_USE_MENU;
