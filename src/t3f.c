@@ -447,6 +447,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	#endif
 
 	strcpy(t3f_window_title, name);
+	al_set_new_window_title(t3f_window_title);
 
 	t3f_timer = al_create_timer(1.000 / fps);
 	if(!t3f_timer)
@@ -748,7 +749,6 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		al_set_config_value(t3f_config, "T3F", "display_height", val);
 		t3f_get_base_transform();
 		t3f_select_view(t3f_current_view);
-		al_set_window_title(t3f_display, t3f_window_title);
 	}
 
 	/* first time creating display */
