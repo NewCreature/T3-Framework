@@ -9,7 +9,7 @@ include makefile.config
 
 DEMO_DIR = ../../$(APP_NAME)_demo
 DEMO_DATA = $(DEMO_DIR)/bin/data
-#DEMO_DELETE = 
+#DEMO_DELETE =
 
 PROJECT_OBJECTS = $(T3F_OBJECTS) $(APP_OBJECTS) $(PLATFORM_OBJECTS)
 
@@ -23,7 +23,7 @@ all : $(APP_EXE_NAME) $(PLATFORM_TARGET) $(APP_EXTRA_TARGET)
 	@echo All targets built!
 
 $(APP_EXE_NAME) : $(PROJECT_OBJECTS) update_changelog
-	$(CC) $(PROJECT_OBJECTS) $(CFLAGS) $(PLATFORM_LIBS) $(APP_LIBS) $(T3F_DEPEND_LIBS) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
+	$(CC) $(LFLAGS) $(PROJECT_OBJECTS) $(PLATFORM_LIBS) $(APP_LIBS) $(T3F_DEPEND_LIBS) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
 	@echo Executable built!
 
 #Unix way of updating the changelog, will be overwritten by MinGW build script under Windows
