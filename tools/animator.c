@@ -225,6 +225,7 @@ int menu_proc_file_new(void * data)
 		t3f_destroy_animation(animation);
 	}
 	animation = t3f_create_animation();
+	t3f_refresh_menus();
 	return 0;
 }
 
@@ -242,6 +243,7 @@ int menu_proc_file_load(void * data)
 		strcpy(last_animation_filename, filename);
 		animation = t3f_load_animation(last_animation_filename);
 		update_config();
+		t3f_refresh_menus();
 	}
 	return 0;
 }
@@ -300,6 +302,7 @@ int menu_proc_bitmap_add(void * data)
 		}
 		strcpy(last_bitmap_filename, fn);
 		update_config();
+		t3f_refresh_menus();
 	}
 	return 0;
 }
@@ -313,6 +316,7 @@ int menu_proc_bitmap_delete(void * data)
 		{
 			current_bitmap = animation->bitmaps - 1;
 		}
+		t3f_refresh_menus();
 	}
 	return 0;
 }
@@ -364,6 +368,7 @@ int menu_proc_frame_add(void * data)
 	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmap[current_bitmap]), 0, 1, 0);
 	current_frame = animation->frames - 1;
 	t3f_animation_build_frame_list(animation);
+	t3f_refresh_menus();
 	return 0;
 }
 
@@ -376,6 +381,7 @@ int menu_proc_frame_delete(void * data)
 		{
 			current_frame = animation->frames - 1;
 		}
+		t3f_refresh_menus();
 	}
 	return 0;
 }
@@ -829,34 +835,34 @@ bool setup_menus(void)
 	{
 		return false;
 	}
-	t3f_add_menu_item(bitmap_menu, "&Add", 0, NULL, menu_proc_bitmap_add, menu_update_bitmap_proc);
-	t3f_add_menu_item(bitmap_menu, "&Delete", 0, NULL, menu_proc_bitmap_delete, menu_update_bitmap_delete_proc);
+	t3f_add_menu_item(bitmap_menu, "&Add", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_bitmap_add, menu_update_bitmap_proc);
+	t3f_add_menu_item(bitmap_menu, "&Delete", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_bitmap_delete, menu_update_bitmap_delete_proc);
 	t3f_add_menu_item(bitmap_menu, NULL, 0, NULL, NULL, NULL);
-	t3f_add_menu_item(bitmap_menu, "&Previous", 0, NULL, menu_proc_bitmap_previous, menu_update_bitmap_iter_proc);
-	t3f_add_menu_item(bitmap_menu, "&Next", 0, NULL, menu_proc_bitmap_next, menu_update_bitmap_iter_proc);
+	t3f_add_menu_item(bitmap_menu, "&Previous", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_bitmap_previous, menu_update_bitmap_iter_proc);
+	t3f_add_menu_item(bitmap_menu, "&Next", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_bitmap_next, menu_update_bitmap_iter_proc);
 	t3f_add_menu_item(bitmap_menu, NULL, 0, NULL, NULL, NULL);
-	t3f_add_menu_item(bitmap_menu, "&Load", 0, NULL, menu_proc_bitmap_load, menu_update_bitmap_delete_proc);
+	t3f_add_menu_item(bitmap_menu, "&Load", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_bitmap_load, menu_update_bitmap_delete_proc);
 
 	frame_menu = al_create_menu();
 	if(!frame_menu)
 	{
 		return false;
 	}
-	t3f_add_menu_item(frame_menu, "&Add", 0, NULL, menu_proc_frame_add, menu_update_frame_proc);
-	t3f_add_menu_item(frame_menu, "&Delete", 0, NULL, menu_proc_frame_delete, menu_update_frame_delete_proc);
+	t3f_add_menu_item(frame_menu, "&Add", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_add, menu_update_frame_proc);
+	t3f_add_menu_item(frame_menu, "&Delete", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_delete, menu_update_frame_delete_proc);
 	t3f_add_menu_item(frame_menu, NULL, 0, NULL, NULL, NULL);
-	t3f_add_menu_item(frame_menu, "&Previous Bitmap", 0, NULL, menu_proc_frame_previous_bitmap, menu_update_frame_delete_proc);
-	t3f_add_menu_item(frame_menu, "&Next Bitmap", 0, NULL, menu_proc_frame_next_bitmap, menu_update_frame_delete_proc);
+	t3f_add_menu_item(frame_menu, "&Previous Bitmap", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_previous_bitmap, menu_update_frame_delete_proc);
+	t3f_add_menu_item(frame_menu, "&Next Bitmap", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_next_bitmap, menu_update_frame_delete_proc);
 	t3f_add_menu_item(frame_menu, NULL, 0, NULL, NULL, NULL);
-	t3f_add_menu_item(frame_menu, "D&ouble Size", 0, NULL, menu_proc_frame_double, menu_update_frame_delete_proc);
-	t3f_add_menu_item(frame_menu, "&Half Size", 0, NULL, menu_proc_frame_half, menu_update_frame_delete_proc);
-	t3f_add_menu_item(frame_menu, "&Reset Size", 0, NULL, menu_proc_frame_reset, menu_update_frame_delete_proc);
+	t3f_add_menu_item(frame_menu, "D&ouble Size", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_double, menu_update_frame_delete_proc);
+	t3f_add_menu_item(frame_menu, "&Half Size", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_half, menu_update_frame_delete_proc);
+	t3f_add_menu_item(frame_menu, "&Reset Size", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_reset, menu_update_frame_delete_proc);
 	t3f_add_menu_item(frame_menu, NULL, 0, NULL, NULL, NULL);
-	t3f_add_menu_item(frame_menu, "&Lengthen", 0, NULL, menu_proc_frame_lengthen, menu_update_frame_delete_proc);
-	t3f_add_menu_item(frame_menu, "Shor&ten", 0, NULL, menu_proc_frame_shorten, menu_update_frame_tick_proc);
+	t3f_add_menu_item(frame_menu, "&Lengthen", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_lengthen, menu_update_frame_delete_proc);
+	t3f_add_menu_item(frame_menu, "Shor&ten", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_shorten, menu_update_frame_tick_proc);
 	t3f_add_menu_item(frame_menu, NULL, 0, NULL, NULL, NULL);
-	t3f_add_menu_item(frame_menu, "Pr&evious", 0, NULL, menu_proc_frame_previous, menu_update_frame_iter_proc);
-	t3f_add_menu_item(frame_menu, "Ne&xt", 0, NULL, menu_proc_frame_next, menu_update_frame_iter_proc);
+	t3f_add_menu_item(frame_menu, "Pr&evious", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_previous, menu_update_frame_iter_proc);
+	t3f_add_menu_item(frame_menu, "Ne&xt", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_next, menu_update_frame_iter_proc);
 
 	main_menu = al_create_menu();
 	if(!main_menu)
@@ -872,7 +878,7 @@ bool setup_menus(void)
 
 bool initialize(void)
 {
-	if(!t3f_initialize("T3F Animator", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
+	if(!t3f_initialize("T3F Animator", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_MENU, NULL))
 	{
 		printf("Failed to initialize T3F.\n");
 		return false;
