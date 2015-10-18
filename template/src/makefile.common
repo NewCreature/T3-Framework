@@ -52,9 +52,9 @@ demo: very_clean
 	cp -a -R ../* $(DEMO_DIR)
 	rm -rf $(DEMO_DIR)/workspace
 	rm -rf $(DEMO_DELETE)
-	$(SED_COMMAND) 's|"$(APP_BUNDLE_NAME)"|"$(APP_BUNDLE_NAME) Demo"|' $(DEMO_DIR)/src/init.c
+	$(SED_COMMAND) 's|"$(APP_TITLE)"|"$(APP_TITLE) Demo"|' $(DEMO_DIR)/src/init.c
 	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/src/makefile.defines
-	$(SED_COMMAND) 's|$(subst $(SPACE),\$(SPACE),$(APP_BUNDLE_NAME))|$(subst $(SPACE),\$(SPACE),$(APP_BUNDLE_NAME))\\$(SPACE)Demo|' $(DEMO_DIR)/src/makefile.defines
+	$(SED_COMMAND) 's|$(subst $(SPACE),\$(SPACE),$(APP_TITLE))|$(subst $(SPACE),\$(SPACE),$(APP_TITLE))\\$(SPACE)Demo|' $(DEMO_DIR)/src/makefile.defines
 	$(SED_COMMAND) 's|com.t3i.vgolfdeluxe|com.t3i.vgolfdeluxedemo|' $(DEMO_DIR)/src/makefile.defines
 	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/changelog
 

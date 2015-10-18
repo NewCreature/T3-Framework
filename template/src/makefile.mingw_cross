@@ -28,7 +28,7 @@ ifndef INNO_SETUP_COMPILER
 	@echo Usage: "make windows_package INNO_SETUP_COMPILER=path_to_compiler"
 else
 	@cp ../win32/installer.iss installer_final.iss
-	@sed -i "s|T3F_APP_NAME|$(APP_BUNDLE_NAME)|" installer_final.iss
+	@sed -i "s|T3F_APP_NAME|$(APP_TITLE)|" installer_final.iss
 	@sed -i "s|T3F_APP_VERSION|$(APP_VERSION)|" installer_final.iss
 	@sed -i "s|T3F_APP_COPYRIGHT|$(APP_COPYRIGHT)|" installer_final.iss
 	@sed -i "s|T3F_APP_PUBLISHER|$(APP_PUBLISHER)|" installer_final.iss

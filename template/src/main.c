@@ -3,9 +3,9 @@
 /* structure to hold all of our app-specific data */
 typedef struct
 {
-	
+
 	int state;
-	
+
 } APP_INSTANCE;
 
 /* main logic routine */
@@ -44,12 +44,12 @@ void app_render(void * data)
 bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 {
 	/* initialize T3F */
-	if(!t3f_initialize("My App", 640, 480, 60.0, app_logic, app_render, T3F_DEFAULT, app))
+	if(!t3f_initialize(T3F_APP_TITLE, 640, 480, 60.0, app_logic, app_render, T3F_DEFAULT, app))
 	{
 		printf("Error initializing T3F\n");
 		return false;
 	}
-	
+
 	app->state = 0;
 	return true;
 }
@@ -57,7 +57,7 @@ bool app_initialize(APP_INSTANCE * app, int argc, char * argv[])
 int main(int argc, char * argv[])
 {
 	APP_INSTANCE app;
-	
+
 	if(app_initialize(&app, argc, argv))
 	{
 		t3f_run();

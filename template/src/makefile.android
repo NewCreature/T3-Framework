@@ -57,7 +57,7 @@ build_android:
 	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/template/AndroidManifest.xml
 	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/template/jni/Android.mk
 	sed -i '' "s|allegro-example|$(APP_NAME)|" ../temp/android/template/jni/Application.mk
-	sed -i '' "s|AllegroActivity|$(APP_BUNDLE_NAME)|" ../temp/android/template/res/values/strings.xml
+	sed -i '' "s|AllegroActivity|$(APP_TITLE)|" ../temp/android/template/res/values/strings.xml
 	sed -i '' "s|org.liballeg.example|$(APP_ANDROID_PACKAGE)|" ../temp/android/template/src/org/liballeg/example/ExampleActivity.java
 	sed -i '' "s|org.liballeg.example|$(APP_ANDROID_PACKAGE)|" ../temp/android/template/src/org/liballeg/example/EditBoxActivity.java
 	sed -i '' "s|APP_NAME|$(APP_NAME)|" ../temp/android/template/src/org/liballeg/example/ExampleActivity.java

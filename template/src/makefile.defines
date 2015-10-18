@@ -9,7 +9,7 @@ include makefile.include
 #########################
 APP_COMPANY = t3-i
 APP_NAME = app-name
-APP_BUNDLE_NAME = App\ Display\ Name
+APP_TITLE = App\ Display\ Name
 APP_VERSION = 0.1
 APP_RELEASE = 1
 APP_PUBLISHER = T\^3\ Software
@@ -26,7 +26,7 @@ app_clean:
 ################
 # global stuff #
 ################
-GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall -I. -DT3F_DEVELOPER_NAME="\"$(APP_COMPANY)\"" -DT3F_PACKAGE_NAME="\"$(APP_NAME)\"" -DT3F_APP_VERSION="\"$(APP_VERSION)\""
+GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall -I. -DT3F_DEVELOPER_NAME="\"$(APP_COMPANY)\"" -DT3F_PACKAGE_NAME="\"$(APP_NAME)\"" -DT3F_APP_VERSION="\"$(APP_VERSION)\"" -DT3F_APP_TITLE=\"$(APP_TITLE)\"
 
 ##################
 # Mac OS X stuff #
