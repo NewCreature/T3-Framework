@@ -128,7 +128,7 @@ int menu_update_bitmap_iter_proc(ALLEGRO_MENU * menu, int item, void * data)
 	{
 		if(view == ANIMATOR_VIEW_BITMAPS)
 		{
-			if(animation->bitmaps > 1)
+			if(animation->bitmaps->count > 1)
 			{
 				al_set_menu_item_flags(menu, item, 0);
 				return 0;
@@ -141,7 +141,7 @@ int menu_update_bitmap_iter_proc(ALLEGRO_MENU * menu, int item, void * data)
 
 int menu_update_frame_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
-	if(animation && animation->bitmaps)
+	if(animation && animation->bitmaps->count)
 	{
 		if(view == ANIMATOR_VIEW_FRAMES)
 		{
@@ -298,7 +298,7 @@ int menu_proc_bitmap_add(void * data)
 		if(bp)
 		{
 			t3f_animation_add_bitmap(animation, bp);
-			current_bitmap = animation->bitmaps - 1;
+			current_bitmap = animation->bitmaps->count - 1;
 		}
 		strcpy(last_bitmap_filename, fn);
 		update_config();
@@ -309,12 +309,12 @@ int menu_proc_bitmap_add(void * data)
 
 int menu_proc_bitmap_delete(void * data)
 {
-	if(current_bitmap < animation->bitmaps)
+	if(current_bitmap < animation->bitmaps->count)
 	{
 		t3f_animation_delete_bitmap(animation, current_bitmap);
-		if(current_bitmap >= animation->bitmaps)
+		if(current_bitmap >= animation->bitmaps->count)
 		{
-			current_bitmap = animation->bitmaps - 1;
+			current_bitmap = animation->bitmaps->count - 1;
 		}
 		t3f_refresh_menus();
 	}
@@ -326,7 +326,7 @@ int menu_proc_bitmap_previous(void * data)
 	current_bitmap--;
 	if(current_bitmap < 0)
 	{
-		current_bitmap = animation->bitmaps - 1;
+		current_bitmap = animation->bitmaps->count - 1;
 	}
 	return 0;
 }
@@ -334,7 +334,7 @@ int menu_proc_bitmap_previous(void * data)
 int menu_proc_bitmap_next(void * data)
 {
 	current_bitmap++;
-	if(current_bitmap >= animation->bitmaps)
+	if(current_bitmap >= animation->bitmaps->count)
 	{
 		current_bitmap = 0;
 	}
@@ -352,11 +352,11 @@ int menu_proc_bitmap_load(void * data)
 		bp = al_load_bitmap(fn);
 		if(bp)
 		{
-			if(animation->bitmap[current_bitmap])
+			if(animation->bitmaps->bitmap[current_bitmap])
 			{
-				al_destroy_bitmap(animation->bitmap[current_bitmap]);
+				al_destroy_bitmap(animation->bitmaps->bitmap[current_bitmap]);
 			}
-			animation->bitmap[current_bitmap] = bp;
+			animation->bitmaps->bitmap[current_bitmap] = bp;
 		}
 		strcpy(last_bitmap_filename, fn);
 	}
@@ -365,7 +365,7 @@ int menu_proc_bitmap_load(void * data)
 
 int menu_proc_frame_add(void * data)
 {
-	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmap[current_bitmap]), 0, 1, 0);
+	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmaps->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmaps->bitmap[current_bitmap]), 0, 1, 0);
 	current_frame = animation->frames - 1;
 	t3f_animation_build_frame_list(animation);
 	t3f_refresh_menus();
@@ -391,7 +391,7 @@ int menu_proc_frame_previous_bitmap(void * data)
 	animation->frame[current_frame]->bitmap--;
 	if(animation->frame[current_frame]->bitmap < 0)
 	{
-		animation->frame[current_frame]->bitmap = animation->bitmaps - 1;
+		animation->frame[current_frame]->bitmap = animation->bitmaps->count - 1;
 	}
 	return 0;
 }
@@ -399,7 +399,7 @@ int menu_proc_frame_previous_bitmap(void * data)
 int menu_proc_frame_next_bitmap(void * data)
 {
 	animation->frame[current_frame]->bitmap++;
-	if(animation->frame[current_frame]->bitmap >= animation->bitmaps)
+	if(animation->frame[current_frame]->bitmap >= animation->bitmaps->count)
 	{
 		animation->frame[current_frame]->bitmap = 0;
 	}
@@ -422,8 +422,8 @@ int menu_proc_frame_half(void * data)
 
 int menu_proc_frame_reset(void * data)
 {
-	animation->frame[current_frame]->width = al_get_bitmap_width(animation->bitmap[animation->frame[current_frame]->bitmap]);
-	animation->frame[current_frame]->height = al_get_bitmap_height(animation->bitmap[animation->frame[current_frame]->bitmap]);
+	animation->frame[current_frame]->width = al_get_bitmap_width(animation->bitmaps->bitmap[animation->frame[current_frame]->bitmap]);
+	animation->frame[current_frame]->height = al_get_bitmap_height(animation->bitmaps->bitmap[animation->frame[current_frame]->bitmap]);
 	return 0;
 }
 
@@ -567,9 +567,9 @@ void bitmap_logic(void)
 	}
 	if(t3f_key[ALLEGRO_KEY_P])
 	{
-		for(i = 0; i < animation->bitmaps; i++)
+		for(i = 0; i < animation->bitmaps->count; i++)
 		{
-			animation->bitmap[i] = pad_bitmap(animation->bitmap[i]);
+			animation->bitmaps->bitmap[i] = pad_bitmap(animation->bitmaps->bitmap[i]);
 		}
 		for(i = 0; i < animation->frames; i++)
 		{
@@ -754,9 +754,9 @@ void help_render(void)
 void bitmap_render(void)
 {
 	al_draw_textf(font, t3f_color_white, 0, 360, 0, "bitmap[%d]", current_bitmap);
-	if(animation->bitmaps && current_bitmap < animation->bitmaps)
+	if(animation->bitmaps->count && current_bitmap < animation->bitmaps->count)
 	{
-		al_draw_scaled_bitmap(animation->bitmap[current_bitmap], 0, 0, al_get_bitmap_width(animation->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmap[current_bitmap]), 32, 32, (float)al_get_bitmap_width(animation->bitmap[current_bitmap]) * zoom, (float)al_get_bitmap_height(animation->bitmap[current_bitmap]) * zoom, 0);
+		al_draw_scaled_bitmap(animation->bitmaps->bitmap[current_bitmap], 0, 0, al_get_bitmap_width(animation->bitmaps->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmaps->bitmap[current_bitmap]), 32, 32, (float)al_get_bitmap_width(animation->bitmaps->bitmap[current_bitmap]) * zoom, (float)al_get_bitmap_height(animation->bitmaps->bitmap[current_bitmap]) * zoom, 0);
 	}
 }
 
@@ -769,7 +769,7 @@ void frame_render(void)
 		al_draw_line(32, 32, 64, 32, al_map_rgba_f(0.0, 1.0, 0.0, 0.5), 1.0);
 		al_draw_line(32, 32, 32, 64, al_map_rgba_f(0.0, 1.0, 0.0, 0.5), 1.0);
 		fp = animation->frame[current_frame];
-		t3f_draw_scaled_bitmap(animation->bitmap[fp->bitmap], t3f_color_white, 32 + fp->x * zoom, 32 + fp->y * zoom, fp->z, fp->width * zoom, fp->height * zoom, 0);
+		t3f_draw_scaled_bitmap(animation->bitmaps->bitmap[fp->bitmap], t3f_color_white, 32 + fp->x * zoom, 32 + fp->y * zoom, fp->z, fp->width * zoom, fp->height * zoom, 0);
 	}
 	t3f_draw_scaled_animation(animation, t3f_color_white, tick, 320 + 32, 32, 0, zoom, 0);
 }

@@ -13,7 +13,8 @@
 #define T3F_ANIMATION_MAX_FRAMES  1024
 #define T3F_ANIMATION_REVISION       1 // change to 1 after we fix image loading to use memfiles
 
-#define T3F_ANIMATION_FLAG_ONCE      1
+#define T3F_ANIMATION_FLAG_ONCE             1
+#define T3F_ANIMATION_FLAG_EXTERNAL_BITMAPS 2
 
 typedef struct
 {
@@ -33,8 +34,15 @@ typedef struct
 typedef struct
 {
 
-	ALLEGRO_BITMAP * bitmap[T3F_ANIMATION_MAX_BITMAPS];
-	int bitmaps;
+    ALLEGRO_BITMAP * bitmap[T3F_ANIMATION_MAX_BITMAPS];
+    int count;
+
+} T3F_ANIMATION_BITMAPS;
+
+typedef struct
+{
+
+    T3F_ANIMATION_BITMAPS * bitmaps;
 
 	T3F_ANIMATION_FRAME * frame[T3F_ANIMATION_MAX_FRAMES];
 	int frames;

@@ -18,7 +18,13 @@ T3F_ANIMATION * t3f_create_animation(void)
 	ap = al_malloc(sizeof(T3F_ANIMATION));
 	if(ap)
 	{
-		ap->bitmaps = 0;
+		ap->bitmaps = al_malloc(sizeof(T3F_ANIMATION_BITMAPS));
+		if(!ap->bitmaps)
+		{
+			free(ap);
+			return NULL;
+		}
+		ap->bitmaps->count = 0;
 		ap->frames = 0;
 		ap->frame_list_total = 0;
 		ap->flags = 0;
@@ -34,16 +40,23 @@ T3F_ANIMATION * t3f_clone_animation(T3F_ANIMATION * ap)
 	clone = t3f_create_animation();
 	if(clone)
 	{
-		for(i = 0; i < ap->bitmaps; i++)
+		if(ap->flags & T3F_ANIMATION_FLAG_EXTERNAL_BITMAPS)
 		{
-			clone->bitmap[i] = al_clone_bitmap(ap->bitmap[i]);
-			if(!clone->bitmap[i])
-			{
-				return NULL;
-			}
-			t3f_clone_resource((void **)&clone->bitmap[i], ap->bitmap[i]);
+			clone->bitmaps = ap->bitmaps;
 		}
-		clone->bitmaps = ap->bitmaps;
+		else
+		{
+			for(i = 0; i < ap->bitmaps->count; i++)
+			{
+				clone->bitmaps->bitmap[i] = al_clone_bitmap(ap->bitmaps->bitmap[i]);
+				if(!clone->bitmaps->bitmap[i])
+				{
+					return NULL;
+				}
+				t3f_clone_resource((void **)&clone->bitmaps->bitmap[i], ap->bitmaps->bitmap[i]);
+			}
+			clone->bitmaps = ap->bitmaps;
+		}
 		for(i = 0; i < ap->frames; i++)
 		{
 			if(!t3f_animation_add_frame(clone, ap->frame[i]->bitmap, ap->frame[i]->x, ap->frame[i]->y, ap->frame[i]->z, ap->frame[i]->width, ap->frame[i]->height, ap->frame[i]->angle, ap->frame[i]->ticks, ap->frame[i]->flags))
@@ -65,15 +78,19 @@ void t3f_destroy_animation(T3F_ANIMATION * ap)
 	{
 		al_free(ap->frame[i]);
 	}
-	for(i = 0; i < ap->bitmaps; i++)
+	if(!(ap->flags & T3F_ANIMATION_FLAG_EXTERNAL_BITMAPS))
 	{
-		/* Attempt to destroy resource. If it fails, that means the user
-		 * probably constructed the animation manually, so destroy the bitmap
-		 * directly. */
-		if(!t3f_destroy_resource(ap->bitmap[i]))
+		for(i = 0; i < ap->bitmaps->count; i++)
 		{
-			al_destroy_bitmap(ap->bitmap[i]);
+			/* Attempt to destroy resource. If it fails, that means the user
+			 * probably constructed the animation manually, so destroy the bitmap
+			 * directly. */
+			if(!t3f_destroy_resource(ap->bitmaps->bitmap[i]))
+			{
+				al_destroy_bitmap(ap->bitmaps->bitmap[i]);
+			}
 		}
+		al_free(ap->bitmaps);
 	}
 	al_free(ap);
 }
@@ -117,10 +134,10 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp, const char * fn)
 		{
 			case 0:
 			{
-				ap->bitmaps = al_fread16le(fp);
-				for(i = 0; i < ap->bitmaps; i++)
+				ap->bitmaps->count = al_fread16le(fp);
+				for(i = 0; i < ap->bitmaps->count; i++)
 				{
-					ap->bitmap[i] = al_load_bitmap_f(fp, ".png");
+					ap->bitmaps->bitmap[i] = al_load_bitmap_f(fp, ".png");
 				}
 				ap->frames = al_fread16le(fp);
 				for(i = 0; i < ap->frames; i++)
@@ -145,12 +162,12 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp, const char * fn)
 			}
 			case 1:
 			{
-				ap->bitmaps = al_fread16le(fp);
-				for(i = 0; i < ap->bitmaps; i++)
+				ap->bitmaps->count = al_fread16le(fp);
+				for(i = 0; i < ap->bitmaps->count; i++)
 				{
 					fpos = al_ftell(fp);
-					ap->bitmap[i] = t3f_load_resource_f((void **)(&ap->bitmap[i]), T3F_RESOURCE_TYPE_BITMAP, fp, fn, 0, 0);
-					if(!ap->bitmap[i])
+					ap->bitmaps->bitmap[i] = t3f_load_resource_f((void **)(&ap->bitmaps->bitmap[i]), T3F_RESOURCE_TYPE_BITMAP, fp, fn, 0, 0);
+					if(!ap->bitmaps->bitmap[i])
 					{
 						al_fseek(fp, fpos, ALLEGRO_SEEK_SET);
 						al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
@@ -159,17 +176,17 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp, const char * fn)
 						al_restore_state(&old_state);
 						if(bp)
 						{
-							ap->bitmap[i] = t3f_squeeze_bitmap(bp, NULL, NULL);
+							ap->bitmaps->bitmap[i] = t3f_squeeze_bitmap(bp, NULL, NULL);
 							al_destroy_bitmap(bp);
 						}
 					}
-					else if(al_get_bitmap_flags(ap->bitmap[i]) & ALLEGRO_MEMORY_BITMAP)
+					else if(al_get_bitmap_flags(ap->bitmaps->bitmap[i]) & ALLEGRO_MEMORY_BITMAP)
 					{
-						bp = t3f_squeeze_bitmap(ap->bitmap[i], NULL, NULL);
-						al_destroy_bitmap(ap->bitmap[i]);
-						ap->bitmap[i] = bp;
+						bp = t3f_squeeze_bitmap(ap->bitmaps->bitmap[i], NULL, NULL);
+						al_destroy_bitmap(ap->bitmaps->bitmap[i]);
+						ap->bitmaps->bitmap[i] = bp;
 					}
-					if(!ap->bitmap[i])
+					if(!ap->bitmaps->bitmap[i])
 					{
 						return NULL;
 					}
@@ -225,14 +242,14 @@ T3F_ANIMATION * t3f_load_animation_from_bitmap(const char * fn)
 	{
 		return NULL;
 	}
-	ap->bitmap[0] = t3f_load_resource((void **)(&(ap->bitmap[0])), T3F_RESOURCE_TYPE_BITMAP, fn, 0, 0, 0);
-	if(!ap->bitmap[0])
+	ap->bitmaps->bitmap[0] = t3f_load_resource((void **)(&(ap->bitmaps->bitmap[0])), T3F_RESOURCE_TYPE_BITMAP, fn, 0, 0, 0);
+	if(!ap->bitmaps->bitmap[0])
 	{
 		t3f_destroy_animation(ap);
 		return NULL;
 	}
-	ap->bitmaps = 1;
-	t3f_animation_add_frame(ap, 0, 0.0, 0.0, 0.0, al_get_bitmap_width(ap->bitmap[0]), al_get_bitmap_height(ap->bitmap[0]), 0.0, 1, 0);
+	ap->bitmaps->count = 1;
+	t3f_animation_add_frame(ap, 0, 0.0, 0.0, 0.0, al_get_bitmap_width(ap->bitmaps->bitmap[0]), al_get_bitmap_height(ap->bitmaps->bitmap[0]), 0.0, 1, 0);
 	return ap;
 }
 
@@ -242,10 +259,10 @@ int t3f_save_animation_f(T3F_ANIMATION * ap, ALLEGRO_FILE * fp)
 
 	ani_header[11] = T3F_ANIMATION_REVISION; // put the version number in
 	al_fwrite(fp, ani_header, 12);
-	al_fwrite16le(fp, ap->bitmaps);
-	for(i = 0; i < ap->bitmaps; i++)
+	al_fwrite16le(fp, ap->bitmaps->count);
+	for(i = 0; i < ap->bitmaps->count; i++)
 	{
-		t3f_save_bitmap_f(fp, ap->bitmap[i]);
+		t3f_save_bitmap_f(fp, ap->bitmaps->bitmap[i]);
 	}
 	al_fwrite16le(fp, ap->frames);
 	for(i = 0; i < ap->frames; i++)
@@ -281,8 +298,8 @@ int t3f_save_animation(T3F_ANIMATION * ap, const char * fn)
 /* utilities */
 int t3f_animation_add_bitmap(T3F_ANIMATION * ap, ALLEGRO_BITMAP * bp)
 {
-	ap->bitmap[ap->bitmaps] = bp;
-	ap->bitmaps++;
+	ap->bitmaps->bitmap[ap->bitmaps->count] = bp;
+	ap->bitmaps->count++;
 	return 1;
 }
 
@@ -290,22 +307,22 @@ int t3f_animation_delete_bitmap(T3F_ANIMATION * ap, int bitmap)
 {
 	int i;
 
-	if(bitmap < ap->bitmaps)
+	if(bitmap < ap->bitmaps->count)
 	{
-		if(!t3f_destroy_resource(ap->bitmap[bitmap]))
+		if(!t3f_destroy_resource(ap->bitmaps->bitmap[bitmap]))
 		{
-			al_destroy_bitmap(ap->bitmap[bitmap]);
+			al_destroy_bitmap(ap->bitmaps->bitmap[bitmap]);
 		}
 	}
 	else
 	{
 		return 0;
 	}
-	for(i = bitmap; i < ap->bitmaps - 1; i++)
+	for(i = bitmap; i < ap->bitmaps->count - 1; i++)
 	{
-		ap->bitmap[i] = ap->bitmap[i + 1];
+		ap->bitmaps->bitmap[i] = ap->bitmaps->bitmap[i + 1];
 	}
-	ap->bitmaps--;
+	ap->bitmaps->count--;
 	return 1;
 }
 
@@ -320,7 +337,7 @@ int t3f_animation_add_frame(T3F_ANIMATION * ap, int bitmap, float x, float y, fl
 		ap->frame[ap->frames]->z = z;
 		if(w < 0.0)
 		{
-			ap->frame[ap->frames]->width = al_get_bitmap_width(ap->bitmap[bitmap]);
+			ap->frame[ap->frames]->width = al_get_bitmap_width(ap->bitmaps->bitmap[bitmap]);
 		}
 		else
 		{
@@ -328,7 +345,7 @@ int t3f_animation_add_frame(T3F_ANIMATION * ap, int bitmap, float x, float y, fl
 		}
 		if(h < 0.0)
 		{
-			ap->frame[ap->frames]->height = al_get_bitmap_height(ap->bitmap[bitmap]);
+			ap->frame[ap->frames]->height = al_get_bitmap_height(ap->bitmaps->bitmap[bitmap]);
 		}
 		else
 		{
@@ -386,9 +403,9 @@ bool t3f_add_animation_to_atlas(T3F_ATLAS * sap, T3F_ANIMATION * ap, int type)
 	int i, failed = 0;
 
 	/* add bitmaps to sprite sheet */
-	for(i = 0; i < ap->bitmaps; i++)
+	for(i = 0; i < ap->bitmaps->count; i++)
 	{
-		if(!t3f_add_bitmap_to_atlas(sap, &ap->bitmap[i], type))
+		if(!t3f_add_bitmap_to_atlas(sap, &ap->bitmaps->bitmap[i], type))
 		{
 			failed = 1;
 		}
@@ -407,11 +424,11 @@ ALLEGRO_BITMAP * t3f_animation_get_bitmap(T3F_ANIMATION * ap, int tick)
 {
 	if(tick >= ap->frame_list_total && ap->flags & T3F_ANIMATION_FLAG_ONCE)
 	{
-		return ap->bitmap[ap->frame[ap->frame_list[ap->frame_list_total - 1]]->bitmap];
+		return ap->bitmaps->bitmap[ap->frame[ap->frame_list[ap->frame_list_total - 1]]->bitmap];
 	}
 	else
 	{
-		return ap->bitmap[ap->frame[ap->frame_list[tick % ap->frame_list_total]]->bitmap];
+		return ap->bitmaps->bitmap[ap->frame[ap->frame_list[tick % ap->frame_list_total]]->bitmap];
 	}
 }
 
@@ -474,7 +491,7 @@ void t3f_draw_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tick, float
 	if(fp)
 	{
 		handle_vh_flip(ap->frame[0], fp, flags, &fox, &foy, &dflags);
-		t3f_draw_scaled_bitmap(ap->bitmap[fp->bitmap], color, x + fp->x + fox, y + fp->y + foy, z + fp->z, fp->width, fp->height, dflags);
+		t3f_draw_scaled_bitmap(ap->bitmaps->bitmap[fp->bitmap], color, x + fp->x + fox, y + fp->y + foy, z + fp->z, fp->width, fp->height, dflags);
 	}
 }
 
@@ -487,7 +504,7 @@ void t3f_draw_scaled_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tick
 	if(fp)
 	{
 		handle_vh_flip(ap->frame[0], fp, flags, &fox, &foy, &dflags);
-		t3f_draw_scaled_bitmap(ap->bitmap[fp->bitmap], color, x + (fp->x + fox) * scale, y + (fp->y + foy) * scale, z + fp->z, fp->width * scale, fp->height * scale, dflags);
+		t3f_draw_scaled_bitmap(ap->bitmaps->bitmap[fp->bitmap], color, x + (fp->x + fox) * scale, y + (fp->y + foy) * scale, z + fp->z, fp->width * scale, fp->height * scale, dflags);
 	}
 }
 
@@ -501,9 +518,9 @@ void t3f_draw_rotated_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tic
 	if(fp)
 	{
 		handle_vh_flip(ap->frame[0], fp, flags, &fox, &foy, &dflags);
-		scale_x = fp->width / al_get_bitmap_width(ap->bitmap[fp->bitmap]);
-		scale_y = fp->height / al_get_bitmap_height(ap->bitmap[fp->bitmap]);
-		t3f_draw_scaled_rotated_bitmap(ap->bitmap[fp->bitmap], color, cx / scale_x - fp->x, cy / scale_y - fp->y, x + fox, y + foy, z + fp->z, angle, scale_x, scale_y, dflags);
+		scale_x = fp->width / al_get_bitmap_width(ap->bitmaps->bitmap[fp->bitmap]);
+		scale_y = fp->height / al_get_bitmap_height(ap->bitmaps->bitmap[fp->bitmap]);
+		t3f_draw_scaled_rotated_bitmap(ap->bitmaps->bitmap[fp->bitmap], color, cx / scale_x - fp->x, cy / scale_y - fp->y, x + fox, y + foy, z + fp->z, angle, scale_x, scale_y, dflags);
 	}
 }
 
@@ -517,9 +534,9 @@ void t3f_draw_rotated_scaled_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, 
 	if(fp)
 	{
 		handle_vh_flip(ap->frame[0], fp, flags, &fox, &foy, &dflags);
-		scale_x = fp->width / al_get_bitmap_width(ap->bitmap[fp->bitmap]);
-		scale_y = fp->height / al_get_bitmap_height(ap->bitmap[fp->bitmap]);
-		t3f_draw_scaled_rotated_bitmap(ap->bitmap[fp->bitmap], color, cx / scale_x - fp->x, cy / scale_y - fp->y, x + fox, y + foy, z + fp->z, angle, scale, scale, dflags);
+		scale_x = fp->width / al_get_bitmap_width(ap->bitmaps->bitmap[fp->bitmap]);
+		scale_y = fp->height / al_get_bitmap_height(ap->bitmaps->bitmap[fp->bitmap]);
+		t3f_draw_scaled_rotated_bitmap(ap->bitmaps->bitmap[fp->bitmap], color, cx / scale_x - fp->x, cy / scale_y - fp->y, x + fox, y + foy, z + fp->z, angle, scale, scale, dflags);
 	}
 }
 
@@ -534,12 +551,12 @@ void t3f_draw_scaled_rotated_animation_region(T3F_ANIMATION * ap, float sx, floa
 	if(fp)
 	{
 		pw = t3f_project_x(1.0, z) - t3f_project_x(0.0, z);
-		sscale_x = fp->width / (float)al_get_bitmap_width(ap->bitmap[fp->bitmap]);
-		sscale_y = fp->height / (float)al_get_bitmap_height(ap->bitmap[fp->bitmap]);
+		sscale_x = fp->width / (float)al_get_bitmap_width(ap->bitmaps->bitmap[fp->bitmap]);
+		sscale_y = fp->height / (float)al_get_bitmap_height(ap->bitmaps->bitmap[fp->bitmap]);
 		fsx = sx / sscale_x;
 		fsy = sy / sscale_y;
 		fsw = sw / sscale_x;
 		fsh = sh / sscale_y;
-		al_draw_tinted_scaled_rotated_bitmap_region(ap->bitmap[fp->bitmap], fsx, fsy, fsw, fsh, color, cx / sscale_x - fp->x, cy / sscale_y - fp->y, t3f_project_x(x + fox, z), t3f_project_y(y + foy, z), scale * sscale_x * pw, scale * sscale_y * pw, angle, flags);
+		al_draw_tinted_scaled_rotated_bitmap_region(ap->bitmaps->bitmap[fp->bitmap], fsx, fsy, fsw, fsh, color, cx / sscale_x - fp->x, cy / sscale_y - fp->y, t3f_project_x(x + fox, z), t3f_project_y(y + foy, z), scale * sscale_x * pw, scale * sscale_y * pw, angle, flags);
 	}
 }
