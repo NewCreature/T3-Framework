@@ -30,18 +30,18 @@ void t3f_debug_message(const char * format, ...)
 		va_start(vap, format);
 		vsnprintf(buf, 1024, format, vap);
 		va_end(vap);
-		
+
 		/* write to debug log file if one is open */
 		if(t3f_debug_file)
 		{
 			fprintf(t3f_debug_file, "%s", buf);
 			fflush(t3f_debug_file);
 		}
-		
+
 		/* otherwise output to console */
 		else
 		{
-			#ifdef T3F_ANDROID
+			#ifdef ALLEGRO_ANDROID
 				ALLEGRO_DEBUG_CHANNEL("main");
 				ALLEGRO_DEBUG("%s", buf);
 			#else

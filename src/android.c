@@ -4,7 +4,7 @@
    our implementation from it and see if we can actually find our
    ExampleActivity class. */
 
-#ifdef T3F_ANDROID
+#ifdef ALLEGRO_ANDROID
 
 	#include <jni.h>
 
@@ -13,7 +13,7 @@
 	#define JNI_FUNC_EVALUATOR(ret, cls, name, params, x) \
 		JNI_FUNC_PASTER(ret, cls, name, params, x)
 	#define JNI_FUNC(ret, cls, name, params) \
-		JNI_FUNC_EVALUATOR(ret, cls, name, params, com_t3i_vgolfdeluxe)
+		JNI_FUNC_EVALUATOR(ret, cls, name, params, T3F_ANDROID_NATIVE_CALL_PREFIX)
 
 	JNIEnv *_al_android_get_jnienv();
 	void __jni_checkException(JNIEnv *env, const char *file, const char *fname, int line);
@@ -93,8 +93,9 @@
 
 	static char * t3f_edit_box_text = NULL; // pointer to text currently being edited in edit box
 	static int t3f_edit_box_text_size = 0;
-	static void(*t3f_edit_box_callback)() = NULL;
-	static void(*t3f_edit_box_staged_callback)() = NULL;
+	static void(*t3f_edit_box_callback)(void * data) = NULL;
+	static void(*t3f_edit_box_staged_callback)(void * data) = NULL;
+	static void * t3f_edit_box_data = NULL;
 
 JNI_FUNC(void, ExampleActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, jstring returnedS))
 	{
@@ -120,16 +121,18 @@ JNI_FUNC(void, ExampleActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj,
 	{
 		if(t3f_edit_box_callback)
 		{
-			t3f_edit_box_callback();
+			t3f_edit_box_callback(t3f_edit_box_data);
 			t3f_edit_box_callback = NULL;
+			t3f_edit_box_data = NULL;
 		}
 	}
 
-	void t3f_open_edit_box(const char * title, char * text, int text_size, const char * flags, void(*callback)())
+	void t3f_open_edit_box(const char * title, char * text, int text_size, const char * flags, void(*callback)(void * data), void * data)
 	{
 		t3f_edit_box_text = text; // point
 		t3f_edit_box_text_size = text_size;
 		t3f_edit_box_staged_callback = callback;
+		t3f_edit_box_data = data;
 		JNIEnv * env = _al_android_get_jnienv();
 		jstring titleS = (*env)->NewStringUTF(env, title);
 		jstring initialS = (*env)->NewStringUTF(env, text);
@@ -181,7 +184,7 @@ JNI_FUNC(void, ExampleActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj,
 	{
 	}
 
-	void t3f_open_edit_box(const char * title, char * text, int text_size, const char * flags, void(*callback)())
+	void t3f_open_edit_box(const char * title, char * text, int text_size, const char * flags, void(*callback)(void * data), void * data)
 	{
 	}
 

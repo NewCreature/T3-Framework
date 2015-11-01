@@ -10,7 +10,7 @@
 	#include <allegro5/allegro_native_dialog.h>
 #endif
 
-#ifdef T3F_ANDROID
+#ifdef ALLEGRO_ANDROID
 	#include <allegro5/allegro_android.h>
 	#include <allegro5/allegro_physfs.h>
 	#include <physfs.h>
@@ -230,7 +230,7 @@ static bool t3f_locate_resource(const char * filename)
 	bool found = false;
 
 	/* handle Android first so we don't do unnecessary checks */
-	#ifdef T3F_ANDROID
+	#ifdef ALLEGRO_ANDROID
 
 		int ret;
 
@@ -374,7 +374,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	t3f_setup_directories(t3f_data_path);
 
 	/* set default options */
-	#ifdef T3F_ANDROID
+	#ifdef ALLEGRO_ANDROID
 		t3f_option[T3F_OPTION_RENDER_MODE] = T3F_RENDER_MODE_ALWAYS_CLEAR;
 	#endif
 
