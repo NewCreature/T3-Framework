@@ -106,7 +106,7 @@ JNI_FUNC(void, ExampleActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj,
 		s = (*env)->GetStringUTFChars(env, returnedS, 0);
 		if(s)
 		{
-			strncpy(t3f_edit_box_text, s, t3f_edit_box_text_size);
+			memcpy(t3f_edit_box_text, s, t3f_edit_box_text_size);
 			(*env)->ReleaseStringUTFChars(env, returnedS, s);
 		}
 		t3f_edit_box_callback = t3f_edit_box_staged_callback;
