@@ -12,6 +12,8 @@ void render(void * data)
 {
 	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
 	al_draw_text(font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 0, 0, 0, text[0]);
+	al_draw_text(font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 0, 16, 0, text[1]);
+	al_draw_text(font, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), 0, 32, 0, text[2]);
 }
 
 int main(int argc, char * argv[])
@@ -26,6 +28,10 @@ int main(int argc, char * argv[])
 		return 1;
 	}
 	t3f_strcpy(text[0], "T³ Software", 1024);
+	t3f_strcpy(text[1], text[0], 1024);
+	t3f_strset(text[1], 2, '5', 1024);
+	t3f_strcpy(text[2], text[1], 1024);
+	t3f_strcat(text[2], " Presents", 1024);
 	t3f_run();
 	return 0;
 }
