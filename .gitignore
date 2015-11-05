@@ -46,6 +46,7 @@ examples/ex_gui
 examples/ex_music
 examples/ex_sound
 examples/ex_tilemap
+examples/ex_ustring
 games/av/av
 games/dot2dot/dot2dot
 games/paddle/paddle
