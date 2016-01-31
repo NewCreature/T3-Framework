@@ -11,7 +11,7 @@
         <activity android:name="org.liballeg.example.ExampleActivity"
                   android:label="@string/app_name"
                   android:launchMode="singleTask"
-                  android:screenOrientation="unspecified"
+                  android:screenOrientation="APP_ORIENTATION"
                   android:configChanges="screenLayout|uiMode|orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
