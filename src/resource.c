@@ -29,7 +29,14 @@ void * t3f_bitmap_resource_handler_proc(ALLEGRO_FILE * fp, const char * filename
 		}
 		if(fp)
 		{
-			ptr = t3f_load_bitmap_f(fp);
+			if(option == 0)
+			{
+				ptr = t3f_load_bitmap_f(fp);
+			}
+			else
+			{
+				ptr = al_load_bitmap_f(fp, ".png");
+			}
 			if(!openfp)
 			{
 				al_fclose(fp);
@@ -98,7 +105,14 @@ void * t3f_bitmap_font_resource_handler_proc(ALLEGRO_FILE * fp, const char * fil
 
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	al_set_new_bitmap_flags(al_get_new_bitmap_flags() | ALLEGRO_NO_PRESERVE_TEXTURE);
-	ptr = al_load_bitmap_font_flags(filename, flags);
+	if(option == 0)
+	{
+		ptr = al_load_bitmap_font_flags(filename, flags);
+	}
+	else
+	{
+		ptr = t3f_load_bitmap_font(filename);
+	}
 	al_restore_state(&old_state);
 	return ptr;
 }
@@ -298,7 +312,7 @@ void * t3f_clone_resource(void ** dest, void * ptr)
 
 	for(i = 0; i < t3f_resources; i++)
 	{
-		if(t3f_resource[i]->ptr == ptr)
+		if(*t3f_resource[i]->ptr == ptr)
 		{
 			old_fi = al_get_new_file_interface();
 			al_set_new_file_interface(t3f_resource[i]->fi);
@@ -308,7 +322,12 @@ void * t3f_clone_resource(void ** dest, void * ptr)
 				t3f_add_resource(t3f_resource[i]->type, dest, t3f_resource[i]->filename, t3f_resource[i]->option, t3f_resource[i]->flags, t3f_resource[i]->offset, al_get_new_file_interface());
 			}
 			al_set_new_file_interface(old_fi);
+			break;
 		}
+	}
+	if(i == t3f_resources)
+	{
+		return NULL;
 	}
 	return *dest;
 }

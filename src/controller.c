@@ -9,7 +9,7 @@ static float t3f_controller_axis_threshold = 0.3;
 T3F_CONTROLLER * t3f_create_controller(int bindings)
 {
 	T3F_CONTROLLER * cp;
-	
+
 	cp = malloc(sizeof(T3F_CONTROLLER));
 	if(!cp)
 	{
@@ -54,6 +54,7 @@ const char * t3f_get_controller_name(T3F_CONTROLLER * cp, int binding)
 
 const char * t3f_get_controller_binding_name(T3F_CONTROLLER * cp, int binding)
 {
+	const char * stick_name;
 	const char * name;
 	switch(cp->binding[binding].type)
 	{
@@ -67,7 +68,7 @@ const char * t3f_get_controller_binding_name(T3F_CONTROLLER * cp, int binding)
 			if(t3f_joystick[cp->binding[binding].joystick])
 			{
 				name = al_get_joystick_button_name(t3f_joystick[cp->binding[binding].joystick], cp->binding[binding].button);
-				sprintf(t3f_binding_return_name, "Button %s", name ? name : "???");
+				sprintf(t3f_binding_return_name, "%s", name ? name : "???");
 			}
 			else
 			{
@@ -79,8 +80,9 @@ const char * t3f_get_controller_binding_name(T3F_CONTROLLER * cp, int binding)
 		{
 			if(t3f_joystick[cp->binding[binding].joystick])
 			{
+				stick_name = al_get_joystick_stick_name(t3f_joystick[cp->binding[binding].joystick], cp->binding[binding].stick);
 				name = al_get_joystick_axis_name(t3f_joystick[cp->binding[binding].joystick], cp->binding[binding].stick, cp->binding[binding].axis);
-				sprintf(t3f_binding_return_name, "Stick %d %s%s%s", cp->binding[binding].stick, name ? name : "???", (cp->binding[binding].flags & T3F_CONTROLLER_FLAG_AXIS_NEGATIVE) ? "-" : "+", (cp->binding[binding].flags & T3F_CONTROLLER_FLAG_AXIS_INVERT) ? "(I)" : "");
+				sprintf(t3f_binding_return_name, "%s %s%s%s", stick_name ? stick_name : "???", name ? name : "???", (cp->binding[binding].flags & T3F_CONTROLLER_FLAG_AXIS_NEGATIVE) ? "-" : "+", (cp->binding[binding].flags & T3F_CONTROLLER_FLAG_AXIS_INVERT) ? "(I)" : "");
 			}
 			else
 			{
@@ -98,7 +100,7 @@ void t3f_write_controller_config(ALLEGRO_CONFIG * acp, const char * section, T3F
 	char temp_string[1024] = {0};
 	char temp_string2[1024] = {0};
 	int j;
-	
+
 	for(j = 0; j < cp->bindings; j++)
 	{
 		sprintf(temp_string, "Binding %d Type", j);
@@ -142,7 +144,7 @@ bool t3f_read_controller_config(ALLEGRO_CONFIG * acp, const char * section, T3F_
 	char temp_string[1024] = {0};
 	const char * item;
 	int j;
-	
+
 	for(j = 0; j < cp->bindings; j++)
 	{
 		sprintf(temp_string, "Binding %d Type", j);
@@ -258,7 +260,7 @@ bool t3f_bind_controller(T3F_CONTROLLER * cp, int binding)
 	ALLEGRO_EVENT event;
 	const char * val;
 	int i, jn;
-	
+
 	queue = al_create_event_queue();
 	if(!queue)
 	{
@@ -372,7 +374,7 @@ void t3f_read_controller(T3F_CONTROLLER * cp)
 {
 	int i;
 	float vpos, vscale;
-	
+
 	for(i = 0; i < cp->bindings; i++)
 	{
 		switch(cp->binding[i].type)
@@ -404,14 +406,14 @@ void t3f_read_controller(T3F_CONTROLLER * cp)
 			case T3F_CONTROLLER_BINDING_JOYSTICK_AXIS:
 			{
 				bool held = false;
-				
+
 				/* get analog position */
 				cp->state[i].pos = t3f_joystick_state[cp->binding[i].joystick].stick[cp->binding[i].stick].axis[cp->binding[i].axis];
 				if(cp->binding[i].flags & T3F_CONTROLLER_FLAG_AXIS_INVERT)
 				{
 					cp->state[i].pos = -cp->state[i].pos;
 				}
-				
+
 				/* correct position for controller configuration */
 				if(!(cp->binding[i].flags & T3F_CONTROLLER_FLAG_AXIS_NO_ADJUST))
 				{
@@ -427,7 +429,7 @@ void t3f_read_controller(T3F_CONTROLLER * cp)
 					vpos *= vscale;
 					cp->state[i].pos = vpos;
 				}
-				
+
 				/* if position is past threshold, consider the axis pressed */
 				if((cp->binding[i].flags & T3F_CONTROLLER_FLAG_AXIS_NEGATIVE) && t3f_joystick_state[cp->binding[i].joystick].stick[cp->binding[i].stick].axis[cp->binding[i].axis] < -T3F_CONTROLLER_AXIS_THRESHOLD)
 				{
@@ -455,7 +457,7 @@ void t3f_read_controller(T3F_CONTROLLER * cp)
 void t3f_update_controller(T3F_CONTROLLER * cp)
 {
 	int i;
-	
+
 	for(i = 0; i < cp->bindings; i++)
 	{
 		cp->state[i].was_held = cp->state[i].held;
@@ -491,7 +493,7 @@ void t3f_update_controller(T3F_CONTROLLER * cp)
 void t3f_clear_controller_state(T3F_CONTROLLER * cp)
 {
 	int i;
-	
+
 	for(i = 0; i < cp->bindings; i++)
 	{
 		cp->state[i].down = false;

@@ -147,7 +147,7 @@ bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp)
 {
 	ALLEGRO_FILE * tfp = NULL;;
 	ALLEGRO_PATH * path = NULL;
-	int i, size;
+	int i, size = 0;
 	bool ret = false;
 
 	path = al_get_standard_path(ALLEGRO_TEMP_PATH);
@@ -166,10 +166,7 @@ bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp)
 					al_fputc(fp, al_fgetc(tfp));
 				}
 				ret = true;
-			}
-			else
-			{
-				al_fwrite32le(fp, 0);
+				al_fclose(tfp);
 			}
 		}
 		al_destroy_path(path);

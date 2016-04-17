@@ -9,7 +9,7 @@
 T3F_TILE * t3f_create_tile(void)
 {
 	T3F_TILE * tp;
-	
+
 	tp = malloc(sizeof(T3F_TILE));
 	if(!tp)
 	{
@@ -44,7 +44,7 @@ short t3f_get_tile(T3F_TILESET * tsp, int tile, int tick)
 T3F_TILESET * t3f_create_tileset(int w, int h)
 {
 	T3F_TILESET * tsp;
-	
+
 	tsp = malloc(sizeof(T3F_TILESET));
 	if(!tsp)
 	{
@@ -60,7 +60,7 @@ T3F_TILESET * t3f_create_tileset(int w, int h)
 void t3f_destroy_tileset(T3F_TILESET * tsp)
 {
 	int i;
-	
+
 	for(i = 0; i < tsp->tiles; i++)
 	{
 		t3f_destroy_tile(tsp->tile[i]);
@@ -77,7 +77,7 @@ T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp, const char * fn)
 	int i, j;
 	T3F_TILESET * tsp;
 	char header[16];
-	
+
 	tsp = t3f_create_tileset(0, 0);
 	if(!tsp)
 	{
@@ -105,7 +105,7 @@ T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp, const char * fn)
 					return NULL;
 				}
 				tsp->tile[i]->flags = al_fread32le(fp);
-				
+
 				/* read user data */
 				if(tsp->tile[i]->flags & T3F_TILE_FLAG_USER_DATA)
 				{
@@ -114,7 +114,7 @@ T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp, const char * fn)
 						tsp->tile[i]->user_data[j] = al_fread32le(fp);
 					}
 				}
-				
+
 				/* read animation frames */
 				tsp->tile[i]->frame_list_total = al_fread32le(fp);
 				for(j = 0; j < tsp->tile[i]->frame_list_total; j++)
@@ -122,12 +122,12 @@ T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp, const char * fn)
 					tsp->tile[i]->frame_list[j] = al_fread16le(fp);
 				}
 			}
-			
+
 			/* read tileset data */
 			tsp->width = al_fread32le(fp);
 			tsp->height = al_fread32le(fp);
 			tsp->flags = al_fread32le(fp);
-			
+
 			break;
 		}
 	}
@@ -138,7 +138,7 @@ T3F_TILESET * t3f_load_tileset(const char * fn)
 {
 	ALLEGRO_FILE * fp;
 	T3F_TILESET * tsp;
-	
+
 	fp = al_fopen(fn, "rb");
 	if(!fp)
 	{
@@ -155,16 +155,16 @@ int t3f_save_tileset_f(T3F_TILESET * tsp, ALLEGRO_FILE * fp)
 	char header[16] = {0};
 	strcpy(header, "T3F_TILESET");
 	header[15] = 0;
-	
+
 	al_fwrite(fp, header, 16);
-	
+
 	/* write tile data */
 	al_fwrite16le(fp, tsp->tiles);
 	for(i = 0; i < tsp->tiles; i++)
 	{
 		t3f_save_animation_f(tsp->tile[i]->ap, fp);
 		al_fwrite32le(fp, tsp->tile[i]->flags);
-		
+
 		/* write user data */
 		if(tsp->tile[i]->flags & T3F_TILE_FLAG_USER_DATA)
 		{
@@ -173,7 +173,7 @@ int t3f_save_tileset_f(T3F_TILESET * tsp, ALLEGRO_FILE * fp)
 				al_fwrite32le(fp, tsp->tile[i]->user_data[j]);
 			}
 		}
-		
+
 		/* write animation frames */
 		al_fwrite32le(fp, tsp->tile[i]->frame_list_total);
 		for(j = 0; j < tsp->tile[i]->frame_list_total; j++)
@@ -181,7 +181,7 @@ int t3f_save_tileset_f(T3F_TILESET * tsp, ALLEGRO_FILE * fp)
 			al_fwrite16le(fp, tsp->tile[i]->frame_list[j]);
 		}
 	}
-	
+
 	/* write tileset data */
 	al_fwrite32le(fp, tsp->width);
 	al_fwrite32le(fp, tsp->height);
@@ -192,7 +192,7 @@ int t3f_save_tileset_f(T3F_TILESET * tsp, ALLEGRO_FILE * fp)
 int t3f_save_tileset(T3F_TILESET * tsp, const char * fn)
 {
 	ALLEGRO_FILE * fp;
-	
+
 	fp = al_fopen(fn, "wb");
 	if(!fp)
 	{
@@ -206,7 +206,7 @@ int t3f_save_tileset(T3F_TILESET * tsp, const char * fn)
 bool t3f_add_tile(T3F_TILESET * tsp, T3F_ANIMATION * ap)
 {
 	T3F_TILE * tp;
-	
+
 	tp = t3f_create_tile();
 	if(!tp)
 	{
@@ -223,7 +223,7 @@ bool t3f_atlas_tileset(T3F_TILESET * tsp)
 	int tile_sheet_size = 1024; // may want to calculate this from the tile data for an optimization
 	int i;
 	bool fail = false;
-	
+
 	tsp->atlas = t3f_create_atlas(tile_sheet_size, tile_sheet_size);
 	if(!tsp->atlas)
 	{
@@ -244,7 +244,7 @@ T3F_TILEMAP_LAYER * t3f_create_tilemap_layer(int w, int h)
 {
 	T3F_TILEMAP_LAYER * tlp;
 	int i, j;
-	
+
 	tlp = malloc(sizeof(T3F_TILEMAP_LAYER));
 	if(!tlp)
 	{
@@ -299,7 +299,7 @@ T3F_TILEMAP * t3f_create_tilemap(int w, int h, int layers)
 {
 	T3F_TILEMAP * tmp;
 	int i;
-	
+
 	tmp = malloc(sizeof(T3F_TILEMAP));
 	if(!tmp)
 	{
@@ -311,14 +311,14 @@ T3F_TILEMAP * t3f_create_tilemap(int w, int h, int layers)
 	}
 	tmp->layers = layers;
 	tmp->flags = 0;
-	
+
 	return tmp;
 }
 
 void t3f_destroy_tilemap(T3F_TILEMAP * tmp)
 {
 	int i;
-	
+
 	for(i = 0; i < tmp->layers; i++)
 	{
 		t3f_destroy_tilemap_layer(tmp->layer[i]);
@@ -331,7 +331,7 @@ T3F_TILEMAP * t3f_load_tilemap_f(ALLEGRO_FILE * fp)
 	int i, j, k, w, h;
 	T3F_TILEMAP * tmp;
 	char header[16];
-	
+
 	al_fread(fp, header, 16);
 	if(strcmp(header, "T3F_TILEMAP"))
 	{
@@ -379,7 +379,7 @@ T3F_TILEMAP * t3f_load_tilemap(const char * fn)
 {
 	ALLEGRO_FILE * fp;
 	T3F_TILEMAP * tmp;
-	
+
 	fp = al_fopen(fn, "rb");
 	if(!fp)
 	{
@@ -396,7 +396,7 @@ int t3f_save_tilemap_f(T3F_TILEMAP * tmp, ALLEGRO_FILE * fp)
 	char header[16] = {0};
 	strcpy(header, "T3F_TILEMAP");
 	header[15] = 0;
-	
+
 	al_fwrite(fp, header, 16);
 	al_fwrite16le(fp, tmp->layers);
 	for(i = 0; i < tmp->layers; i++)
@@ -425,7 +425,7 @@ int t3f_save_tilemap_f(T3F_TILEMAP * tmp, ALLEGRO_FILE * fp)
 int t3f_save_tilemap(T3F_TILEMAP * tmp, const char * fn)
 {
 	ALLEGRO_FILE * fp;
-	
+
 	fp = al_fopen(fn, "wb");
 	if(!fp)
 	{
@@ -446,7 +446,7 @@ static void t3f_render_static_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 	ALLEGRO_STATE old_blender;
 	int i, j;
 	bool held;
-	
+
 	held = al_is_bitmap_drawing_held();
 	al_store_state(&old_blender, ALLEGRO_STATE_BLENDER);
 	if(tmp->layer[layer]->flags & T3F_TILEMAP_LAYER_SOLID)
@@ -493,14 +493,14 @@ static void t3f_render_normal_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 	float cy = (oy * tmp->layer[layer]->speed_y) - tmp->layer[layer]->y;
 	ALLEGRO_STATE old_blender;
 	bool held;
-	
+
 	sw = t3f_virtual_display_width;
 	sh = t3f_virtual_display_height;
-	
+
 	/* calculate total visible tiles */
 	tw = sw / ztp; // width of screen divided by total width of tile in pixels
 	th = sh / zhp;
-	
+
 	/* calculate first visible horizontal tile */
 	fox = (cx * zsp) / ztp - ((t3f_project_x(0.0, tmp->layer[layer]->z - oz)) / ztp);
 	ostartx = fox;
@@ -518,7 +518,7 @@ static void t3f_render_normal_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 	{
 		startx -= tmp->layer[layer]->width;
 	}
-	
+
 	/* calculate first visible vertical tile */
 	foy = (cy * zsp) / zhp - ((t3f_project_y(0.0, tmp->layer[layer]->z - oz)) / zhp);
 	ostarty = foy;
@@ -536,11 +536,11 @@ static void t3f_render_normal_tilemap(T3F_TILEMAP * tmp, T3F_TILESET * tsp, int 
 	{
 		starty -= tmp->layer[layer]->height;
 	}
-	
+
 	/* render the tiles */
 	ty = ostarty;
 	py = starty;
-	
+
 	held = al_is_bitmap_drawing_held();
 	al_store_state(&old_blender, ALLEGRO_STATE_BLENDER);
 	if(tmp->layer[layer]->flags & T3F_TILEMAP_LAYER_SOLID)

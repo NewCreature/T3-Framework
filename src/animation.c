@@ -48,14 +48,17 @@ T3F_ANIMATION * t3f_clone_animation(T3F_ANIMATION * ap)
 		{
 			for(i = 0; i < ap->bitmaps->count; i++)
 			{
-				clone->bitmaps->bitmap[i] = al_clone_bitmap(ap->bitmaps->bitmap[i]);
+/*				clone->bitmaps->bitmap[i] = al_clone_bitmap(ap->bitmaps->bitmap[i]);
 				if(!clone->bitmaps->bitmap[i])
 				{
 					return NULL;
+				} */
+				if(!t3f_clone_resource((void **)&clone->bitmaps->bitmap[i], ap->bitmaps->bitmap[i]))
+				{
+					clone->bitmaps->bitmap[i] = al_clone_bitmap(ap->bitmaps->bitmap[i]);
 				}
-				t3f_clone_resource((void **)&clone->bitmaps->bitmap[i], ap->bitmaps->bitmap[i]);
 			}
-			clone->bitmaps = ap->bitmaps;
+			clone->bitmaps->count = ap->bitmaps->count;
 		}
 		for(i = 0; i < ap->frames; i++)
 		{
@@ -137,7 +140,7 @@ T3F_ANIMATION * t3f_load_animation_f(ALLEGRO_FILE * fp, const char * fn)
 				ap->bitmaps->count = al_fread16le(fp);
 				for(i = 0; i < ap->bitmaps->count; i++)
 				{
-					ap->bitmaps->bitmap[i] = al_load_bitmap_f(fp, ".png");
+					ap->bitmaps->bitmap[i] = t3f_load_resource_f((void **)(&ap->bitmaps->bitmap[i]), T3F_RESOURCE_TYPE_BITMAP, fp, fn, 1, 0);
 				}
 				ap->frames = al_fread16le(fp);
 				for(i = 0; i < ap->frames; i++)
@@ -262,7 +265,11 @@ int t3f_save_animation_f(T3F_ANIMATION * ap, ALLEGRO_FILE * fp)
 	al_fwrite16le(fp, ap->bitmaps->count);
 	for(i = 0; i < ap->bitmaps->count; i++)
 	{
-		t3f_save_bitmap_f(fp, ap->bitmaps->bitmap[i]);
+		if(!t3f_save_bitmap_f(fp, ap->bitmaps->bitmap[i]))
+		{
+			printf("failed to save bitmap\n");
+			return 0;
+		}
 	}
 	al_fwrite16le(fp, ap->frames);
 	for(i = 0; i < ap->frames; i++)
