@@ -44,18 +44,18 @@ static float allegro_get_element_height(T3F_GUI_ELEMENT * ep)
 static void allegro_render_element(T3F_GUI * pp, int i, bool hover)
 {
 	int sx, sy;
-	
+
 	if(hover)
 	{
-		sx = -4;
-		sy = -4;
+		sx = -pp->element[i].sx * 2;
+		sy = -pp->element[i].sy * 2;
 	}
 	else
 	{
-		sx = -2;
-		sy = -2;
+		sx = -pp->element[i].sx;
+		sy = -pp->element[i].sy;
 	}
-	
+
 	switch(pp->element[i].type)
 	{
 		case T3F_GUI_ELEMENT_TEXT:
@@ -172,7 +172,7 @@ T3F_GUI * t3f_create_gui(int ox, int oy)
 void t3f_destroy_gui(T3F_GUI * pp)
 {
 	int i;
-	
+
 	for(i = 0; i < pp->elements; i++)
 	{
 		if(pp->element[i].flags & T3F_GUI_ELEMENT_COPY)
@@ -231,6 +231,8 @@ int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(void *, int, void *), cha
 	pp->element[pp->elements].color = color;
 	pp->element[pp->elements].flags = flags;
 	pp->element[pp->elements].description = NULL;
+	pp->element[pp->elements].sx = 2;
+	pp->element[pp->elements].sy = 2;
 	pp->elements++;
 	return 1;
 }
@@ -261,7 +263,7 @@ void t3f_center_gui(T3F_GUI * pp, float oy, float my)
 	float dheight = my - oy;
 	float height;
 	float offset;
-	
+
 	for(i = 0; i < pp->elements; i++)
 	{
 		if(pp->element[i].oy < top)
@@ -276,6 +278,17 @@ void t3f_center_gui(T3F_GUI * pp, float oy, float my)
 	height = bottom - top;
 	offset = oy + dheight / 2.0 - height / 2.0;
 	pp->oy = offset - top;
+}
+
+void t3f_set_gui_shadow(T3F_GUI * pp, float x, float y)
+{
+	int i;
+
+	for(i = 0; i < pp->elements; i++)
+	{
+		pp->element[i].sx = x;
+		pp->element[i].sy = y;
+	}
 }
 
 static bool t3f_gui_check_hover_x(T3F_GUI * pp, int i, float x)
@@ -371,7 +384,7 @@ void t3f_process_gui(T3F_GUI * pp, void * data)
 	int touch_id = 0;
 	int x, y;
 	float mouse_x = 0.0, mouse_y = 0.0;
-	
+
 	/* check if the mouse has been moved */
 	t3f_get_mouse_mickeys(&x, &y, NULL);
 	if(x != 0 || y != 0 || t3f_mouse_button[0])
@@ -447,14 +460,14 @@ void t3f_render_gui_element(T3F_GUI * pp, int i, bool hover)
 void t3f_render_gui(T3F_GUI * pp)
 {
 	int i;
-	
+
 	if(pp)
 	{
 		for(i = 0; i < pp->elements; i++)
 		{
 			t3f_render_gui_element(pp, i, i == pp->hover_element);
 		}
-		
+
 		/* render the hover element last so it appears on top */
 //		if(pp->hover_element >= 0 && pp->hover_element < pp->elements)
 //		{
