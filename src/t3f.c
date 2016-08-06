@@ -55,7 +55,7 @@ int t3f_mouse_dx = 0;
 int t3f_mouse_dy = 0;
 int t3f_mouse_dz = 0;
 bool t3f_mouse_button[16] = {0};
-bool t3f_mouse_hidden = false;
+bool t3f_mouse_tracking = false;
 
 /* joystick data */
 ALLEGRO_JOYSTICK * t3f_joystick[T3F_MAX_JOYSTICKS] = {NULL};
@@ -662,13 +662,11 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	int dw, dh;
 	int ret = 1;
 
-	/* Disable full screen window attempt on Mac OS X because it will not give
-	 * the correct results on 10.5 (my deployment target. This should really be
-	 * fixed in Allegro but it is not on their to-do list */
-	#ifndef ALLEGRO_MACOSX
-		bool fsw_supported = true; // is full screen window supported?
+	bool fsw_supported = true;
+	#ifdef ALLEGRO_ANDROID
+		bool no_windowed = true; // is full screen window supported?
 	#else
-		bool fsw_supported = false; // is full screen window supported?
+		bool no_windowed = false;
 	#endif
 
 	/* disable fsw support if the config file says to */
@@ -772,7 +770,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		}
 		cvalue = al_get_config_value(t3f_config, "T3F", "force_fullscreen");
 		cvalue2 = al_get_config_value(t3f_config, "T3F", "force_window");
-		if((flags & T3F_USE_FULLSCREEN || (cvalue && !strcmp(cvalue, "true"))) && !(cvalue2 && !strcmp(cvalue2, "true")))
+		if(((flags & T3F_USE_FULLSCREEN || (cvalue && !strcmp(cvalue, "true"))) && !(cvalue2 && !strcmp(cvalue2, "true"))) || no_windowed)
 		{
 			if(fsw_supported)
 			{
@@ -1226,6 +1224,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
+			t3f_mouse_tracking = true;
 
 			t3f_touch[0].active = true;
 			t3f_touch[0].x = t3f_mouse_x;
@@ -1239,6 +1238,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
+			t3f_mouse_tracking = true;
 
 			t3f_touch[0].active = false;
 			t3f_touch[0].x = t3f_mouse_x;
@@ -1251,6 +1251,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
+			t3f_mouse_tracking = true;
 
 			if(t3f_touch[0].active)
 			{
@@ -1273,12 +1274,12 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		}
 		case ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY:
 		{
-			t3f_mouse_hidden = true;
+			t3f_mouse_tracking = false;
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY:
 		{
-			t3f_mouse_hidden = false;
+			t3f_mouse_tracking = true;
 			break;
 		}
 
@@ -1331,6 +1332,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			{
 				t3f_pause_music();
 			}
+			al_save_config_file(t3f_config_filename, t3f_config);
 			break;
 		}
 		case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:

@@ -95,7 +95,7 @@ extern int t3f_mouse_dx;
 extern int t3f_mouse_dy;
 extern int t3f_mouse_dz;
 extern bool t3f_mouse_button[16];
-extern bool t3f_mouse_hidden;
+extern bool t3f_mouse_tracking;
 
 extern ALLEGRO_JOYSTICK * t3f_joystick[T3F_MAX_JOYSTICKS];
 extern ALLEGRO_JOYSTICK_STATE t3f_joystick_state[T3F_MAX_JOYSTICKS];

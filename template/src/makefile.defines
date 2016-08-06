@@ -73,6 +73,15 @@ GLOBAL_CFLAGS = -O2 -fomit-frame-pointer -funroll-loops -Wall -I. -DT3F_DEVELOPE
 #MINGW_DEPEND_LIBS =
 #MINGW_PLATFORM_TARGET =
 
+#################
+# Android stuff #
+#################
+#ANDROID_CFLAGS =
+#ANDROID_PLATFORM_OBJECTS =
+ANDROID_PLATFORM_LIBS = -lcurl
+#ANDROID_DEPEND_LIBS =
+#ANDROID_PLATFORM_TARGET =
+
 ##########################
 # Debian packaging stuff #
 ##########################

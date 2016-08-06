@@ -4,11 +4,17 @@
 T3F_VIEW * t3f_default_view = NULL;
 T3F_VIEW * t3f_current_view = NULL;
 
+void t3f_set_view_focus(T3F_VIEW * vp, float fx, float fy)
+{
+	vp->vp_x = fx;
+	vp->vp_y = fy;
+}
+
 void t3f_select_view(T3F_VIEW * sp)
 {
 	float sx, sy;
 	float dsx, dsy;
-	
+
 	if(sp != NULL)
 	{
 		t3f_current_view = sp;
@@ -21,7 +27,7 @@ void t3f_select_view(T3F_VIEW * sp)
 	dsy = (float)t3f_display_height / t3f_virtual_display_height;
 	sx = t3f_current_view->width / t3f_virtual_display_width;
 	sy = t3f_current_view->height / t3f_virtual_display_height;
-	
+
 	/* apply additional transformations */
 	al_build_transform(&t3f_current_transform, t3f_display_offset_x + (t3f_current_view->offset_x * dsx), t3f_display_offset_y + (t3f_current_view->offset_y * dsy), dsx * sx, dsy * sy, 0.0);
 	al_use_transform(&t3f_current_transform);
@@ -55,7 +61,7 @@ bool t3f_project_coordinates(float vw, float vpx, float vpy, float * x, float * 
 float t3f_project_x(float x, float z)
 {
 	float rx;
-	
+
 //	if(z + t3f_current_view->width > 0)
 	if(z + t3f_virtual_display_width > 0)
 	{
@@ -74,7 +80,7 @@ float t3f_project_x(float x, float z)
 float t3f_project_y(float y, float z)
 {
 	float ry;
-	
+
 //	if(z + t3f_current_view->height > 0)
 	if(z + t3f_virtual_display_width > 0)
 	{

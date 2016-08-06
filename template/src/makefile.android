@@ -67,13 +67,12 @@ build_android:
 	sed -i '' "s|armeabi-v7a|$(ANDROID_ARCHITECTURE)|" ../temp/android/template/jni/Application.mk
 	sed -i '' "s|APP_VERSION_STRING|$(APP_VERSION)|" ../temp/android/template/AndroidManifest.xml
 	sed -i '' "s|APP_RELEASE_NUMBER|$(APP_RELEASE)|" ../temp/android/template/AndroidManifest.xml
-	sed -i '' "s|APP_ORIENTATION|$(APP_ORIENTATION)" ../temp/android/template/AndroidManifest.xml
 	@echo Building Android project
 	cd ../temp/android/template; export T3F_APP_LIBS='$(APP_LIBS)'; export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT); export APP_LIBS='$(APP_LIBS)'; export PLATFORM_LIBS='$(PLATFORM_LIBS)'; export PLATFORM_CFLAGS='$(PLATFORM_CFLAGS)'; export NATIVE_CALL_PREFIX='$(ANDROID_NATIVE_CALL_PREFIX)'; $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant release; cp bin/alandroid-project-release-unsigned.apk ../../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
 
 build_allegro:
 	@echo Building Allegro...
-	cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT) -DWANT_ANDROID=on -DWANT_RELEASE_LOGGING=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_VIDEO=OFF -DWANT_TTF=ON -DFREETYPE_INCLUDE_DIR_freetype2=$(ANDROID_TOOLCHAIN_ROOT)/user/armeabi-v7a/include/freetype2; make install; cp lib/Allegro5.jar ../../
+	export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT); cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DCMAKE_TOOLCHAIN_FILE=$(ALLEGRO_SRC_ROOT)/cmake/Toolchain-android.cmake -DWANT_RELEASE_LOGGING=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DWANT_TESTS=OFF -DCMAKE_BUILD_TYPE=$(ANDROID_BUILD_TYPE) -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_VIDEO=OFF -DWANT_TTF=ON -DFREETYPE_INCLUDE_DIR_freetype2=$(ANDROID_TOOLCHAIN_ROOT)/user/armeabi-v7a/include/freetype2; make install; cp lib/Allegro5.jar ../../
 #	cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT) -DWANT_ANDROID=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_FFMPEG=ON; make install; cp lib/Allegro5.jar ../../
 
 build_temp:
