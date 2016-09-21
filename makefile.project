@@ -46,7 +46,7 @@ else
 	@cp -a template/macosx "$(DIR)"
 endif
 
-import_project_updates:
+import_updates:
 ifndef DIR
 	@echo "Usage: make import_project_updates DIR=location"
 else
