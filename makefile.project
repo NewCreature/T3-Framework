@@ -45,3 +45,25 @@ else
 	@cp -a template/win32 "$(DIR)"
 	@cp -a template/macosx "$(DIR)"
 endif
+
+import_project_updates:
+ifndef DIR
+	@echo "Usage: make import_project_updates DIR=location"
+else
+	@echo "Importing T3F changes from project in '$(DIR)'..."
+	@cp "$(DIR)/src/t3f/"*.c src
+	@cp "$(DIR)/src/t3f/"*.h include/t3f
+	@cp "$(DIR)/src/Makefile" template/src/Makefile
+	@cp "$(DIR)/src/makefile.include" template/src/makefile.include
+	@cp "$(DIR)/src/makefile.common" template/src/makefile.common
+	@cp "$(DIR)/src/makefile.android" template/src/makefile.android
+	@cp "$(DIR)/src/makefile.linux" template/src/makefile.linux
+	@cp "$(DIR)/src/makefile.linux_static" template/src/makefile.linux_static
+	@cp "$(DIR)/src/makefile.macosx" template/src/makefile.macosx
+	@cp "$(DIR)/src/makefile.mingw" template/src/makefile.mingw
+	@cp "$(DIR)/src/makefile.mingw_cross" template/src/makefile.mingw_cross
+	@cp -a "$(DIR)/debian/." template/src/debian/
+	@cp -a "$(DIR)/android/." template/src/android/
+	@cp -a "$(DIR)/win32/." template/src/win32/
+	@cp -a "$(DIR)/macosx/." template/src/macosx/
+endif

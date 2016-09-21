@@ -30,3 +30,6 @@ project:
 
 upgrade_project:
 	@$(MAKE) -f makefile.project upgrade_project
+
+import_project_updates:
+	@$(MAKE) -f makefile.project import_project_updates
