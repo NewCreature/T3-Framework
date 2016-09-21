@@ -322,12 +322,7 @@ void * t3f_clone_resource(void ** dest, void * ptr)
 				t3f_add_resource(t3f_resource[i]->type, dest, t3f_resource[i]->filename, t3f_resource[i]->option, t3f_resource[i]->flags, t3f_resource[i]->offset, al_get_new_file_interface());
 			}
 			al_set_new_file_interface(old_fi);
-			break;
 		}
-	}
-	if(i == t3f_resources)
-	{
-		return NULL;
 	}
 	return *dest;
 }

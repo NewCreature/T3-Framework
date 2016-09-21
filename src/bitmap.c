@@ -2,7 +2,7 @@
 #include <allegro5/allegro_image.h>
 #include <math.h>
 #include <stdio.h>
-#include "t3f/t3f.h"
+#include "t3f.h"
 
 ALLEGRO_COLOR interpolate(ALLEGRO_COLOR c1, ALLEGRO_COLOR c2, float frac)
 {
@@ -21,7 +21,7 @@ ALLEGRO_BITMAP * t3f_squeeze_bitmap(ALLEGRO_BITMAP * bp, int * ow, int * oh)
 	float pixx, pixx_f, pixy, pixy_f;
 	ALLEGRO_COLOR a, b, c, d, ab, cd, result;
 	ALLEGRO_STATE old_state;
-	
+
 	printf("max size = %d\n", width);
 	if(start_w < width)
 	{
@@ -40,14 +40,14 @@ ALLEGRO_BITMAP * t3f_squeeze_bitmap(ALLEGRO_BITMAP * bp, int * ow, int * oh)
 	{
 		*oh = start_h;
 	}
-	
+
 	/* return original bitmap if it already fits */
 	if(start_w <= width && start_h <= height)
 	{
 		printf("clone (%d, %d) (%d, %d)\n", start_w, start_h, width, height);
 		return al_clone_bitmap(bp);
 	}
-	
+
 	/* scale with software filtering */
 	rbp = al_create_bitmap(width, height);
 	if(!rbp)

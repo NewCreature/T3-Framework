@@ -1,8 +1,5 @@
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_acodec.h>
-#include "t3f/t3f.h"
-#include "t3f/music.h"
+#include "t3f.h"
+#include "music.h"
 
 ALLEGRO_AUDIO_STREAM * t3f_stream = NULL;
 ALLEGRO_MUTEX * t3f_music_mutex = NULL;

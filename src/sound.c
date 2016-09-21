@@ -1,9 +1,7 @@
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_audio.h>
 #include <math.h>
 #include <stdio.h>
-#include "t3f/t3f.h"
-#include "t3f/sound.h"
+#include "t3f.h"
+#include "sound.h"
 
 static float t3f_sound_volume = 1.0;
 static ALLEGRO_SAMPLE * t3f_sample_queue[T3F_MAX_QUEUED_SAMPLES] = {NULL};
@@ -44,7 +42,7 @@ bool t3f_queue_sample(ALLEGRO_SAMPLE * sp)
 void t3f_clear_sample_queue(void)
 {
 	int i;
-	
+
 	if(t3f_flags & T3F_USE_SOUND)
 	{
 		for(i = 0; i < T3F_MAX_QUEUED_SAMPLES; i++)
@@ -69,7 +67,7 @@ ALLEGRO_SAMPLE * t3f_get_queue_sample(void)
 static void t3f_play_queued_sample(void)
 {
 	int i;
-	
+
 	if(t3f_sample_queue[0])
 	{
 		t3f_queue_sample_instance = al_create_sample_instance(t3f_sample_queue[0]);
@@ -116,9 +114,9 @@ float t3f_get_sound_position(float earx, float eary, float soundx, float soundy)
 float t3f_get_sound_gain(float earx, float eary, float soundx, float soundy, float scale)
 {
 	float distance;
-	
+
 	distance = hypot(earx - soundx, eary - soundy);
-	
+
 	/* sound is out of hearing range */
 	if(distance > scale)
 	{

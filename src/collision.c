@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "t3f/t3f.h"
-#include "t3f/collision.h"
+#include "t3f.h"
+#include "collision.h"
 
 static void add_collision_point(T3F_COLLISION_LIST * lp, float x, float y)
 {
@@ -19,7 +19,7 @@ T3F_COLLISION_OBJECT * t3f_create_collision_object(float rx, float ry, float w, 
 {
 	T3F_COLLISION_OBJECT * cp;
 	float i;
-	
+
 	cp = malloc(sizeof(T3F_COLLISION_OBJECT));
 	if(!cp)
 	{
@@ -31,7 +31,7 @@ T3F_COLLISION_OBJECT * t3f_create_collision_object(float rx, float ry, float w, 
 	cp->map.bottom.points = 0;
 	cp->map.left.points = 0;
 	cp->map.right.points = 0;
-	
+
 	/* map top points */
 	add_collision_point(&cp->map.top, rx + w / 2.0, ry); // center collision point
 	for(i = rx; i < rx + w; i += tw)
@@ -39,7 +39,7 @@ T3F_COLLISION_OBJECT * t3f_create_collision_object(float rx, float ry, float w, 
 		add_collision_point(&cp->map.top, i, ry);
 	}
 	add_collision_point(&cp->map.top, rx + w - 1.0, ry);
-    
+
 	/* map bottom points */
 	add_collision_point(&cp->map.bottom, rx + w / 2.0, ry + h - 1.0); // center collision point
 	for(i = rx; i < rx + w; i += tw)
@@ -63,7 +63,7 @@ T3F_COLLISION_OBJECT * t3f_create_collision_object(float rx, float ry, float w, 
 		add_collision_point(&cp->map.right, rx + w - 1.0, i);
 	}
 	add_collision_point(&cp->map.right, rx + w - 1.0, ry + h - 1.0);
-	
+
 	cp->flags = flags;
 	return cp;
 }
@@ -71,14 +71,14 @@ T3F_COLLISION_OBJECT * t3f_create_collision_object(float rx, float ry, float w, 
 void t3f_recreate_collision_object(T3F_COLLISION_OBJECT * cp, float rx, float ry, float w, float h, int tw, int th, int flags)
 {
 	float i;
-	
+
 	cp->x = 0.0;
 	cp->y = 0.0;
 	cp->map.top.points = 0;
 	cp->map.bottom.points = 0;
 	cp->map.left.points = 0;
 	cp->map.right.points = 0;
-	
+
 	/* map top points */
 	add_collision_point(&cp->map.top, (rx + w) / 2.0, ry); // center collision point
 	for(i = rx; i < w; i += tw)
@@ -86,7 +86,7 @@ void t3f_recreate_collision_object(T3F_COLLISION_OBJECT * cp, float rx, float ry
 		add_collision_point(&cp->map.top, i, ry);
 	}
 	add_collision_point(&cp->map.top, rx + w - 1.0, ry);
-    
+
 	/* map bottom points */
 	add_collision_point(&cp->map.bottom, (rx + w) / 2.0, ry + h - 1.0); // center collision point
 	for(i = rx; i < w; i += tw)
@@ -110,7 +110,7 @@ void t3f_recreate_collision_object(T3F_COLLISION_OBJECT * cp, float rx, float ry
 		add_collision_point(&cp->map.right, rx + w - 1.0, i);
 	}
 	add_collision_point(&cp->map.right, rx + w - 1.0, ry + h - 1.0);
-	
+
 	cp->flags = flags;
 }
 
@@ -125,7 +125,7 @@ T3F_COLLISION_OBJECT * t3f_load_collision_object_f(ALLEGRO_FILE * fp, int tw, in
 	char header[16];
 	float rx, ry, w, h;
 	int flags;
-	
+
 	al_fread(fp, header, 16);
 	if(strcmp(header, "T3F_COBJECT"))
 	{
@@ -156,7 +156,7 @@ T3F_COLLISION_OBJECT * t3f_load_collision_object(const char * fn, int tw, int th
 {
 	ALLEGRO_FILE * fp;
 	T3F_COLLISION_OBJECT * op = NULL;
-	
+
 	fp = al_fopen(fn, "rb");
 	if(!fp)
 	{
@@ -171,7 +171,7 @@ bool t3f_save_collision_object_f(T3F_COLLISION_OBJECT * op, ALLEGRO_FILE * fp)
 {
 	char header[16];
 	float rx, ry, w, h;
-	
+
 	rx = op->map.left.point[0].x;
 	ry = op->map.top.point[0].y;
 	w = op->map.right.point[0].x - op->map.left.point[0].x;
@@ -191,7 +191,7 @@ bool t3f_save_collision_object(T3F_COLLISION_OBJECT * op, const char * fn)
 {
 	ALLEGRO_FILE * fp;
 	bool ret;
-	
+
 	fp = al_fopen(fn, "wb");
 	if(!fp)
 	{
@@ -206,7 +206,7 @@ T3F_COLLISION_TILEMAP * t3f_create_collision_tilemap(int w, int h, int tw, int t
 {
 	T3F_COLLISION_TILEMAP * tmp;
 	int i, j;
-	
+
 	tmp = malloc(sizeof(T3F_COLLISION_TILEMAP));
 	if(!tmp)
 	{
@@ -273,7 +273,7 @@ T3F_COLLISION_TILEMAP * t3f_load_collision_tilemap_f(ALLEGRO_FILE * fp)
 	T3F_COLLISION_TILEMAP * tmp = NULL;
 	char header[16];
 	int j, k, l;
-	
+
 	if(al_fread(fp, header, 16) != 16)
 	{
 		printf("read failed\n");
@@ -335,7 +335,7 @@ T3F_COLLISION_TILEMAP * t3f_load_collision_tilemap(char * fn)
 {
 	ALLEGRO_FILE * fp;
 	T3F_COLLISION_TILEMAP * tmp;
-	
+
 	fp = al_fopen(fn, "rb");
 	if(!fp)
 	{
@@ -351,7 +351,7 @@ bool t3f_save_collision_tilemap_f(T3F_COLLISION_TILEMAP * tmp, ALLEGRO_FILE * fp
 	char header[16] = {0};
 	int j, k, l;
 	strcpy(header, "T3F_CTILEMAP");
-	
+
 	al_fwrite(fp, header, 16);
 	al_fwrite16le(fp, tmp->width);
 	al_fwrite16le(fp, tmp->height);
@@ -394,7 +394,7 @@ bool t3f_save_collision_tilemap_f(T3F_COLLISION_TILEMAP * tmp, ALLEGRO_FILE * fp
 bool t3f_save_collision_tilemap(T3F_COLLISION_TILEMAP * tmp, char * fn)
 {
 	ALLEGRO_FILE * fp;
-	
+
 	fp = al_fopen(fn, "wb");
 	if(!fp)
 	{
@@ -410,7 +410,7 @@ void t3f_move_collision_object_x(T3F_COLLISION_OBJECT * cp, float x)
 	cp->ox = cp->x;
 	cp->x = x;
 	cp->vx = cp->x - cp->ox;
-	
+
 //	cp->ox = cp->x;
 //	cp->x = x;
 //	cp->vx = cp->x - cp->ox;
@@ -421,7 +421,7 @@ void t3f_move_collision_object_y(T3F_COLLISION_OBJECT * cp, float y)
 	cp->oy = cp->y;
 	cp->y = y;
 	cp->vy = cp->y - cp->oy;
-	
+
 //	cp->oy = cp->y;
 //	cp->y = y;
 //	cp->vy = cp->y - cp->oy;
@@ -524,10 +524,10 @@ int t3f_get_collision_tile_x(T3F_COLLISION_TILEMAP * tmp, float x)
 	{
 		tx -= total_width;
 	}
-	
+
 	/* figure out tile index */
 	ctx = (int)tx / tmp->tile_width;
-	
+
 	return ctx;
 }
 
@@ -546,10 +546,10 @@ int t3f_get_collision_tile_y(T3F_COLLISION_TILEMAP * tmp, float y)
 	{
 		ty -= total_height;
 	}
-	
+
 	/* figure out tile index */
 	cty = (int)ty / tmp->tile_height;
-	
+
 	return cty;
 }
 
@@ -582,7 +582,7 @@ int t3f_check_collision_tilemap_flag(T3F_COLLISION_TILEMAP * tmp, float x, float
 int t3f_check_tilemap_collision_top(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TILEMAP * tmp)
 {
 	int i;
-	
+
     if(cp->map.top.points > 0)
     {
 	    if(cp->vy < 0.0)
@@ -614,7 +614,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 	int pinslope = 1;
 //	int pxinslope = 0;
 	bool crossed = false;
-	
+
     if(cp->vy > 0.0)
     {
     	if(cp->map.bottom.points > 0)
@@ -637,7 +637,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 	                	hit = 1;
                		}
            		}
-           		
+
     		}
 			/* if we crossed a tile border, check previous tile for slope */
 			if(crossed && t3f_get_collision_tilemap_flag(tmp, cp->x + cp->map.bottom.point[0].x, cp->oy + cp->map.bottom.point[0].y, T3F_COLLISION_FLAG_SLOPE_TOP))
@@ -663,7 +663,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 	    	T3F_COLLISION_TILE * pyp = &tmp->data[t3f_get_collision_tile_y(tmp, cp->oy + cp->map.bottom.point[0].y)][t3f_get_collision_tile_x(tmp, cp->x + cp->map.bottom.point[0].x)];
 	    	int bpy = cp->y + cp->map.bottom.point[0].y;
 	    	int bpoy = cp->oy + cp->map.bottom.point[0].y;
-	    	
+
 			if(tp->slope)
 			{
 				if((cp->y + cp->map.bottom.point[0].y) > (float)((bpy / tmp->tile_height) * tmp->tile_height + tp->slope[(int)fmodf(cp->x + cp->map.bottom.point[0].x, tmp->tile_width)]))
@@ -675,7 +675,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 			{
 				printf("xcross\n");
 			}
-			
+
 			/* first see if sprite is moving within a tile */
 	    	if(tp == pp)
 	    	{
@@ -685,7 +685,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 			    	return 1;
 		    	}
 	    	}
-	    	
+
 	    	/* now see if sprite has crossed into the next tile */
 	    	if(crossed && tp != pyp)
 	    	{
@@ -700,7 +700,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 			    	return 1;
 	    		}
 	    	}
-	    	
+
 	    	/* see if x movement caused sprite to cross the slope */
 	    	if(tp == pxp)
 	    	{
@@ -710,7 +710,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 			    	return 1;
 	    		}
 	    	}
-	    	
+
 	    	/* see if we passed through the gap between two tiles */
 	    	if(tp != pp)
 	    	{
@@ -751,9 +751,9 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 	    			}
     			}
 	    	}
-    	
+
 	    	return hit;
-	    	
+
 	    	if(tp->slope)
 	    	{
 		    	if(pyp->slope)
@@ -836,7 +836,7 @@ int t3f_check_tilemap_collision_bottom(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_
 int t3f_check_tilemap_collision_left(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TILEMAP * tmp)
 {
 	int i;
-	
+
     if(cp->map.left.points > 0)
     {
 	    if(cp->vx < 0.0)
@@ -861,7 +861,7 @@ int t3f_check_tilemap_collision_left(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TI
 int t3f_check_tilemap_collision_right(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TILEMAP * tmp)
 {
 	int i;
-	
+
     if(cp->map.right.points > 0)
     {
 	    if(cp->vx > 0.0)
@@ -924,7 +924,7 @@ float t3f_get_tilemap_collision_x(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TILEM
 	int tw = tmp->tile_width;
 	float rx;
 	float tx;
-	
+
     /* if sprite was moving left */
     if(cp->x < cp->ox)
     {
@@ -1067,7 +1067,7 @@ float t3f_get_tilemap_walk_position(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TIL
 {
 	int tflags, bflags, aflags;
 	T3F_COLLISION_TILE * current_tile, * below_tile, * above_tile;
-	
+
 	if(flags & T3F_COLLISION_FLAG_SOLID_TOP)
 	{
 		current_tile = t3f_get_collision_tile(tmp, cp->x + cp->map.bottom.point[0].x, cp->y + cp->map.bottom.point[0].y);
@@ -1078,7 +1078,7 @@ float t3f_get_tilemap_walk_position(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TIL
 		bflags = (below_tile->flags) & (T3F_COLLISION_FLAG_SLOPE_TOP | T3F_COLLISION_FLAG_SOLID_TOP);
 		above_tile = t3f_get_collision_tile(tmp, cp->x + cp->map.bottom.point[0].x, cp->y + cp->map.bottom.point[0].y - tmp->tile_height);
 		aflags = (above_tile->flags) & (T3F_COLLISION_FLAG_SLOPE_TOP | T3F_COLLISION_FLAG_SOLID_TOP);
-		
+
 		/* current tile is solid on top and is sloped, place sprite on top of the slope */
 		if((tflags & T3F_COLLISION_FLAG_SOLID_TOP) && (tflags & T3F_COLLISION_FLAG_SLOPE_TOP))
 		{
@@ -1093,7 +1093,7 @@ float t3f_get_tilemap_walk_position(T3F_COLLISION_OBJECT * cp, T3F_COLLISION_TIL
 			printf("2\n");
 			return ((int)(cp->oy + cp->map.bottom.point[0].y) / tmp->tile_height) * tmp->tile_height - (cp->map.bottom.point[0].y - cp->map.top.point[0].y) + previous_tile->slope[(int)fmodf(cp->x + cp->map.bottom.point[0].x, tmp->tile_width)] - 1.0;
 		} */
-		
+
 		/* tile above current tile is solid and sloped */
 		else if((aflags & T3F_COLLISION_FLAG_SOLID_TOP) && (aflags & T3F_COLLISION_FLAG_SLOPE_TOP) && (bflags & T3F_COLLISION_FLAG_SOLID_TOP))
 		{

@@ -1,7 +1,6 @@
-#include "t3f/t3f.h"
-#include <allegro5/allegro_ttf.h>
-#include "t3f/font.h"
-#include "t3f/draw.h"
+#include "t3f.h"
+#include "font.h"
+#include "draw.h"
 
 /* make "magic pink" transparent and grays different levels of alpha */
 static void t3f_convert_grey_to_alpha(ALLEGRO_BITMAP * bitmap)

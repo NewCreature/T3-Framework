@@ -1,10 +1,8 @@
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_font.h>
 #include <math.h>
-#include "t3f/t3f.h"
-#include "t3f/animation.h"
-#include "t3f/tilemap.h"
-#include "t3f/view.h"
+#include "t3f.h"
+#include "animation.h"
+#include "tilemap.h"
+#include "view.h"
 
 T3F_TILE * t3f_create_tile(void)
 {

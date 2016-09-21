@@ -1,11 +1,11 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
 #include <math.h>
-#include "t3f/t3f.h"
-#include "t3f/animation.h"
-#include "t3f/bitmap.h"
-#include "t3f/draw.h"
-#include "t3f/view.h"
+#include "t3f.h"
+#include "animation.h"
+#include "bitmap.h"
+#include "draw.h"
+#include "view.h"
 #include "resource.h"
 
 static char ani_header[12] = {'O', 'C', 'D', 'A', 'S', 0};
@@ -48,15 +48,7 @@ T3F_ANIMATION * t3f_clone_animation(T3F_ANIMATION * ap)
 		{
 			for(i = 0; i < ap->bitmaps->count; i++)
 			{
-/*				clone->bitmaps->bitmap[i] = al_clone_bitmap(ap->bitmaps->bitmap[i]);
-				if(!clone->bitmaps->bitmap[i])
-				{
-					return NULL;
-				} */
-				if(!t3f_clone_resource((void **)&clone->bitmaps->bitmap[i], ap->bitmaps->bitmap[i]))
-				{
-					clone->bitmaps->bitmap[i] = al_clone_bitmap(ap->bitmaps->bitmap[i]);
-				}
+				t3f_clone_resource((void **)&(clone->bitmaps->bitmap[i]), ap->bitmaps->bitmap[i]);
 			}
 			clone->bitmaps->count = ap->bitmaps->count;
 		}

@@ -1,12 +1,12 @@
-#include "t3f/t3f.h"
-#include "t3f/vector.h"
-#include "t3f/view.h"
+#include "t3f.h"
+#include "vector.h"
+#include "view.h"
 
 /* vector object creation */
 T3F_VECTOR_OBJECT * t3f_create_vector_object(void)
 {
 	T3F_VECTOR_OBJECT * vp;
-	
+
 	vp = malloc(sizeof(T3F_VECTOR_OBJECT));
 	if(!vp)
 	{
@@ -19,7 +19,7 @@ T3F_VECTOR_OBJECT * t3f_create_vector_object(void)
 void t3f_destroy_vector_object(T3F_VECTOR_OBJECT * vp)
 {
 	int i;
-	
+
 	for(i = 0; i < vp->segments; i++)
 	{
 		free(vp->segment[i]);
@@ -53,7 +53,7 @@ bool t3f_add_vector_segment(T3F_VECTOR_OBJECT * vp, float sx, float sy, float sz
 bool t3f_remove_vector_segment(T3F_VECTOR_OBJECT * vp, unsigned int segment)
 {
 	int i;
-	
+
 	if((int)segment < vp->segments)
 	{
 		free(vp->segment[segment]);
@@ -72,7 +72,7 @@ T3F_VECTOR_FONT * t3f_create_vector_font(void)
 {
 	T3F_VECTOR_FONT * vfp;
 	int i;
-	
+
 	vfp = malloc(sizeof(T3F_VECTOR_FONT));
 	if(!vfp)
 	{
@@ -88,7 +88,7 @@ T3F_VECTOR_FONT * t3f_create_vector_font(void)
 void t3f_destroy_vector_font(T3F_VECTOR_FONT * vfp)
 {
 	int i;
-	
+
 	for(i = 0; i < T3F_VECTOR_FONT_MAX_CHARACTERS; i++)
 	{
 		if(vfp->character[i])
@@ -129,7 +129,7 @@ T3F_VECTOR_OBJECT * t3f_load_vector_object_f(ALLEGRO_FILE * fp)
 	char header[16] = {0};
 	int i;
 	int segments = 0;
-	
+
 	if(al_fread(fp, header, 16) != 16)
 	{
 		return NULL;
@@ -170,7 +170,7 @@ T3F_VECTOR_OBJECT * t3f_load_vector_object(const char * fn)
 {
 	ALLEGRO_FILE * fp;
 	T3F_VECTOR_OBJECT * vp = NULL;
-	
+
 	fp = al_fopen(fn, "rb");
 	if(!fp)
 	{
@@ -186,7 +186,7 @@ bool t3f_save_vector_object_f(T3F_VECTOR_OBJECT * vp, ALLEGRO_FILE * fp)
 	unsigned char r, g, b, a;
 	char header[16] = {'T', '3', 'F', 'V'};
 	int i;
-	
+
 	if(al_fwrite(fp, header, 16) != 16)
 	{
 		return false;
@@ -214,7 +214,7 @@ bool t3f_save_vector_object(T3F_VECTOR_OBJECT * vp, const char * fn)
 {
 	ALLEGRO_FILE * fp;
 	bool ret;
-	
+
 	fp = al_fopen(fn, "wb");
 	if(!fp)
 	{
@@ -234,7 +234,7 @@ T3F_VECTOR_FONT * t3f_load_vector_font_f(ALLEGRO_FILE * fp)
 	float max_y = 0.0;
 	char header[16] = {0};
 	int i, j;
-	
+
 	if(al_fread(fp, header, 16) != 16)
 	{
 		return NULL;
@@ -276,7 +276,7 @@ T3F_VECTOR_FONT * t3f_load_vector_font(const char * fn)
 {
 	ALLEGRO_FILE * fp;
 	T3F_VECTOR_FONT * vfp = NULL;
-	
+
 	fp = al_fopen(fn, "rb");
 	if(!fp)
 	{
@@ -291,7 +291,7 @@ bool t3f_save_vector_font_f(T3F_VECTOR_FONT * vfp, ALLEGRO_FILE * fp)
 {
 	char header[16] = {'T', '3', 'F', 'V', 'F'};
 	int i;
-	
+
 	if(al_fwrite(fp, header, 16) != 16)
 	{
 		return false;
@@ -316,7 +316,7 @@ bool t3f_save_vector_font(T3F_VECTOR_FONT * vfp, const char * fn)
 {
 	ALLEGRO_FILE * fp;
 	bool ret;
-	
+
 	fp = al_fopen(fn, "wb");
 	if(!fp)
 	{
@@ -337,7 +337,7 @@ float t3f_get_morphed_vector_text_width(T3F_VECTOR_FONT * vfp, float sx, const c
 {
 	float width = 0.0;
 	unsigned int i;
-	
+
 	for(i = 0; i < strlen(text); i++)
 	{
 		if(vfp->character[(int)text[i]])
@@ -372,7 +372,7 @@ void t3f_draw_tinted_vector_object(T3F_VECTOR_OBJECT * vp, float x, float y, flo
 void t3f_draw_morphed_vector_object(T3F_VECTOR_OBJECT * vp, float x, float y, float z, float sx, float sy, float sz, float tscale)
 {
 	int i;
-	
+
 	for(i = 0; i < vp->segments; i++)
 	{
 		al_draw_line(t3f_project_x(x + vp->segment[i]->point[0].x * sx, vp->segment[i]->point[0].z * sz + z) + 0.5, t3f_project_y(y + vp->segment[i]->point[0].y * sy, vp->segment[i]->point[0].z * sz + z) + 0.5, t3f_project_x(x + vp->segment[i]->point[1].x * sx, vp->segment[i]->point[1].z * sz + z) + 0.5, t3f_project_y(y + vp->segment[i]->point[1].y * sy, vp->segment[i]->point[1].z * sz + z) + 0.5, vp->segment[i]->color, vp->segment[i]->thickness * tscale);
@@ -382,7 +382,7 @@ void t3f_draw_morphed_vector_object(T3F_VECTOR_OBJECT * vp, float x, float y, fl
 void t3f_draw_morphed_vector_object_extrusion(T3F_VECTOR_OBJECT * vp, float x, float y, float z, float sx, float sy, float sz, float lz, float tscale)
 {
 	int i;
-	
+
 	for(i = 0; i < vp->segments; i++)
 	{
 		al_draw_line(t3f_project_x(x + vp->segment[i]->point[0].x * sx, vp->segment[i]->point[0].z * sz + z) + 0.5, t3f_project_y(y + vp->segment[i]->point[0].y * sy, vp->segment[i]->point[0].z * sz + z) + 0.5, t3f_project_x(x + vp->segment[i]->point[0].x * sx, vp->segment[i]->point[0].z * sz + z + lz) + 0.5, t3f_project_y(y + vp->segment[i]->point[0].y * sy, vp->segment[i]->point[0].z * sz + z + lz) + 0.5, vp->segment[i]->color, vp->segment[i]->thickness * tscale);
@@ -392,7 +392,7 @@ void t3f_draw_morphed_vector_object_extrusion(T3F_VECTOR_OBJECT * vp, float x, f
 void t3f_draw_tinted_morphed_vector_object(T3F_VECTOR_OBJECT * vp, float x, float y, float z, float sx, float sy, float sz, float tscale, ALLEGRO_COLOR color)
 {
 	int i;
-	
+
 	for(i = 0; i < vp->segments; i++)
 	{
 		al_draw_line(t3f_project_x(x + vp->segment[i]->point[0].x * sx, vp->segment[i]->point[0].z * sz + z) + 0.5, t3f_project_y(y + vp->segment[i]->point[0].y * sy, vp->segment[i]->point[0].z * sz + z) + 0.5, t3f_project_x(x + vp->segment[i]->point[1].x * sx, vp->segment[i]->point[1].z * sz + z) + 0.5, t3f_project_y(y + vp->segment[i]->point[1].y * sy, vp->segment[i]->point[1].z * sz + z) + 0.5, color, vp->segment[i]->thickness * tscale);
@@ -402,7 +402,7 @@ void t3f_draw_tinted_morphed_vector_object(T3F_VECTOR_OBJECT * vp, float x, floa
 void t3f_draw_tinted_morphed_vector_object_extrusion(T3F_VECTOR_OBJECT * vp, float x, float y, float z, float sx, float sy, float sz, float lz, float tscale, ALLEGRO_COLOR color)
 {
 	int i;
-	
+
 	for(i = 0; i < vp->segments; i++)
 	{
 		al_draw_line(t3f_project_x(x + vp->segment[i]->point[0].x * sx, vp->segment[i]->point[0].z * sz + z) + 0.5, t3f_project_y(y + vp->segment[i]->point[0].y * sy, vp->segment[i]->point[0].z * sz + z) + 0.5, t3f_project_x(x + vp->segment[i]->point[0].x * sx, vp->segment[i]->point[0].z * sz + z + lz) + 0.5, t3f_project_y(y + vp->segment[i]->point[0].y * sy, vp->segment[i]->point[0].z * sz + z + lz) + 0.5, color, vp->segment[i]->thickness * tscale);
@@ -414,7 +414,7 @@ void t3f_draw_vector_text(T3F_VECTOR_FONT * vfp, ALLEGRO_COLOR color, float x, f
 {
 	unsigned int i;
 	float ox = x;
-	
+
 	for(i = 0; i < strlen(text); i++)
 	{
 		if(vfp->character[(int)text[i]])
@@ -429,7 +429,7 @@ void t3f_draw_morphed_vector_text(T3F_VECTOR_FONT * vfp, ALLEGRO_COLOR color, fl
 {
 	unsigned int i;
 	float ox = x;
-	
+
 	for(i = 0; i < strlen(text); i++)
 	{
 		if(vfp->character[(int)text[i]])
@@ -444,7 +444,7 @@ void t3f_draw_morphed_vector_text_extrusion(T3F_VECTOR_FONT * vfp, ALLEGRO_COLOR
 {
 	unsigned int i;
 	float ox = x;
-	
+
 	for(i = 0; i < strlen(text); i++)
 	{
 		if(vfp->character[(int)text[i]])

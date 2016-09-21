@@ -1,6 +1,6 @@
 #include <allegro5/allegro5.h>
-#include "t3f/t3f.h"
-#include "t3f/controller.h"
+#include "t3f.h"
+#include "controller.h"
 
 static char t3f_binding_return_name[256] = {0};
 static char t3f_controller_return_name[256] = {0};
