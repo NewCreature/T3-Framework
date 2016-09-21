@@ -35,67 +35,99 @@ t3f.c
 This is the main module which handles the events and processes your logic and
 rendering routines. Here is a list of functions and what they do:
 
-int t3f_initialize(const char * name, int w, int h, double fps,
-	void (*logic_proc)(), void (*render_proc)(), int flags)
+int t3f_initialize(const char * name, int w, int h, double fps, void
+	(*logic_proc)(void * data), void (*render_proc)(void * data), int flags,
+	void * data);
 
 	Initialize T3F with the given parameters.
-	
+
 	'name' is the name of the program. The window title will be set to this and
 	the configuration file will be stored in a folder with this name.
-	
+
 	'w' and 'h' are the virtual display dimensions. These determine how big the
-	drawing area is. This is independant of the display size. If your display is
+	drawing area is. This is independent of the display size. If your display is
 	a different size all drawing will be stretched accordingly.
-	
+
 	'fps' is the rate at which the logic routine is run. Typically a value of 60
 	will give good results.
-	
+
 	'logic_proc' is a pointer to your logic routine.
-	
+
 	'render_proc' is a pointer to your render routine.
-	
+
 	'flags' are described below:
-	
+
 		T3F_USE_KEYBOARD
-		
+
 			Your program will be using the keyboard.
-			
+
 		T3F_USE_MOUSE
-		
+
 			Your program will be using the mouse.
-			
+
 		T3F_USE_JOYSTICK
-		
+
 			Your program will be using the joystick(s).
-			
+
 		T3F_USE_SOUND
-		
+
 			Your program will be using sound.
-			
+
 		T3F_USE_FULLSCREEN
-		
+
 			Your program will be full screen.
-			
+
 		T3F_RESIZABLE
-		
+
 			Your program will have a resizable window.
-			
+
 		T3F_FORCE_ASPECT
-		
+
 			Your program will maintain its aspect ratio when resized.
-			
-		T3F_USE_CONSOLE
-		
+
+		T3F_NO_DISPLAY
+
 			Your program will not create a window.
-			
+
+		T3F_USE_TOUCH
+
+			Your program will be using touch input.
+
+		T3F_USE_OPENGL
+
+			Always use OpenGL. Use this if you intend to use OpenGL code in your
+			project. If this flag is not specified, Direct3D will be used on Windows.
+
+		T3F_FILL_SCREEN
+
+			Used in combination with T3F_FORCE_ASPECT, this will cause the rendering to
+			be scaled to fill the screen instead of letter boxed.
+
+		T3F_USE_MENU
+
+			Tell T3F that you will be using OS native menus in your program. If you
+			don't specify this flag, menus may not work on some platforms.
+
 		T3F_DEFAULT
-		
-			Same as using "T3F_USE_KEYBOARD | T3F_USE_SOUND."
-	
+
+			Same as using 'T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_JOYSTICK |
+			T3F_USE_TOUCH | T3F_USE_SOUND | T3F_FORCE_ASPECT'. These settings are ideal
+			for a typical game.
+
+		Check 't3f_flags' for these flags after init to see what features initialized
+		successfully. E.g. 't3f_flags & T3F_USE_SOUND' will be 0 if the sound system
+		failed to initialize. Any required feature should be checked for before
+		continuing to initialize your program.
+
+	'data' is a pointer to any data that you would like T3F to pass into your
+	logic and rendering routines. This will typically be a pointer to your
+	program's main data structure. If you like using global variables you can just
+	pass NULL.
+
 int t3f_set_gfx_mode(int w, int h, int flags)
 
 	Changes the size of the display. Accepts the display flags listed above.
-	
+
 void t3f_exit(void)
 
 	Shuts down T3F. Call this somewhere in your logic routine (e.g. when user
@@ -106,7 +138,7 @@ void t3f_run(void)
 	Start the main program loop. This is where all the events are handled and
 	your logic and render routines are called from. This function will not
 	return until a call to t3f_exit().
-	
+
 
 T3F provides keyboard access similar to Allegro 4. Use the t3f_key[] array to
 check if a specific key is pressed (see Allegro 5 docs for key values). Buffered
@@ -124,7 +156,7 @@ char t3f_read_key(int flags)
 
 	Read the next key from the keyboard buffer. Returns 0 if there are no keys
 	in the buffer.
-	
+
 
 T3F has a few contains functions which allow you to create some modest 3D
 effects. Below is a list of structures and functions and their descriptions:
@@ -141,7 +173,7 @@ T3F_VIEW * t3f_create_view(float ox, float oy, float w, float h, float vpx,
 	the offset of the viewport in relation to T3F's virtual display. 'w' and 'h'
 	are the viewport's dimensions. 'vpx' and 'vpy' are the coordinates of the
 	vanishing point.
-	
+
 void t3f_destroy_view(T3F_VIEW * vp)
 
 	Frees the passed T3F_VIEW from memory.
@@ -197,9 +229,9 @@ sprites without breaking a sweat. Here's a list of functions and what they do:
 T3F_ATLAS * t3f_create_atlas(int w, int h)
 
 	Create an atlas of the specified width, height, and type.
-	
+
 	Example usage:
-	
+
 		T3F_ATLAS * atlas = t3f_create_atlas(512, 512);
 
 ALLEGRO_BITMAP * t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, int type)
@@ -260,39 +292,39 @@ void * t3f_load_resource(void ** ptr, int type, const char * filename,
 
 	Load resource of type 'type' from file 'filename' with the specified
 	options into '*ptr'. Valid types are:
-	
+
 		T3F_RESOURCE_TYPE_BITMAP (resource loaded using al_load_bitmap())
 		T3F_RESOURCE_TYPE_FONT (resource loaded using al_load_ttf_font())
 		T3F_RESOURCE_TYPE_BITMAP_FONT (resource loaded using
 			al_load_bitmap_font_flags())
 		T3F_RESOURCE_TYPE_T3F_FONT (resource loaded using t3f_load_font())
-	
+
 	'option' is used to specify the size of the loaded font when loading a
 		T3F_RESOURCE_TYPE_FONT resource.
-	
+
 	'offset' is the seek offset within the file. You will always pass 0 for this
 	argument. This parameter is used internally by the resource manager to help
 	reloading resources after they have been lost or unloaded.
-		
+
 void * t3f_load_resource_f(void ** ptr, int type, ALLEGRO_FILE * fp, const char
 	* filename, int option, int flags);
 
 	Same as t3f_load_resource() but loads from 'fp' instead of a filename. This
 	is useful if you embed graphics into your own file format and need to use
 	the resource manager with them.
-	
+
 void t3f_destroy_resource(void * ptr)
 
 	Destroy the specified resource and quit tracking it. Call this instead of
 	Allegro's normal al_destroy_*() functions on resources loaded with the
 	resource manager.
-	
+
 void t3f_unload_resources(void)
 
 	Unload all loaded resources. This is done automatically by the framework
 	when necessary. There are some cases when you may wish to do this yourself,
 	like if you need to recreate a display.
-	
+
 void t3f_reload_resources(void)
 
 	Reload all resources being handled by the resource manager. Use this if you
@@ -309,9 +341,9 @@ bool t3f_play_music(char * fn)
 
 	Play the specified file. Looping data can be stored in a corresponding INI
 	file (e.g. loop data will be read from "bgm.ini" if you play "bgm.ogg").
-	
+
 	The INI format is:
-	
+
 		[loop]
 		start=0.0
 		end=86.5
@@ -326,7 +358,7 @@ void t3f_stop_music(void)
 void t3f_pause_music(void)
 
 	Pause the playing music.
-	
+
 void t3f_resume_music(void)
 
 	Unpause the music.
@@ -439,9 +471,9 @@ void t3f_update_controller(T3F_CONTROLLER * cp)
 
 	Update controller state based on data retrieved by t3f_read_controller().
 	Usually you will want to call t3f_read_controller() prior to calling this.
-	
+
 	Example usage:
-	
+
 		t3f_read_controller(&my_controller);
 		t3f_update_controller(&my_controller);
 		if(cp->state[0].pressed) // button was just pressed
@@ -541,9 +573,9 @@ int t3f_animation_delete_frame(T3F_ANIMATION * ap, int frame)
 void t3f_add_animation_to_sprite_sheet(T3F_ANIMATION * ap)
 
 	Moves an animation's bitmaps to the current sprite sheet.
-	
+
 	Example usage:
-	
+
 	my_sprite_sheet = al_create_bitmap(512, 512);
 	if(!my_sprite_sheet)
 	{
@@ -557,7 +589,7 @@ void t3f_add_animation_to_sprite_sheet(T3F_ANIMATION * ap)
 	}
 	t3f_add_animation_to_sprite_sheet(my_animation);
 	t3f_finish_sprite_sheet();
-	
+
 Several functions are provided which aid with drawing animations. These are as
 follows:
 
@@ -578,9 +610,9 @@ void t3f_draw_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tick,
 
 void t3f_draw_scaled_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color,
 	int tick, float x, float y,	float z, float scale, int flags);
-	
+
 	Same as t3f_draw_animation() except it allows you to specify a scale factor.
-	
+
 void t3f_draw_rotated_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color,
 	int tick, float cx, float cy, float x, float y, float z, float angle,
 	int flags)
@@ -591,7 +623,7 @@ void t3f_draw_rotated_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color,
 void t3f_draw_rotated_scaled_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color,
 	int tick, float cx, float cy, float x, float y, float z, float angle,
 	float scale, int flags);
-	
+
 	Same as t3f_draw_animation() except it allows you to specify a scale factor
 	and angle of rotation.
 
@@ -619,20 +651,20 @@ Here are some of the most useful functions:
 
 T3F_COLLISION_OBJECT * t3f_create_collision_object(float rx, float ry, float w,
 	float h, int tw, int th, int flags)
-	
+
 	Create a collision object. (rx, ry) are the coordinates of the upper left
 	corner of the collision object as they relate to the actual sprite. 'w' and
 	'h' are the width and height of the collision object. 'tw' and 'th' are the
 	width and height of tiles in a T3F_COLLISION_TILEMAP that the object needs
 	to interact with. If you are not using T3F_COLLISION_TILEMAPs you can safely
 	set these to 32.
-	
+
 void t3f_recreate_collision_object(T3F_COLLISION_OBJECT * cp, float rx,
 	float ry, float w, float h, int tw, int th, int flags)
-	
+
 	Same as t3f_create_collision_object() but instead updates an existing
 	T3F_COLLISION_OBJECT.
-	
+
 void t3f_destroy_collision_object(T3F_COLLISION_OBJECT * cp)
 
 	Destroy the object, freeing all memory used by it.
@@ -654,7 +686,7 @@ void t3f_move_collision_object_xy(T3F_COLLISION_OBJECT * cp, float x, float y)
 
 int t3f_check_object_collision(T3F_COLLISION_OBJECT * cp1,
 	T3F_COLLISION_OBJECT * cp2)
-	
+
 	See if the two objects collided.
 
 
@@ -724,7 +756,7 @@ T3F_GUI_DRIVER
 
 	A GUI system driver. Make your own driver by filling in the three members
 	with your own functions. Members are:
-	
+
 		float(*get_element_width)(T3F_GUI_ELEMENT * ep);
 		float(*get_element_height)(T3F_GUI_ELEMENT * ep);
 		void(*render_element)(T3F_GUI * pp, int i, bool hover);
@@ -753,7 +785,7 @@ int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *),
 
 	Add an image element to a GUI. The image will be displayed at the specified
 	location within the page. Flags can be:
-	
+
 		T3F_GUI_ELEMENT_CENTER
 		T3F_GUI_ELEMENT_SHADOW
 		T3F_GUI_ELEMENT_AUTOHIDE
@@ -763,16 +795,16 @@ int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *),
 int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(int, void *),
 	char * text, ALLEGRO_FONT * fp, int ox, int oy, ALLEGRO_COLOR color,
 	int flags);
-	
+
 	Add a text element to a GUI. The text will be displayed at the specified
 	location using the specified font. Flags can be:
-	
+
 		T3F_GUI_ELEMENT_CENTER
 		T3F_GUI_ELEMENT_SHADOW
 		T3F_GUI_ELEMENT_AUTOHIDE
 		T3F_GUI_ELEMENT_COPY
 		T3F_GUI_ELEMENT_STATIC
-	
+
 void t3f_center_gui(T3F_GUI * pp, float oy, float my)
 
 	Vertically center a GUI. The GUI's center will be the center point between
