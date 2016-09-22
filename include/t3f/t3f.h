@@ -19,8 +19,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "debug.h"
-
 #define T3F_USE_KEYBOARD    1
 #define T3F_USE_MOUSE       2
 #define T3F_USE_JOYSTICK    4
@@ -61,16 +59,26 @@ typedef struct
 } T3F_TOUCH;
 
 /* include all T3F modules */
-#include "sound.h"
-#include "music.h"
-#include "bitmap.h"
+#include "android.h"
 #include "animation.h"
-#include "font.h"
+#include "atlas.h"
+#include "bitmap.h"
 #include "collision.h"
 #include "controller.h"
+#include "debug.h"
+#include "draw.h"
+#include "font.h"
 #include "gui.h"
-//#include "tilemap.h"
+#include "memory.h"
+#include "menu.h"
+#include "music.h"
+#include "primitives.h"
+#include "resource.h"
+#include "rng.h"
+#include "sound.h"
+#include "tilemap.h"
 #include "vector.h"
+#include "view.h"
 
 extern int t3f_virtual_display_width;
 extern int t3f_virtual_display_height;
