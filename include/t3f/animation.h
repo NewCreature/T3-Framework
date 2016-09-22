@@ -6,7 +6,6 @@
 #endif
 
 #include <allegro5/allegro5.h>
-#include "t3f.h"
 #include "atlas.h"
 
 #define T3F_ANIMATION_MAX_BITMAPS  256

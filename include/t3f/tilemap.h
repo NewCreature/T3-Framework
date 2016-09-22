@@ -6,7 +6,6 @@
 #endif
 
 #include <allegro5/allegro5.h>
-#include "t3f.h"
 #include "animation.h"
 
 #define T3F_MAX_TILES         1024
@@ -27,61 +26,61 @@
 
 typedef struct
 {
-	
+
 	T3F_ANIMATION * ap;
 	int user_data[T3F_TILE_MAX_DATA];
 	int flags;
-	
+
 	/* animated tiles (tiles which change to other tiles) */
 	short frame_list[1024];
 	short frame_list_total;
-	
+
 } T3F_TILE;
 
 typedef struct
 {
-	
+
 	T3F_ATLAS * atlas;
-	
+
 	T3F_TILE * tile[T3F_MAX_TILES];
 	int tiles;
 	int width;
 	int height;
 	int flags;
-	
+
 } T3F_TILESET;
 
 typedef struct
 {
-	
+
 	/* map data */
 	short ** data;
 	int width;
 	int height;
 	int bitmap;
-	
+
 	/* position of layer plane in 3D space */
 	float x;
 	float y;
 	float z;
-	
+
 	/* scaling attributes */
 	float scale;
 	float speed_x;
 	float speed_y;
-	
+
 	int flags;
-	
+
 } T3F_TILEMAP_LAYER;
 
 typedef struct
 {
-	
+
 	T3F_TILEMAP_LAYER * layer[T3F_MAX_LAYERS];
 	int layers;
-	
+
 	int flags;
-	
+
 } T3F_TILEMAP;
 
 T3F_TILE * t3f_create_tile(void);
