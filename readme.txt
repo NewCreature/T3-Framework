@@ -157,13 +157,17 @@ char t3f_read_key(int flags)
 	Read the next key from the keyboard buffer. Returns 0 if there are no keys
 	in the buffer.
 
+bool t3f_key_pressed(void)
+
+	Returns true if any key presses in the keyboard buffer.
+
 
 T3F has a few contains functions which allow you to create some modest 3D
 effects. Below is a list of structures and functions and their descriptions:
 
 T3F_VIEW
 
-	This structure hold projection data which is needed for all of the 3D
+	This structure holds projection data which is needed for all of the 3D
 	functions.
 
 T3F_VIEW * t3f_create_view(float ox, float oy, float w, float h, float vpx,
