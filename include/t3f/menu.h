@@ -11,5 +11,7 @@ int t3f_process_menu_click(int id, void * data);
 void t3f_update_menus(void * data);
 void t3f_refresh_menus(void);
 bool t3f_attach_menu(ALLEGRO_MENU * mp);
+void t3f_enable_menus(bool enabled);
+bool t3f_menus_enabled(void);
 
 #endif

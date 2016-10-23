@@ -33,6 +33,8 @@ int t3f_virtual_display_width = 0;
 int t3f_virtual_display_height = 0;
 int t3f_display_offset_x = 0;
 int t3f_display_offset_y = 0;
+float t3f_display_scale_x = 0;
+float t3f_display_scale_y = 0;
 int t3f_display_width = 0;
 int t3f_display_height = 0;
 float t3f_mouse_scale_x = 1.0;
@@ -48,6 +50,8 @@ int t3f_key_buffer[T3F_KEY_BUFFER_MAX] = {0};
 int t3f_key_buffer_keys = 0;
 
 /* mouse data */
+int t3f_real_mouse_x = 0;
+int t3f_real_mouse_y = 0;
 int t3f_mouse_x = 0;
 int t3f_mouse_y = 0;
 int t3f_mouse_z = 0;
@@ -103,6 +107,8 @@ ALLEGRO_COLOR t3f_color_black;
 static bool t3f_need_redraw = false;
 static int t3f_halted = 0;
 static void (*t3f_event_handler_proc)(ALLEGRO_EVENT * event, void * data) = NULL;
+static void (*t3f_queued_call_proc)(void * data) = NULL;
+static void * t3f_queued_call_data = NULL;
 
 static char * t3f_developer_name = NULL;
 static char * t3f_package_name = NULL; // used to locate resources
@@ -536,13 +542,15 @@ void t3f_set_option(int option, int value)
 
 static void t3f_get_base_transform(void)
 {
-	float r, vr, scalex = 1.0, scaley = 1.0;
+	float r, vr;
 	const char * value;
 	bool override_setup = false;
 
 	/* reset internal display dimensions */
 	t3f_display_offset_x = 0;
 	t3f_display_offset_y = 0;
+	t3f_display_scale_x = 1.0;
+	t3f_display_scale_y = 1.0;
 	t3f_display_width = al_get_display_width(t3f_display);
 	t3f_display_height = al_get_display_height(t3f_display);
 	value = al_get_config_value(t3f_config, "T3F", "display_offset_x");
@@ -571,9 +579,9 @@ static void t3f_get_base_transform(void)
 	/* if we encounter any overrides in the config file, switch to manual mode */
 	if(override_setup)
 	{
-		scalex = (float)t3f_display_width / (float)t3f_virtual_display_width;
-		scaley = (float)t3f_display_height / (float)t3f_virtual_display_height;
-		al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, scalex, scaley, 0.0);
+		t3f_display_scale_x = (float)t3f_display_width / (float)t3f_virtual_display_width;
+		t3f_display_scale_y = (float)t3f_display_height / (float)t3f_virtual_display_height;
+		al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, t3f_display_scale_x, t3f_display_scale_y, 0.0);
 	}
 	else if(t3f_flags & T3F_FORCE_ASPECT)
 	{
@@ -596,9 +604,9 @@ static void t3f_get_base_transform(void)
 				t3f_display_offset_y = 0;
 				t3f_display_height = al_get_display_height(t3f_display);
 			}
-			scalex = (float)t3f_display_width / (float)t3f_virtual_display_width;
-			scaley = (float)t3f_display_height / (float)t3f_virtual_display_height;
-			al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, scalex, scaley, 0.0);
+			t3f_display_scale_x = (float)t3f_display_width / (float)t3f_virtual_display_width;
+			t3f_display_scale_y = (float)t3f_display_height / (float)t3f_virtual_display_height;
+			al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, t3f_display_scale_x, t3f_display_scale_y, 0.0);
 		}
 		else
 		{
@@ -617,18 +625,18 @@ static void t3f_get_base_transform(void)
 				t3f_display_offset_y = 0;
 				t3f_display_height = al_get_display_height(t3f_display);
 			}
-			scalex = (float)t3f_display_width / (float)t3f_virtual_display_width;
-			scaley = (float)t3f_display_height / (float)t3f_virtual_display_height;
-			al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, scalex, scaley, 0.0);
+			t3f_display_scale_x = (float)t3f_display_width / (float)t3f_virtual_display_width;
+			t3f_display_scale_y = (float)t3f_display_height / (float)t3f_virtual_display_height;
+			al_build_transform(&t3f_base_transform, t3f_display_offset_x, t3f_display_offset_y, t3f_display_scale_x, t3f_display_scale_y, 0.0);
 		}
 	}
 	else
 	{
 		t3f_display_width = al_get_display_width(t3f_display);
 		t3f_display_height = al_get_display_height(t3f_display);
-		scalex = (float)t3f_display_width / (float)t3f_virtual_display_width;
-		scaley = (float)t3f_display_height / (float)t3f_virtual_display_height;
-		al_build_transform(&t3f_base_transform, 0.0, 0.0, scalex, scaley, 0.0);
+		t3f_display_scale_x = (float)t3f_display_width / (float)t3f_virtual_display_width;
+		t3f_display_scale_y = (float)t3f_display_height / (float)t3f_virtual_display_height;
+		al_build_transform(&t3f_base_transform, 0.0, 0.0, t3f_display_scale_x, t3f_display_scale_y, 0.0);
 	}
 
 	/* scale mouse coordinates */
@@ -640,14 +648,14 @@ static void t3f_get_base_transform(void)
 	{
 		t3f_display_left = 0;
 		t3f_display_right = t3f_virtual_display_width;
-		t3f_display_top = -t3f_display_offset_y / scaley;
+		t3f_display_top = -t3f_display_offset_y / t3f_display_scale_y;
 		t3f_display_bottom = t3f_virtual_display_height - t3f_display_top;
 	}
 	else
 	{
 		t3f_display_top = 0;
 		t3f_display_bottom = t3f_virtual_display_height;
-		t3f_display_left = -t3f_display_offset_x / scalex;
+		t3f_display_left = -t3f_display_offset_x / t3f_display_scale_x;
 		t3f_display_right = t3f_virtual_display_width - t3f_display_left;
 	}
 }
@@ -1221,6 +1229,8 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
 		{
 			t3f_mouse_button[event->mouse.button - 1] = 1;
+			t3f_real_mouse_x = event->mouse.x;
+			t3f_real_mouse_y = event->mouse.y;
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
@@ -1234,6 +1244,8 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
 		{
 			t3f_mouse_button[event->mouse.button - 1] = 0;
+			t3f_real_mouse_x = event->mouse.x;
+			t3f_real_mouse_y = event->mouse.y;
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
@@ -1246,6 +1258,8 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		}
 		case ALLEGRO_EVENT_MOUSE_AXES:
 		{
+			t3f_real_mouse_x = event->mouse.x;
+			t3f_real_mouse_y = event->mouse.y;
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 			t3f_mouse_z = event->mouse.z;
@@ -1259,6 +1273,8 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		}
 		case ALLEGRO_EVENT_MOUSE_WARPED:
 		{
+			t3f_real_mouse_x = event->mouse.x;
+			t3f_real_mouse_y = event->mouse.y;
 			t3f_mouse_x = (float)(event->mouse.x - t3f_display_offset_x) * t3f_mouse_scale_x;
 			t3f_mouse_y = (float)(event->mouse.y - t3f_display_offset_y) * t3f_mouse_scale_y;
 
@@ -1417,6 +1433,13 @@ void t3f_run(void)
 	al_start_timer(t3f_timer);
 	while(!t3f_quit)
 	{
+		/* call queued up procudure */
+		if(t3f_queued_call_proc)
+		{
+			t3f_queued_call_proc(t3f_queued_call_data);
+			t3f_queued_call_proc = NULL;
+			t3f_queued_call_data = NULL;
+		}
 		al_wait_for_event(t3f_queue, &event);
 		if(t3f_event_handler_proc)
 		{
@@ -1491,4 +1514,15 @@ void t3f_store_state(T3F_VIEW * sp)
 void t3f_restore_state(T3F_VIEW * sp)
 {
 	memcpy(t3f_current_view, sp, sizeof(T3F_VIEW));
+}
+
+bool t3f_queue_call(void (*proc)(void * data), void * data)
+{
+	if(!t3f_queued_call_proc)
+	{
+		t3f_queued_call_proc = proc;
+		t3f_queued_call_data = data;
+		return true;
+	}
+	return false;
 }

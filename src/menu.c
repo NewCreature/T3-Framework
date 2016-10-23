@@ -9,6 +9,7 @@ static ALLEGRO_MENU * t3f_menu[T3F_MAX_MENU_ITEMS] = {NULL}; // keep track of me
 static int (*t3f_menu_proc[T3F_MAX_MENU_ITEMS])(void * data) = {NULL};
 static int (*t3f_menu_update_proc[T3F_MAX_MENU_ITEMS])(ALLEGRO_MENU * menu, int item, void * data) = {NULL};
 static bool t3f_refresh_menus_needed = false;
+static bool t3f_menus_allowed = true;
 
 void t3f_reset_menus(void)
 {
@@ -36,11 +37,14 @@ int t3f_add_menu_item(ALLEGRO_MENU * mp, const char * text, int flags, ALLEGRO_M
 
 int t3f_process_menu_click(int id, void * data)
 {
-    if(id < t3f_current_menu_id)
+    if(t3f_menus_allowed)
     {
-        if(t3f_menu_proc[id])
+        if(id < t3f_current_menu_id)
         {
-            return t3f_menu_proc[id](data);
+            if(t3f_menu_proc[id])
+            {
+                return t3f_menu_proc[id](data);
+            }
         }
     }
     return 0;
@@ -73,4 +77,14 @@ bool t3f_attach_menu(ALLEGRO_MENU * mp)
     al_register_event_source(t3f_queue, al_get_default_menu_event_source());
     al_set_display_menu(t3f_display, mp);
     return true;
+}
+
+void t3f_enable_menus(bool enabled)
+{
+    t3f_menus_allowed = enabled;
+}
+
+bool t3f_menus_enabled(void)
+{
+    return t3f_menus_allowed;
 }

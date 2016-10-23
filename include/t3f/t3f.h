@@ -84,6 +84,8 @@ extern int t3f_virtual_display_width;
 extern int t3f_virtual_display_height;
 extern int t3f_display_offset_x;
 extern int t3f_display_offset_y;
+extern float t3f_display_scale_x;
+extern float t3f_display_scale_y;
 extern int t3f_display_width;
 extern int t3f_display_height;
 extern float t3f_display_top;
@@ -96,6 +98,8 @@ extern bool t3f_quit;
 extern int t3f_flags;
 extern int t3f_option[T3F_MAX_OPTIONS];
 
+extern int t3f_real_mouse_x;
+extern int t3f_real_mouse_y;
 extern int t3f_mouse_x;
 extern int t3f_mouse_y;
 extern int t3f_mouse_z;
@@ -162,6 +166,9 @@ void t3f_setup_directories(ALLEGRO_PATH * final);
 const char * t3f_get_filename(ALLEGRO_PATH * path, const char * fn);
 bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp);
 ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp);
+
+/* threading */
+bool t3f_queue_call(void (*proc)(void * data), void * data);
 
 #ifdef __cplusplus
    }
