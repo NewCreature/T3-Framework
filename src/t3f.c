@@ -156,7 +156,7 @@ bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp)
 	int i, size = 0;
 	bool ret = false;
 
-	path = al_get_standard_path(ALLEGRO_TEMP_PATH);
+	path = al_clone_path(t3f_data_path);
 	if(path)
 	{
 		al_set_path_filename(path, "t3saver.png");
@@ -174,6 +174,7 @@ bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp)
 				ret = true;
 				al_fclose(tfp);
 			}
+			al_remove_filename(al_path_cstr(path, '/'));
 		}
 		al_destroy_path(path);
 	}
