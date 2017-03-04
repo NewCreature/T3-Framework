@@ -70,7 +70,9 @@ typedef struct
 #include "font.h"
 #include "gui.h"
 #include "memory.h"
-#include "menu.h"
+#ifndef ALLEGRO_ANDROID
+    #include "menu.h"
+#endif
 #include "music.h"
 #include "primitives.h"
 #include "resource.h"
@@ -166,6 +168,8 @@ void t3f_setup_directories(ALLEGRO_PATH * final);
 const char * t3f_get_filename(ALLEGRO_PATH * path, const char * fn);
 bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp);
 ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp);
+bool t3f_save_color_f(ALLEGRO_FILE * fp, ALLEGRO_COLOR * color);
+bool t3f_load_color_f(ALLEGRO_FILE * fp, ALLEGRO_COLOR * color);
 
 /* threading */
 bool t3f_queue_call(void (*proc)(void * data), void * data);

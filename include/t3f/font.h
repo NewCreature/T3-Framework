@@ -10,37 +10,38 @@
 
 typedef struct
 {
-	
+
 	ALLEGRO_BITMAP * bitmap;
 	int x, y, width, height;
-	
+
 } T3F_FONT_CHARACTER;
 
 typedef struct
 {
-	
+
 	ALLEGRO_BITMAP * character_sheet;
 	T3F_FONT_CHARACTER character[T3F_FONT_MAX_CHARACTERS];
 	float adjust;
 	float scale;
-	
+
 } T3F_FONT;
 
 typedef struct
 {
-	
+
 	char text[256];
-	
+	float width;
+
 } T3F_TEXT_LINE;
 
 typedef struct
 {
-	
+
 	T3F_FONT * font;
 	T3F_TEXT_LINE line[64];
 	int lines;
 	float tab;
-	
+
 } T3F_TEXT_LINE_DATA;
 
 ALLEGRO_FONT * t3f_load_bitmap_font(const char * fn);
@@ -57,6 +58,6 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 void t3f_draw_textf(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * format, ...);
 
 void t3f_create_text_line_data(T3F_TEXT_LINE_DATA * lp, T3F_FONT * fp, float w, float tab, const char * text);
-void t3f_draw_text_lines(T3F_TEXT_LINE_DATA * lines, ALLEGRO_COLOR color, float x, float y, float z);
+void t3f_draw_text_lines(T3F_TEXT_LINE_DATA * lines, ALLEGRO_COLOR color, float x, float y, float z, int flags);
 
 #endif

@@ -156,7 +156,7 @@ bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp)
 	int i, size = 0;
 	bool ret = false;
 
-	path = al_clone_path(t3f_data_path);
+	path = al_get_standard_path(ALLEGRO_TEMP_PATH);
 	if(path)
 	{
 		al_set_path_filename(path, "t3saver.png");
@@ -174,7 +174,6 @@ bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp)
 				ret = true;
 				al_fclose(tfp);
 			}
-			al_remove_filename(al_path_cstr(path, '/'));
 		}
 		al_destroy_path(path);
 	}
@@ -205,6 +204,60 @@ ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp)
 		}
 	}
 	return bp;
+}
+
+bool t3f_save_color_f(ALLEGRO_FILE * fp, ALLEGRO_COLOR * color)
+{
+	unsigned char r, g, b, a;
+
+	al_unmap_rgba(*color, &r, &g, &b, &a);
+	if(al_fputc(fp, r) != r)
+	{
+		return false;
+	}
+	if(al_fputc(fp, g) != g)
+	{
+		return false;
+	}
+	if(al_fputc(fp, b) != b)
+	{
+		return false;
+	}
+	if(al_fputc(fp, a) != a)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool t3f_load_color_f(ALLEGRO_FILE * fp, ALLEGRO_COLOR * color)
+{
+	int r, g, b, a;
+
+	r = al_fgetc(fp);
+	if(r == EOF)
+	{
+		return false;
+	}
+	g = al_fgetc(fp);
+	if(g == EOF)
+	{
+		return false;
+	}
+	b = al_fgetc(fp);
+	if(b == EOF)
+	{
+		return false;
+	}
+	a = al_fgetc(fp);
+	if(a == EOF)
+	{
+		return false;
+	}
+	*color = al_map_rgba(r, g, b, a);
+
+	return true;
 }
 
 static void t3f_get_options(void)
