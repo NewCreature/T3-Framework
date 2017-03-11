@@ -111,7 +111,7 @@ int menu_update_bitmap_delete_proc(ALLEGRO_MENU * menu, int item, void * data)
 	{
 		if(view == ANIMATOR_VIEW_BITMAPS)
 		{
-			if(animation->bitmaps)
+			if(animation->bitmaps->count)
 			{
 				al_set_menu_item_flags(menu, item, 0);
 				return 0;
@@ -139,6 +139,46 @@ int menu_update_bitmap_iter_proc(ALLEGRO_MENU * menu, int item, void * data)
 	return 0;
 }
 
+int menu_update_mode_bitmaps_proc(ALLEGRO_MENU * menu, int item, void * data)
+{
+	if(animation)
+	{
+		if(view == ANIMATOR_VIEW_BITMAPS)
+		{
+			al_set_menu_item_flags(menu, item, ALLEGRO_MENU_ITEM_CHECKED);
+		}
+		else
+		{
+			al_set_menu_item_flags(menu, item, 0);
+		}
+	}
+	else
+	{
+		al_set_menu_item_flags(menu, item, ALLEGRO_MENU_ITEM_DISABLED);
+	}
+	return 0;
+}
+
+int menu_update_mode_frames_proc(ALLEGRO_MENU * menu, int item, void * data)
+{
+	if(animation)
+	{
+		if(view == ANIMATOR_VIEW_FRAMES)
+		{
+			al_set_menu_item_flags(menu, item, ALLEGRO_MENU_ITEM_CHECKED);
+		}
+		else
+		{
+			al_set_menu_item_flags(menu, item, 0);
+		}
+	}
+	else
+	{
+		al_set_menu_item_flags(menu, item, ALLEGRO_MENU_ITEM_DISABLED);
+	}
+	return 0;
+}
+
 int menu_update_frame_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
 	if(animation && animation->bitmaps->count)
@@ -157,7 +197,7 @@ int menu_update_frames_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
 	if(animation)
 	{
-		if(view == ANIMATOR_VIEW_BITMAPS && animation->bitmaps)
+		if(view == ANIMATOR_VIEW_BITMAPS && animation->bitmaps->count)
 		{
 			al_set_menu_item_flags(menu, item, 0);
 			return 0;
@@ -169,7 +209,7 @@ int menu_update_frames_proc(ALLEGRO_MENU * menu, int item, void * data)
 
 int menu_update_frame_delete_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
-	if(animation && animation->bitmaps)
+	if(animation && animation->bitmaps->count)
 	{
 		if(view == ANIMATOR_VIEW_FRAMES)
 		{
@@ -186,7 +226,7 @@ int menu_update_frame_delete_proc(ALLEGRO_MENU * menu, int item, void * data)
 
 int menu_update_frame_tick_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
-	if(animation && animation->bitmaps)
+	if(animation && animation->bitmaps->count)
 	{
 		if(view == ANIMATOR_VIEW_FRAMES)
 		{
@@ -203,7 +243,7 @@ int menu_update_frame_tick_proc(ALLEGRO_MENU * menu, int item, void * data)
 
 int menu_update_frame_iter_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
-	if(animation && animation->bitmaps)
+	if(animation && animation->bitmaps->count)
 	{
 		if(view == ANIMATOR_VIEW_FRAMES)
 		{
@@ -277,12 +317,14 @@ int menu_proc_file_quit(void * data)
 int menu_proc_view_bitmaps(void * data)
 {
 	view = ANIMATOR_VIEW_BITMAPS;
+	t3f_refresh_menus();
 	return 0;
 }
 
 int menu_proc_view_frames(void * data)
 {
 	view = ANIMATOR_VIEW_FRAMES;
+	t3f_refresh_menus();
 	return 0;
 }
 
@@ -827,8 +869,8 @@ bool setup_menus(void)
 	{
 		return false;
 	}
-	t3f_add_menu_item(view_menu, "&Bitmaps", 0, NULL, menu_proc_view_bitmaps, menu_update_frame_proc);
-	t3f_add_menu_item(view_menu, "&Frames", 0, NULL, menu_proc_view_frames, menu_update_frames_proc);
+	t3f_add_menu_item(view_menu, "&Bitmaps", ALLEGRO_MENU_ITEM_CHECKBOX | ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_view_bitmaps, menu_update_mode_bitmaps_proc);
+	t3f_add_menu_item(view_menu, "&Frames", ALLEGRO_MENU_ITEM_CHECKBOX | ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_view_frames, menu_update_mode_frames_proc);
 
 	bitmap_menu = al_create_menu();
 	if(!bitmap_menu)
