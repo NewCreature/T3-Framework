@@ -5,13 +5,13 @@ CXXFLAGS = $(CFLAGS)
 LFLAGS = $(MACOSX_LINKER_SETTINGS)
 PLATFORM_OBJECTS = t3f/menu.o $(MACOSX_PLATFORM_OBJECTS)
 PLATFORM_LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_dialog$(LIB_SUFFIX) -lallegro_main-static $(MACOSX_PLATFORM_LIBS)
-PLATFORM_TARGET = ../$(APP_TITLE).app
+PLATFORM_TARGET = $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 LIB_SUFFIX = -static
 DEPEND_LIBS = -lz -lpng -ljpeg -lFLAC -lvorbis -logg -lvorbisfile -ldumb -lfreetype $(MACOSX_DEPEND_LIBS)
 DEL_COMMAND = rm -f
 DEL_FOLDER_COMMAND = rm -rf
 SED_COMMAND = sed -i ''
-PLATFORM_CLEAN = rm -rf ../$(APP_TITLE).app
+PLATFORM_CLEAN = rm -rf $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 
 include makefile.common
 

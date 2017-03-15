@@ -69,4 +69,4 @@ debian_package: $(APP_EXE_NAME) ../debian/control_gen
 	rm -f ../debian/control_gen
 	rm -f ../debian/control_gen.o
 	echo Testing package...
-	lintian ../$(DEBIAN_APP_NAME)_$(APP_VERSION)_`dpkg-architecture -l -qDEB_BUILD_ARCH`.deb
+	lintian $(APP_PACKAGE_DIR)/$(DEBIAN_APP_NAME)_$(APP_VERSION)_`dpkg-architecture -l -qDEB_BUILD_ARCH`.deb
