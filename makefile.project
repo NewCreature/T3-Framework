@@ -21,6 +21,7 @@ else
 	@cp -a template/win32 "$(DIR)"
 	@cp -a template/macosx "$(DIR)"
 	@cp -a template/icons "$(DIR)"
+	@cp -a template/packages "$(DIR)"
 endif
 
 upgrade_project:
@@ -44,6 +45,7 @@ else
 	@cp -a template/android "$(DIR)"
 	@cp -a template/win32 "$(DIR)"
 	@cp -a template/macosx "$(DIR)"
+	@cp -a template/packages "$(DIR)"
 endif
 
 import_updates:
