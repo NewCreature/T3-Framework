@@ -2,12 +2,3 @@ T3F_OBJECTS = t3f/t3f.o t3f/music.o t3f/sound.o t3f/font.o t3f/animation.o\
              t3f/bitmap.o t3f/draw.o t3f/view.o t3f/android.o t3f/atlas.o\
              t3f/resource.o t3f/debug.o t3f/collision.o t3f/controller.o\
              t3f/gui.o t3f/tilemap.o t3f/vector.o t3f/rng.o t3f/primitives.o
-T3NET_OFILES = t3net/t3net.o
-ENET_OFILES = joynet/enet-1.3.1/callbacks.o joynet/enet-1.3.1/compress.o\
-              joynet/enet-1.3.1/host.o joynet/enet-1.3.1/list.o\
-              joynet/enet-1.3.1/packet.o joynet/enet-1.3.1/peer.o\
-              joynet/enet-1.3.1/protocol.o joynet/enet-1.3.1/unix.o\
-              joynet/enet-1.3.1/win32.o
-JOYNET_OFILES = $(ENET_OFILES) joynet/chat.o joynet/client.o\
-                joynet/game_message.o joynet/game.o joynet/joynet.o\
-                joynet/message.o joynet/serialize.o joynet/server.o
