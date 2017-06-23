@@ -399,47 +399,33 @@ void t3f_create_text_line_data(T3F_TEXT_LINE_DATA * lp, T3F_FONT * fp, float w, 
 		/* copy this line to our list of lines because it is long enough */
 		else if(t3f_get_text_width(fp, current_line) > wi)
 		{
-			if(last_space >= 0)
+			current_line[last_space] = '\0';
+			strcpy(lp->line[lp->lines].text, current_line);
+			current_line_start_pos += last_space + 1;
+			while(text[i] != ' ' && i >= 0)
 			{
-				current_line[last_space] = '\0';
-				strcpy(lp->line[lp->lines].text, current_line);
-				current_line_start_pos += last_space + 1;
-				while(text[i] != ' ' && i >= 0)
-				{
-					i--;
-				}
-				lp->lines++;
-				strcpy(lp->line[lp->lines].text, "");
-				current_line_pos = 0;
-				current_line[current_line_pos] = '\0';
-				wi = w - tab;
+				i--;
 			}
+			lp->lines++;
+			strcpy(lp->line[lp->lines].text, "");
+			current_line_pos = 0;
+			current_line[current_line_pos] = '\0';
+			wi = w - tab;
 		}
 	}
 	strcpy(lp->line[lp->lines].text, current_line);
 	lp->lines++;
 }
 
-void t3f_draw_text_lines(T3F_TEXT_LINE_DATA * lines, ALLEGRO_COLOR color, float x, float y, float z, int flags)
+void t3f_draw_text_lines(T3F_TEXT_LINE_DATA * lines, ALLEGRO_COLOR color, float x, float y, float z)
 {
 	int i;
 	float px = x;
 	float py = y;
-	float ox;
 
 	for(i = 0; i < lines->lines; i++)
 	{
-		ox = 0;
-		if(flags & T3F_FONT_ALIGN_CENTER)
-		{
-			ox = lines->line[i].width / 2;
-		}
-		else if(flags & T3F_FONT_ALIGN_RIGHT)
-		{
-			ox = lines->line[i].width;
-		}
-
-		t3f_draw_text(lines->font, color, px - ox, py, z, 0.0, 0.0, 0, lines->line[i].text);
+		t3f_draw_text(lines->font, color, px, py, z, 0.0, 0.0, 0, lines->line[i].text);
 		px = x + lines->tab;
 		py += t3f_get_font_line_height(lines->font);
 	}
@@ -474,7 +460,7 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 	if(w > 0.0)
 	{
 		t3f_create_text_line_data(&line_data, fp, w, tab, text);
-		t3f_draw_text_lines(&line_data, color, x, y, z, flags);
+		t3f_draw_text_lines(&line_data, color, x, y, z);
 	}
 	else
 	{

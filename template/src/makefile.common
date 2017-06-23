@@ -4,13 +4,12 @@ SPACE:=$(NOTHING) $(NOTHING)
 
 T3F_DEPEND_LIBS = -lallegro_image$(LIB_SUFFIX) -lallegro_font$(LIB_SUFFIX) -lallegro_ttf$(LIB_SUFFIX) -lallegro_primitives$(LIB_SUFFIX) -lallegro_audio$(LIB_SUFFIX) -lallegro_acodec$(LIB_SUFFIX) -lallegro_memfile$(LIB_SUFFIX) -lallegro$(LIB_SUFFIX) -lm
 
-T3F_CFLAGS = -I. -DT3F_DEVELOPER_NAME="\"$(APP_COMPANY)\"" -DT3F_PACKAGE_NAME="\"$(APP_NAME)\"" -DT3F_APP_VERSION="\"$(APP_VERSION)\"" -DT3F_APP_TITLE=\"$(APP_TITLE)\"
-
 include makefile.defines
 include makefile.config
 
 DEMO_DIR = ../../$(APP_NAME)_demo
 DEMO_DATA = $(DEMO_DIR)/bin/data
+#DEMO_DELETE =
 
 PROJECT_OBJECTS = $(T3F_OBJECTS) $(APP_OBJECTS) $(PLATFORM_OBJECTS)
 
@@ -28,23 +27,23 @@ $(APP_EXE_NAME) : $(PROJECT_OBJECTS) update_changelog
 	@echo Executable built!
 
 #Unix way of updating the changelog, will be overwritten by MinGW build script under Windows
-update_changelog:
-	cp -a ../changelog ../docs
+update_changelog: ../changelog
+	$(COPY_COMMAND) $(subst /,$(PATH_SEPARATOR),../changelog ../docs)
 	$(SED_COMMAND) "s|BUILD_DATE|`date -u +"%a, %d %b %Y %T"`|" ../docs/changelog
 	$(SED_COMMAND) "s|BUILD_VERSION|$(APP_VERSION)|" ../docs/changelog
 
 clean: app_clean
 	@$(PLATFORM_CLEAN)
-	@$(DEL_COMMAND) $(PROJECT_OBJECTS)
+	@$(DEL_COMMAND) $(subst /,$(PATH_SEPARATOR),$(PROJECT_OBJECTS))
 	@echo Cleanup complete!
 
 very_clean: clean
-	$(DEL_COMMAND) ../bin/$(APP_NAME) ../bin/$(APP_NAME).exe ../bin/$(APP_NAME)$(EXE_SUFFIX) $(APP_EXTRA_TARGET)
+	$(DEL_COMMAND) $(APP_EXE_NAME) $(APP_EXTRA_TARGET)
 
 #create tar.gz package for source code distribution
 package:
 	make -f Makefile clean_all
-	$(shell rm -rf ../../$(APP_PACKAGE_NAME); mkdir ../../$(APP_PACKAGE_NAME); mkdir ../../$(APP_PACKAGE_NAME)/packages; cp ../packages/packages.here ../../$(APP_PACKAGE_NAME)/packages/packages.here; cp -a "../bin" ../../$(APP_PACKAGE_NAME); cp -a "../src" ../../$(APP_PACKAGE_NAME); cp -a "../docs" ../../$(APP_PACKAGE_NAME); cp -a "../android" ../../$(APP_PACKAGE_NAME); cp -a "../debian" ../../$(APP_PACKAGE_NAME); cp -a "../macosx" ../../$(APP_PACKAGE_NAME); cp -a "../win32" ../../$(APP_PACKAGE_NAME); cp -a "../icons" ../../$(APP_PACKAGE_NAME); cp -a "../graphics_src" ../../$(APP_PACKAGE_NAME); cp "../changelog" ../../$(APP_PACKAGE_NAME); cp "../build.txt" ../../$(APP_PACKAGE_NAME); cp "../issues.txt" ../../$(APP_PACKAGE_NAME); cd ../../; rm -f $(APP_PACKAGE_FILENAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="old" --dereference -czf $(APP_PACKAGE_FILENAME) $(APP_PACKAGE_NAME))
+	$(shell rm -rf ../../$(APP_PACKAGE_NAME); mkdir ../../$(APP_PACKAGE_NAME); cp -a "../bin" ../../$(APP_PACKAGE_NAME); cp -a "../src" ../../$(APP_PACKAGE_NAME); cp -a "../docs" ../../$(APP_PACKAGE_NAME); cp -a "../android" ../../$(APP_PACKAGE_NAME); cp -a "../debian" ../../$(APP_PACKAGE_NAME); cp -a "../macosx" ../../$(APP_PACKAGE_NAME); cp -a "../win32" ../../$(APP_PACKAGE_NAME); cp -a "../icons" ../../$(APP_PACKAGE_NAME); cp -a "../graphics_src" ../../$(APP_PACKAGE_NAME); cp "../changelog" ../../$(APP_PACKAGE_NAME); cp "../build.txt" ../../$(APP_PACKAGE_NAME); cp "../issues.txt" ../../$(APP_PACKAGE_NAME); cd ../../; rm -f $(APP_PACKAGE_FILENAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="old" --dereference -czf $(APP_PACKAGE_FILENAME) $(APP_PACKAGE_NAME))
 	@echo Package successfully created!
 
 #make a copy of the source tree with non-demo data deleted

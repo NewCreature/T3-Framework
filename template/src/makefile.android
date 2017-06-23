@@ -1,10 +1,10 @@
 #CC = gcc
 #CFLAGS = $(GLOBAL_CFLAGS) $(APP_CFLAGS) $(ANDROID_CFLAGS)
-PLATFORM_CFLAGS = $(T3F_CFLAGS) $(GLOBAL_CFLAGS) $(ANDROID_CFLAGS) $(APP_CFLAGS)
+PLATFORM_CFLAGS = $(GLOBAL_CFLAGS) $(ANDROID_CFLAGS) $(APP_CFLAGS)
 PLATFORM_OBJECTS = $(ANDROID_PLATFORM_OBJECTS)
 PLATFORM_LIBS = $(ANDROID_PLATFORM_LIBS)
 DEPEND_LIBS = $(ANDROID_DEPEND_LIBS)
-LIB_SUFFIX = -static
+#LIB_SUFFIX = -static
 #DEL_COMMAND = rm -f
 #DEL_FOLDER_COMMAND = rm -rf
 
@@ -14,33 +14,25 @@ ANDROID_NATIVE_CALL_PREFIX = $(subst .,_,$(APP_ANDROID_PACKAGE))
 
 include makefile.common
 
-../temp/copydir:
-	gcc $(GLOBAL_CFLAGS) -I/usr/local/include -L/usr/local/lib ../temp/copydir.c -o ../temp/copydir $(T3F_DEPEND_LIBS) -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_dialog$(LIB_SUFFIX) -lallegro_main-static
-
 #generate Android package, rebuilds Allegro first to update package name
-android_package: build_temp ../temp/copydir build_allegro build_android $(ANDROID_PLATFORM_TARGET)
+android_package: build_temp build_allegro build_android $(ANDROID_PLATFORM_TARGET)
 	rm -rf ../temp
 
 #generate Android package, doesn't rebuild Allegro
-android_repackage: clean_packages build_temp ../temp/copydir build_android $(ANDROID_PLATFORM_TARGET)
+android_repackage: clean_packages build_temp build_android $(ANDROID_PLATFORM_TARGET)
 	rm -rf ../temp
 
-android_sign: $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
-	@sign $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
-	@rm $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
+android_sign: ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
+	@sign ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
+	@rm ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
 
 #sed info: sed -i requires backup extension argument on OS X, should work fine this
 #          way on other Unix platforms, we should do "sed -i '' -original-new- filename"
 build_android:
 	@echo Copying sources to Android project...
-	../temp/copydir ../android ../temp/android
-	../temp/copydir ../src ../temp/src
-#	cp -a ../android/ ../temp
-#	cp -L -a ../src/ ../temp
-#	rm ../temp/src/t3f
-#	mkdir ../temp/src/t3f
-#	cp -a ../src/t3f/* ../temp/src/t3f
-	cp -L ../temp/android/template/jni/*.mk ../temp/src
+	cp -a ../android ../temp
+	cp -a ../src ../temp
+	cp ../temp/android/template/jni/*.mk ../temp/src
 	rm -rf ../temp/android/template/jni
 	mv ../temp/src ../temp/android/template/jni
 	@echo Copying Allegro libs to Android project...
@@ -76,7 +68,7 @@ build_android:
 	sed -i '' "s|APP_VERSION_STRING|$(APP_VERSION)|" ../temp/android/template/AndroidManifest.xml
 	sed -i '' "s|APP_RELEASE_NUMBER|$(APP_RELEASE)|" ../temp/android/template/AndroidManifest.xml
 	@echo Building Android project
-	cd ../temp/android/template; export T3F_APP_LIBS='$(APP_LIBS)'; export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT); export APP_LIBS='$(APP_LIBS)'; export PLATFORM_LIBS='$(PLATFORM_LIBS)'; export PLATFORM_CFLAGS='$(PLATFORM_CFLAGS)'; export NATIVE_CALL_PREFIX='$(ANDROID_NATIVE_CALL_PREFIX)'; $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant release; cp bin/alandroid-project-release-unsigned.apk ../../../src/$(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
+	cd ../temp/android/template; export T3F_APP_LIBS='$(APP_LIBS)'; export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT); export APP_LIBS='$(APP_LIBS)'; export PLATFORM_LIBS='$(PLATFORM_LIBS)'; export PLATFORM_CFLAGS='$(PLATFORM_CFLAGS)'; export NATIVE_CALL_PREFIX='$(ANDROID_NATIVE_CALL_PREFIX)'; $(ANDROID_NDK_ROOT)/ndk-build; $(ANDROID_SDK_ROOT)/tools/android update project -p .; ant release; cp bin/alandroid-project-release-unsigned.apk ../../../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk
 
 build_allegro:
 	@echo Building Allegro...
@@ -85,7 +77,6 @@ build_allegro:
 
 build_temp:
 	mkdir -p ../temp
-	cp ../android/copydir.c ../temp
 
 clean_packages:
 	rm -rf ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE)-unsigned.apk ../$(APP_PACKAGE_NAME)-$(ANDROID_ARCHITECTURE).apk
