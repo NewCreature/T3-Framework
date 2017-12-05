@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = $(GLOBAL_CFLAGS) $(APP_CFLAGS) $(LINUX_STATIC_CFLAGS)
 PLATFORM_OBJECTS = t3f/menu.o $(LINUX_STATIC_PLATFORM_OBJECTS)
 PLATFORM_LIBS = -lallegro_dialog$(LIB_SUFFIX) $(LINUX_STATIC_PLATFORM_LIBS)
-DEPEND_LIBS = -lpng -ljpeg -lfreetype -lpulse -lpulse-simple -lasound -ldumb -lvorbisfile -lvorbis -lX11 -lXcursor -lXinerama -lXrandr -lGL `pkg-config gtk+-x11-2.0 --libs` -lpthread -lm -lstdc++ $(LINUX_STATIC_DEPEND_LIBS)
+DEPEND_LIBS = -lpng -ljpeg -lfreetype -lasound -lpulse -lpulse-simple -ldumb `pkg-config --libs --static allegro-static-5` `pkg-config gtk+-x11-2.0 --libs` -lpthread -lm -lstdc++ $(LINUX_STATIC_DEPEND_LIBS)
 LIB_SUFFIX = -static
 DEL_COMMAND = rm -f
 DEL_FOLDER_COMMAND = rm -rf
@@ -18,8 +18,8 @@ include makefile.common
 #generate Debian package
 debian_package: $(APP_EXE_NAME) ../debian/control_gen
 	echo Generating files...
-	echo "!C menu-2\n?package("$(DEBIAN_APP_NAME)"):\n	needs=\"X11\"\n	section=\"Games/Action\"\n	title=\""$(APP_TITLE)"\"\n	command=\"/usr/games/$(DEBIAN_APP_NAME)\"\n	;" > ../debian/menu
-	echo "[Desktop Entry]\nName="$(APP_TITLE)"\nExec=/usr/games/$(DEBIAN_APP_NAME)\nIcon=$(DEBIAN_APP_NAME)\nTerminal=false\nType=Application\nCategories=Game;" > ../debian/app.desktop
+	echo "!C menu-2\n?package("$(DEBIAN_APP_NAME)"):\n	needs=\"X11\"\n	section=\"Games/Action\"\n	title=\""$(APP_TITLE)"\"\n	command=\"/usr/$(DEBIAN_DIR)/$(DEBIAN_APP_NAME)\"\n	;" > ../debian/menu
+	echo "[Desktop Entry]\nName="$(APP_TITLE)"\nExec=/usr/$(DEBIAN_DIR)/$(DEBIAN_APP_NAME)\nIcon=$(DEBIAN_APP_NAME)\nTerminal=false\nType=Application\nCategories=Game;" > ../debian/app.desktop
 	../debian/control_gen ../debian $(DEBIAN_APP_NAME) $(APP_VERSION) $(DEBIAN_SECTION) optional `dpkg-architecture -l -qDEB_BUILD_ARCH` $(DEBIAN_DEPENDS) "`du -s --block-size=1024 ../bin`" $(DEBIAN_MAINTAINER) $(DEBIAN_DESCRIPTION) $(DEBIAN_LONG_DESCRIPTION)
 	echo Building directory structure...
 	mkdir -p ../temp
@@ -33,7 +33,7 @@ debian_package: $(APP_EXE_NAME) ../debian/control_gen
 	mkdir -p ../temp/debian_temp/usr/share/pixmaps
 	mkdir -p ../temp/debian_temp/usr/share/applications
 	mkdir -p ../temp/debian_temp/usr/share/menu
-	mkdir -p ../temp/debian_temp/usr/games
+	mkdir -p ../temp/debian_temp/usr/$(DEBIAN_DIR)
 	echo Copying files...
 	cp -a ../bin/data ../temp/debian_temp/usr/share/$(DEBIAN_APP_NAME)
 	cp ../docs/changelog ../temp/debian_temp/usr/share/doc/$(DEBIAN_APP_NAME)/changelog
@@ -42,12 +42,12 @@ debian_package: $(APP_EXE_NAME) ../debian/control_gen
 	cp ../icons/debian_icon.svg ../temp/debian_temp/usr/share/pixmaps/$(DEBIAN_APP_NAME).svg
 	cp ../debian/app.desktop ../temp/debian_temp/usr/share/applications/$(DEBIAN_APP_NAME).desktop
 	cp ../debian/menu ../temp/debian_temp/usr/share/menu/$(DEBIAN_APP_NAME)
-	cp ../bin/$(DEBIAN_APP_NAME) ../temp/debian_temp/usr/games/$(DEBIAN_APP_NAME)
+	cp ../bin/$(DEBIAN_APP_NAME) ../temp/debian_temp/usr/$(DEBIAN_DIR)/$(DEBIAN_APP_NAME)
 	cp ../debian/control ../temp/DEBIAN
 	cp ../debian/postinst ../temp/DEBIAN
 	echo Building package...
-	strip ../temp/debian_temp/usr/games/$(DEBIAN_APP_NAME)
-	chmod 755 ../temp/debian_temp/usr/games/$(DEBIAN_APP_NAME)
+	strip ../temp/debian_temp/usr/$(DEBIAN_DIR)/$(DEBIAN_APP_NAME)
+	chmod 755 ../temp/debian_temp/usr/$(DEBIAN_DIR)/$(DEBIAN_APP_NAME)
 	chmod 755 ../temp/DEBIAN/postinst
 	find ../temp/debian_temp -type d | xargs chmod 755
 	find ../temp/debian_temp/usr/share/$(DEBIAN_APP_NAME) -type f -exec chmod 644 {} \;
@@ -62,7 +62,7 @@ debian_package: $(APP_EXE_NAME) ../debian/control_gen
 	rm -f ../temp/DEBIAN/md5sums-pre
 	mv ../temp/DEBIAN ../temp/debian_temp
 	fakeroot dpkg-deb --build ../temp/debian_temp
-	mv ../temp/debian_temp.deb ../$(DEBIAN_APP_NAME)_$(APP_VERSION)_`dpkg-architecture -l -qDEB_BUILD_ARCH`.deb
+	mv ../temp/debian_temp.deb $(APP_PACKAGE_DIR)/$(DEBIAN_APP_NAME)_$(APP_VERSION)_`dpkg-architecture -l -qDEB_BUILD_ARCH`.deb
 	echo Cleaning up...
 	rm -rf ../temp
 	rm -f ../debian/control
@@ -71,4 +71,4 @@ debian_package: $(APP_EXE_NAME) ../debian/control_gen
 	rm -f ../debian/control_gen
 	rm -f ../debian/control_gen.o
 	echo Testing package...
-	lintian ../$(DEBIAN_APP_NAME)_$(APP_VERSION)_`dpkg-architecture -l -qDEB_BUILD_ARCH`.deb
+	lintian $(APP_PACKAGE_DIR)/$(DEBIAN_APP_NAME)_$(APP_VERSION)_`dpkg-architecture -l -qDEB_BUILD_ARCH`.deb

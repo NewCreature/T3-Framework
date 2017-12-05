@@ -27,6 +27,9 @@
 #ifndef ALLEGRO_ANDROID
 	#include "menu.h"
 #endif
+#ifdef ALLEGRO_WINDOWS
+	#include "windows.h"
+#endif
 
 /* display data */
 int t3f_virtual_display_width = 0;
@@ -537,7 +540,7 @@ void t3f_set_option(int option, int value)
 	al_set_config_value(t3f_config, "Options", buf, vbuf);
 }
 
-static void t3f_get_base_transform(void)
+void t3f_get_base_transform(void)
 {
 	float r, vr;
 	const char * value;
@@ -646,8 +649,10 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 {
 	const char * cvalue = NULL;
 	const char * cvalue2 = NULL;
+	const char * cvalue3 = NULL;
 	char val[128] = {0};
 	int dflags = 0;
+	int dx, dy, doy;
 	int dw, dh;
 	int ret = 1;
 
@@ -846,6 +851,33 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			dw = 800;
 			dh = 480;
 		#endif
+		#ifdef ALLEGRO_WINDOWS
+			al_set_config_value(t3f_config, "T3F", "save_window_pos", "false");
+		#endif
+		cvalue = al_get_config_value(t3f_config, "T3F", "save_window_pos");
+		if(cvalue)
+		{
+			if(!strcmp(cvalue, "true"))
+			{
+				cvalue = al_get_config_value(t3f_config, "T3F", "window_pos_x");
+				if(cvalue)
+				{
+					cvalue2 = al_get_config_value(t3f_config, "T3F", "window_pos_y");
+					if(cvalue2)
+					{
+						doy = 0;
+						cvalue3 = al_get_config_value(t3f_config, "T3F", "windows_menu_height");
+						if(cvalue3)
+						{
+							doy = atoi(cvalue3);
+						}
+						dx = atoi(cvalue);
+						dy = atoi(cvalue2);
+						al_set_new_window_position(dx, dy + doy ? (doy + doy / 2 + 3) : 0);
+					}
+				}
+			}
+		}
 		t3f_display = al_create_display(dw, dh);
 		if(!t3f_display)
 		{
@@ -869,6 +901,9 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		t3f_get_base_transform();
 		al_set_window_title(t3f_display, t3f_window_title);
 	}
+	#ifdef ALLEGRO_WINDOWS
+		t3f_set_windows_icon("allegro_icon");
+	#endif
 	return ret;
 }
 
@@ -911,14 +946,30 @@ void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event, void * data))
 	t3f_event_handler_proc = proc;
 }
 
-void t3f_exit(void)
+bool t3f_save_config(void)
 {
 	const ALLEGRO_FILE_INTERFACE * old_interface;
+	bool ret;
 
 	old_interface = al_get_new_file_interface();
 	al_set_standard_file_interface();
-	al_save_config_file(t3f_config_filename, t3f_config);
+	ret = al_save_config_file(t3f_config_filename, t3f_config);
 	al_set_new_file_interface(old_interface);
+
+	return ret;
+}
+
+void t3f_exit(void)
+{
+	char buf[256];
+	int x, y;
+
+	al_get_window_position(t3f_display, &x, &y);
+	sprintf(buf, "%d", x);
+	al_set_config_value(t3f_config, "T3F", "window_pos_x", buf);
+	sprintf(buf, "%d", y);
+	al_set_config_value(t3f_config, "T3F", "window_pos_y", buf);
+	t3f_save_config();
 	t3f_quit = true;
 }
 
@@ -1046,33 +1097,6 @@ int t3f_get_joystick_number(ALLEGRO_JOYSTICK * jp)
 	return -1;
 }
 
-float t3f_fread_float(ALLEGRO_FILE * fp)
-{
-	char buffer[256] = {0};
-	int l;
-
-	l = al_fgetc(fp);
-	al_fread(fp, buffer, l);
-	buffer[l] = '\0';
-	return atof(buffer);
-//	float f;
-//	al_fread(fp, &f, sizeof(float));
-//	return f;
-}
-
-int t3f_fwrite_float(ALLEGRO_FILE * fp, float f)
-{
-	char buffer[256] = {0};
-	int l;
-
-	sprintf(buffer, "%f", f);
-	l = strlen(buffer);
-	al_fputc(fp, l);
-	al_fwrite(fp, buffer, l);
-//	al_fwrite(fp, &f, sizeof(float));
-	return 1;
-}
-
 ALLEGRO_FILE * t3f_open_file(ALLEGRO_PATH * pp, const char * fn, const char * m)
 {
 	ALLEGRO_PATH * tpath = al_clone_path(pp);
@@ -1137,7 +1161,10 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		/* user pressed close button */
 		case ALLEGRO_EVENT_DISPLAY_CLOSE:
 		{
-			t3f_exit();
+			if(event->display.source == t3f_display)
+			{
+				t3f_exit();
+			}
 			break;
 		}
 
@@ -1145,16 +1172,18 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		case ALLEGRO_EVENT_DISPLAY_RESIZE:
 		{
 			char val[8] = {0};
+			int menu_height = 0;
 			al_acknowledge_resize(t3f_display);
 			/* handle resize event caused by attaching menu */
 			#ifdef ALLEGRO_WINDOWS
-				int menu_height;
 				if(t3f_flags & T3F_USE_MENU)
 				{
 					if(t3f_menu_resize)
 					{
-						menu_height = al_get_display_height(t3f_display) - t3f_display_height;
-						al_resize_display(t3f_display, al_get_display_width(t3f_display), al_get_display_height(t3f_display) + menu_height);
+						menu_height = t3f_display_height - al_get_display_height(t3f_display);
+						sprintf(val, "%d", menu_height);
+						al_set_config_value(t3f_config, "T3F", "windows_menu_height", val);
+						al_resize_display(t3f_display, al_get_display_width(t3f_display), al_get_display_height(t3f_display) + menu_height * 2);
 						t3f_menu_resize = false;
 					}
 				}
@@ -1454,6 +1483,7 @@ void t3f_run(void)
 	{
 		free(t3f_package_name);
 	}
+
 	al_destroy_display(t3f_display);
 }
 

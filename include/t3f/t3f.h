@@ -80,6 +80,7 @@ typedef struct
 #include "vector.h"
 #include "view.h"
 
+extern bool t3f_menu_resize;
 extern int t3f_virtual_display_width;
 extern int t3f_virtual_display_height;
 extern int t3f_display_offset_x;
@@ -128,6 +129,7 @@ int t3f_set_gfx_mode(int w, int h, int flags);
 void t3f_set_clipping_rectangle(int x, int y, int w, int h);
 void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event, void * data));
 void t3f_exit(void);
+bool t3f_save_config(void);
 void t3f_event_handler(ALLEGRO_EVENT * event);
 void t3f_process_events(void);
 void t3f_render(bool flip);
@@ -152,8 +154,6 @@ bool t3f_push_state(int flags);
 bool t3f_pop_state(void);
 
 int t3f_get_joystick_number(ALLEGRO_JOYSTICK * jp);
-float t3f_fread_float(ALLEGRO_FILE * fp);
-int t3f_fwrite_float(ALLEGRO_FILE * fp, float f);
 
 ALLEGRO_FILE * t3f_open_file(ALLEGRO_PATH * pp, const char * fn, const char * m);
 unsigned long t3f_checksum_file(const char * fn);
