@@ -80,7 +80,6 @@ typedef struct
 #include "vector.h"
 #include "view.h"
 
-extern bool t3f_menu_resize;
 extern int t3f_virtual_display_width;
 extern int t3f_virtual_display_height;
 extern int t3f_display_offset_x;
@@ -159,7 +158,7 @@ ALLEGRO_FILE * t3f_open_file(ALLEGRO_PATH * pp, const char * fn, const char * m)
 unsigned long t3f_checksum_file(const char * fn);
 bool t3f_copy_file(const char * src, const char * dest);
 void t3f_setup_directories(ALLEGRO_PATH * final);
-const char * t3f_get_filename(ALLEGRO_PATH * path, const char * fn);
+char * t3f_get_filename(ALLEGRO_PATH * path, const char * fn, char * buffer, int buffer_size);
 bool t3f_save_bitmap_f(ALLEGRO_FILE * fp, ALLEGRO_BITMAP * bp);
 ALLEGRO_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp);
 
