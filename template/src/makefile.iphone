@@ -1,7 +1,7 @@
-CC = $(MACOSX_CC)
+CC = gcc
 CFLAGS = $(T3F_CFLAGS) $(GLOBAL_CFLAGS) $(IPHONE_ARCHITECURES) $(IPHONE_COMPILER_SETTINGS) $(IPHONE_SYS_ROOT) $(IPHONE_MIN_VERSION) $(APP_CFLAGS) $(IPHONE_CFLAGS)
-CXX = gcc
-CXXFLAGS = g++
+CXX = g++
+CXXFLAGS = $(CFLAGS)
 LFLAGS = $(IPHONE_LINKER_SETTINGS)
 PLATFORM_OBJECTS = t3f/menu.o $(IPHONE_PLATFORM_OBJECTS)
 PLATFORM_LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_dialog$(LIB_SUFFIX) -lallegro_main-static $(IPHONE_PLATFORM_LIBS)
