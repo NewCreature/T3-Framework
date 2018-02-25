@@ -1,13 +1,13 @@
 CC = gcc
-CFLAGS = $(T3F_CFLAGS) $(GLOBAL_CFLAGS) $(IPHONE_ARCHITECURES) $(IPHONE_COMPILER_SETTINGS) $(IPHONE_SYS_ROOT) $(IPHONE_MIN_VERSION) $(APP_CFLAGS) $(IPHONE_CFLAGS)
+CFLAGS = $(T3F_CFLAGS) $(GLOBAL_CFLAGS) $(IPHONE_ARCHITECTURES) $(IPHONE_COMPILER_SETTINGS) $(IPHONE_SYS_ROOT) $(IPHONE_MIN_VERSION) $(APP_CFLAGS) $(IPHONE_CFLAGS)
 CXX = g++
 CXXFLAGS = $(CFLAGS)
-LFLAGS = $(IPHONE_LINKER_SETTINGS)
+LFLAGS = $(IPHONE_LINKER_SETTINGS) $(IPHONE_ARCHITECTURES) $(IPHONE_SYS_ROOT) $(IPHONE_MIN_VERSION)
 PLATFORM_OBJECTS = t3f/menu.o $(IPHONE_PLATFORM_OBJECTS)
-PLATFORM_LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_dialog$(LIB_SUFFIX) -lallegro_main-static $(IPHONE_PLATFORM_LIBS)
+PLATFORM_LIBS = -framework IOKit -framework AudioToolbox -framework OpenGLES -framework OpenAL -framework CoreGraphics -framework Foundation -framework QuartzCore -framework UIKit -framework MobileCoreServices -lallegro_dialog$(LIB_SUFFIX) -lallegro_main-static $(IPHONE_PLATFORM_LIBS)
 PLATFORM_TARGET = $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 LIB_SUFFIX = -static
-DEPEND_LIBS = -lz -lpng -ljpeg -lFLAC -lvorbis -logg -lvorbisfile -ldumb -lfreetype $(IPHONE_DEPEND_LIBS)
+DEPEND_LIBS = -lz -lpng -lvorbisidec -ldumb -lfreetype $(IPHONE_DEPEND_LIBS)
 DEL_COMMAND = rm -f
 DEL_FOLDER_COMMAND = rm -rf
 SED_COMMAND = sed -i ''
