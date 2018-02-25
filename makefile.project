@@ -20,6 +20,7 @@ else
 	@cp -a template/android "$(DIR)"
 	@cp -a template/win32 "$(DIR)"
 	@cp -a template/macosx "$(DIR)"
+	@cp -a template/iphone "$(DIR)"
 	@cp -a template/icons "$(DIR)"
 	@cp -a template/packages "$(DIR)"
 endif
@@ -38,13 +39,15 @@ else
 	@cp template/src/makefile.linux "$(DIR)/src"
 	@cp template/src/makefile.linux_static "$(DIR)/src"
 	@cp template/src/makefile.macosx "$(DIR)/src"
+	@cp template/src/makefile.iphone "$(DIR)/src"
 	@cp template/src/makefile.mingw "$(DIR)/src"
 	@cp template/src/makefile.mingw_cross "$(DIR)/src"
-	@cp template/src/makefile.config "$(DIR)/src"
+	@cp template/src/makefile.default_config "$(DIR)/src"
 	@cp -a template/debian "$(DIR)"
 	@cp -a template/android "$(DIR)"
 	@cp -a template/win32 "$(DIR)"
 	@cp -a template/macosx "$(DIR)"
+	@cp -a template/iphone "$(DIR)"
 	@cp -a template/packages "$(DIR)"
 endif
 
@@ -62,6 +65,7 @@ else
 	@cp "$(DIR)/src/makefile.linux" template/src/makefile.linux
 	@cp "$(DIR)/src/makefile.linux_static" template/src/makefile.linux_static
 	@cp "$(DIR)/src/makefile.macosx" template/src/makefile.macosx
+	@cp "$(DIR)/src/makefile.iphone" template/src/makefile.iphone
 	@cp "$(DIR)/src/makefile.mingw" template/src/makefile.mingw
 	@cp "$(DIR)/src/makefile.mingw_cross" template/src/makefile.mingw_cross
 	@cp "$(DIR)/src/makefile.mingw_cross" template/src/makefile.default_config
@@ -69,4 +73,5 @@ else
 	@cp -a "$(DIR)/android/." template/android/
 	@cp -a "$(DIR)/win32/." template/win32/
 	@cp -a "$(DIR)/macosx/." template/macosx/
+	@cp -a "$(DIR)/iphone/." template/iphone/
 endif
