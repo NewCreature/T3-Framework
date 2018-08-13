@@ -503,12 +503,26 @@ void mapper_tilemap_delete_column(int layer, int column)
 
 void mapper_tilemap_move_logic(void)
 {
+	int i, j;
+
 	if(t3f_key[ALLEGRO_KEY_LEFT])
 	{
 		if(t3f_key[ALLEGRO_KEY_LSHIFT])
 		{
 			mapper_camera.x -= mapper_tileset->width;
 			mapper_camera.x = (int)(mapper_camera.x / mapper_tileset->width) * mapper_tileset->width;
+			t3f_key[ALLEGRO_KEY_LEFT] = 0;
+		}
+		else if(t3f_key[ALLEGRO_KEY_ALT])
+		{
+			for(i = 0; i < mapper_tilemap->layer[mapper_current_layer]->height; i++)
+			{
+				for(j = 0; j < mapper_tilemap->layer[mapper_current_layer]->width - 1; j++)
+				{
+					mapper_tilemap->layer[mapper_current_layer]->data[i][j] = mapper_tilemap->layer[mapper_current_layer]->data[i][j + 1];
+				}
+				mapper_tilemap->layer[mapper_current_layer]->data[i][mapper_tilemap->layer[mapper_current_layer]->width - 1] = 0;
+			}
 			t3f_key[ALLEGRO_KEY_LEFT] = 0;
 		}
 		else
@@ -524,6 +538,18 @@ void mapper_tilemap_move_logic(void)
 			mapper_camera.x = (int)(mapper_camera.x / mapper_tileset->width) * mapper_tileset->width;
 			t3f_key[ALLEGRO_KEY_RIGHT] = 0;
 		}
+		else if(t3f_key[ALLEGRO_KEY_ALT])
+		{
+			for(i = 0; i < mapper_tilemap->layer[mapper_current_layer]->height; i++)
+			{
+				for(j = mapper_tilemap->layer[mapper_current_layer]->width - 1; j > 0; j--)
+				{
+					mapper_tilemap->layer[mapper_current_layer]->data[i][j] = mapper_tilemap->layer[mapper_current_layer]->data[i][j - 1];
+				}
+				mapper_tilemap->layer[mapper_current_layer]->data[i][0] = 0;
+			}
+			t3f_key[ALLEGRO_KEY_RIGHT] = 0;
+		}
 		else
 		{
 			mapper_camera.x += 1.0;
@@ -537,6 +563,18 @@ void mapper_tilemap_move_logic(void)
 			mapper_camera.y = (int)(mapper_camera.y / mapper_tileset->height) * mapper_tileset->height;
 			t3f_key[ALLEGRO_KEY_UP] = 0;
 		}
+		else if(t3f_key[ALLEGRO_KEY_ALT])
+		{
+			for(i = 0; i < mapper_tilemap->layer[mapper_current_layer]->height - 1; i++)
+			{
+				for(j = 0; j < mapper_tilemap->layer[mapper_current_layer]->width; j++)
+				{
+					mapper_tilemap->layer[mapper_current_layer]->data[i][j] = mapper_tilemap->layer[mapper_current_layer]->data[i + 1][j];
+				}
+				mapper_tilemap->layer[mapper_current_layer]->data[mapper_tilemap->layer[mapper_current_layer]->height - 1][j] = 0;
+			}
+			t3f_key[ALLEGRO_KEY_UP] = 0;
+		}
 		else
 		{
 			mapper_camera.y -= 1.0;
@@ -548,6 +586,18 @@ void mapper_tilemap_move_logic(void)
 		{
 			mapper_camera.y += mapper_tileset->height;
 			mapper_camera.y = (int)(mapper_camera.y / mapper_tileset->height) * mapper_tileset->height;
+			t3f_key[ALLEGRO_KEY_DOWN] = 0;
+		}
+		else if(t3f_key[ALLEGRO_KEY_ALT])
+		{
+			for(i = mapper_tilemap->layer[mapper_current_layer]->height - 1; i > 0; i--)
+			{
+				for(j = 0; j < mapper_tilemap->layer[mapper_current_layer]->width; j++)
+				{
+					mapper_tilemap->layer[mapper_current_layer]->data[i][j] = mapper_tilemap->layer[mapper_current_layer]->data[i - 1][j];
+				}
+				mapper_tilemap->layer[mapper_current_layer]->data[0][j] = 0;
+			}
 			t3f_key[ALLEGRO_KEY_DOWN] = 0;
 		}
 		else
