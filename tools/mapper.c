@@ -1020,11 +1020,14 @@ void mapper_render(void * data)
 	al_hold_bitmap_drawing(false);
 }
 
+static int vwidth = 640;
+static int vheight = 480;
+
 bool mapper_initialize(void)
 {
 	const char * val = NULL;
 
-	if(!t3f_initialize("T3F Mapper", 640, 480, 60.0, mapper_logic, mapper_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
+	if(!t3f_initialize("T3F Mapper", vwidth, vheight, 60.0, mapper_logic, mapper_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE, NULL))
 	{
 		return false;
 	}
@@ -1069,8 +1072,27 @@ bool mapper_initialize(void)
 	return true;
 }
 
-int main(void)
+int main(int argc, char * argv[])
 {
+	int i;
+
+	for(i = 1; i < argc; i++)
+	{
+		if(!strcmp(argv[i], "--width"))
+		{
+			if(argc > i)
+			{
+				vwidth = atoi(argv[i + 1]);
+			}
+		}
+		if(!strcmp(argv[i], "--height"))
+		{
+			if(argc > i)
+			{
+				vheight = atoi(argv[i + 1]);
+			}
+		}
+	}
 	if(!mapper_initialize())
 	{
 		return -1;
