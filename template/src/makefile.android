@@ -75,7 +75,7 @@ build_android:
 
 build_allegro:
 	@echo Building Allegro...
-	export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT); cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DCMAKE_TOOLCHAIN_FILE=$(ALLEGRO_SRC_ROOT)/cmake/Toolchain-android.cmake -DWANT_RELEASE_LOGGING=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DWANT_TESTS=OFF -DCMAKE_BUILD_TYPE=$(ANDROID_BUILD_TYPE) -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_VIDEO=OFF -DWANT_TTF=ON -DFREETYPE_INCLUDE_DIR_freetype2=$(ANDROID_TOOLCHAIN_ROOT)/user/armeabi-v7a/include/freetype2; make install; cp lib/Allegro5.jar ../../
+	export ANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_TOOLCHAIN_ROOT); export ANDROID_HOME=$(ANDROID_SDK_ROOT); cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DCMAKE_TOOLCHAIN_FILE=$(ALLEGRO_SRC_ROOT)/cmake/Toolchain-android.cmake -DWANT_RELEASE_LOGGING=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DWANT_TESTS=OFF -DCMAKE_BUILD_TYPE=$(ANDROID_BUILD_TYPE) -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_VIDEO=OFF -DWANT_TTF=ON -DFREETYPE_INCLUDE_DIR_freetype2=$(ANDROID_TOOLCHAIN_ROOT)/user/armeabi-v7a/include/freetype2; make install; cp lib/Allegro5.jar ../../
 #	cd ../temp; mkdir build-android; cd build-android; cmake $(ALLEGRO_SRC_ROOT) -DANDROID_NDK_TOOLCHAIN_ROOT=$(ANDROID_NDK_ROOT) -DWANT_ANDROID=on -DWANT_EXAMPLES=OFF -DWANT_DEMO=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_NAME_TOOL=/usr/bin/install_name_tool -DWANT_TREMOR=ON -DWANT_OPENSL=ON -DWANT_FFMPEG=ON; make install; cp lib/Allegro5.jar ../../
 
 build_temp:

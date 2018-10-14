@@ -733,6 +733,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		sprintf(val, "%d", h);
 		al_set_config_value(t3f_config, "T3F", "display_height", val);
 		t3f_get_base_transform();
+		t3f_current_view->need_update = true;
 		t3f_select_view(t3f_current_view);
 	}
 
@@ -932,7 +933,7 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 	}
 	al_transform_coordinates(&t3f_current_transform, &tx, &ty);
 	al_transform_coordinates(&t3f_current_transform, &twx, &twy);
-	al_set_clipping_rectangle(tx, ty, twx, twy);
+	al_set_clipping_rectangle(tx, ty, twx - tx, twy - ty);
 }
 
 void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event, void * data))
