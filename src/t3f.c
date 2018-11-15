@@ -640,12 +640,93 @@ void t3f_get_base_transform(void)
 	t3f_mouse_scale_y = (float)t3f_virtual_display_height / (float)t3f_display_height;
 }
 
+static int t3f_set_new_gfx_mode(int w, int h, int flags)
+{
+	char val[128] = {0};
+	int ret = 1;
+
+	if(flags & T3F_RESIZABLE)
+	{
+		if(!(t3f_flags & T3F_RESIZABLE))
+		{
+			ret = 2;
+		}
+	}
+	else
+	{
+		if(t3f_flags & T3F_RESIZABLE)
+		{
+			ret = 2;
+		}
+	}
+
+	/* don't attempt to set new video mode if we already know we need to destroy the display
+	 * to get the type of display requested */
+	if(ret != 2)
+	{
+		if(flags & T3F_USE_FULLSCREEN)
+		{
+			/* toggle flag if going from window to full screen */
+			if(!(t3f_flags & T3F_USE_FULLSCREEN))
+			{
+				if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, true))
+				{
+					ret = 2;
+				}
+				else
+				{
+					t3f_flags |= T3F_USE_FULLSCREEN;
+				}
+			}
+		}
+		else
+		{
+			/* if we are switching from full screen to window */
+			if(t3f_flags & T3F_USE_FULLSCREEN)
+			{
+				if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false))
+				{
+					ret = 2;
+				}
+				else
+				{
+					t3f_flags &= ~T3F_USE_FULLSCREEN;
+					if(!al_resize_display(t3f_display, w, h))
+					{
+						ret = 0;
+					}
+				}
+			}
+			else
+			{
+				if(!al_resize_display(t3f_display, w, h))
+				{
+					ret = 0;
+				}
+			}
+		}
+	}
+
+	/* update settings if we successfully set the new mode */
+	if(ret == 1)
+	{
+		sprintf(val, "%d", al_get_display_width(t3f_display));
+		al_set_config_value(t3f_config, "T3F", "display_width", val);
+		sprintf(val, "%d", al_get_display_height(t3f_display));
+		al_set_config_value(t3f_config, "T3F", "display_height", val);
+		t3f_get_base_transform();
+		t3f_default_view->need_update = true;
+		t3f_select_view(t3f_default_view);
+	}
+
+	return ret;
+}
+
 /* returns 1 on success, 0 on failure, 2 if toggling fullscreen/window failed */
 int t3f_set_gfx_mode(int w, int h, int flags)
 {
 	const char * cvalue = NULL;
 	const char * cvalue2 = NULL;
-	char val[128] = {0};
 	int dflags = 0;
 	int dx, dy, doy;
 	int dw, dh;
@@ -673,68 +754,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 
 	if(t3f_display)
 	{
-		if(flags & T3F_RESIZABLE)
-		{
-			if(!(t3f_flags & T3F_RESIZABLE))
-			{
-				ret = 2;
-			}
-		}
-		else
-		{
-			if(t3f_flags & T3F_RESIZABLE)
-			{
-				ret = 2;
-			}
-		}
-
-		/* don't attempt to set new video mode if we already know we need to destroy the display
-		 * to get the type of display requested */
-		if(ret != 2)
-		{
-			if(flags & T3F_USE_FULLSCREEN)
-			{
-				/* toggle flag if going from window to full screen */
-				if(!(t3f_flags & T3F_USE_FULLSCREEN))
-				{
-					if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, true))
-					{
-						ret = 2;
-					}
-					else
-					{
-						t3f_flags |= T3F_USE_FULLSCREEN;
-					}
-				}
-			}
-			else
-			{
-				/* if we are switching from full screen to window */
-				if(t3f_flags & T3F_USE_FULLSCREEN)
-				{
-					if(!al_toggle_display_flag(t3f_display, ALLEGRO_FULLSCREEN_WINDOW, false))
-					{
-						ret = 2;
-					}
-					else
-					{
-						t3f_flags &= ~T3F_USE_FULLSCREEN;
-						al_resize_display(t3f_display, w, h);
-					}
-				}
-				else
-				{
-					al_resize_display(t3f_display, w, h);
-				}
-			}
-		}
-		sprintf(val, "%d", w);
-		al_set_config_value(t3f_config, "T3F", "display_width", val);
-		sprintf(val, "%d", h);
-		al_set_config_value(t3f_config, "T3F", "display_height", val);
-		t3f_get_base_transform();
-		t3f_current_view->need_update = true;
-		t3f_select_view(t3f_current_view);
+		ret = t3f_set_new_gfx_mode(w, h, flags);
 	}
 
 	/* first time creating display */
@@ -921,8 +941,8 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 	{
 		tx = x;
 		ty = y;
-		twx = w;
-		twy = h;
+		twx = x + w;
+		twy = y + h;
 	}
 	else
 	{
@@ -1169,6 +1189,8 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			char val[8] = {0};
 			al_acknowledge_resize(t3f_display);
 			t3f_get_base_transform();
+			t3f_default_view->need_update = true;
+			t3f_select_view(t3f_default_view);
 			al_set_clipping_rectangle(0, 0, al_get_display_width(t3f_display), al_get_display_height(t3f_display));
 			al_clear_to_color(al_map_rgb_f(0.0, 0.0, 0.0));
 			al_flip_display();
