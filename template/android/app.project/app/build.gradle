@@ -3,11 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.t3i.vgolfdeluxe"
+        applicationId "APP_PACKAGE"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        versionCode APP_RELEASE
+        versionName "APP_VERSION"
     }
     buildTypes {
         release {
