@@ -66,5 +66,6 @@ int main(int argc, char * argv[])
 	{
 		printf("Error: could not initialize T3F!\n");
 	}
+	t3f_finish();
 	return 0;
 }
