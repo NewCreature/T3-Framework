@@ -136,6 +136,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event);
 void t3f_process_events(void);
 void t3f_render(bool flip);
 void t3f_run(void);
+void t3f_finish(void);
 
 float t3f_distance(float x1, float y1, float x2, float y2);
 

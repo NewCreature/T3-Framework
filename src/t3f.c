@@ -23,6 +23,7 @@
 #include "memory.h"
 #include "resource.h"
 #include "view.h"
+#include "music.h"
 #include "android.h"
 #ifndef ALLEGRO_ANDROID
 	#include "menu.h"
@@ -1477,6 +1478,28 @@ void t3f_run(void)
 			t3f_halted = 2;
 		}
 	}
+	al_stop_timer(t3f_timer);
+	while(!al_event_queue_is_empty(t3f_queue))
+	{
+		al_wait_for_event(t3f_queue, &event);
+	}
+}
+
+void t3f_finish(void)
+{
+	if(t3f_timer)
+	{
+		al_destroy_timer(t3f_timer);
+	}
+	if(t3f_display)
+	{
+		al_destroy_display(t3f_display);
+	}
+	if(t3f_queue)
+	{
+		al_destroy_event_queue(t3f_queue);
+	}
+	t3f_stop_music();
 	if(t3f_developer_name)
 	{
 		free(t3f_developer_name);
