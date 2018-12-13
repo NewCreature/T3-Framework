@@ -64,7 +64,7 @@ demo_clean:
 	rm -rf $(DEMO_DELETE)
 
 demo_edit:
-	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/src/makefile.defines
+	$(SED_COMMAND) 's|= $(APP_NAME)|= $(APP_NAME)-demo|' $(DEMO_DIR)/src/makefile.defines
 	$(SED_COMMAND) 's|$(subst $(SPACE),\$(SPACE),$(APP_TITLE))|$(subst $(SPACE),\$(SPACE),$(APP_TITLE))\\$(SPACE)Demo|' $(DEMO_DIR)/src/makefile.defines
 	$(SED_COMMAND) 's|$(APP_ANDROID_PACKAGE)|$(APP_ANDROID_PACKAGE)demo|' $(DEMO_DIR)/src/makefile.defines
 	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/changelog
