@@ -1424,19 +1424,22 @@ void t3f_render(bool flip)
 	}
 }
 
-void t3f_process_events(void)
+void t3f_process_events(bool ignore)
 {
 	ALLEGRO_EVENT event;
 
 	while(al_get_next_event(t3f_queue, &event))
 	{
-		if(t3f_event_handler_proc)
+		if(!ignore)
 		{
-			t3f_event_handler_proc(&event, t3f_user_data);
-		}
-		else
-		{
-			t3f_event_handler(&event);
+			if(t3f_event_handler_proc)
+			{
+				t3f_event_handler_proc(&event, t3f_user_data);
+			}
+			else
+			{
+				t3f_event_handler(&event);
+			}
 		}
 	}
 }
