@@ -118,20 +118,10 @@ void t3f_select_view(T3F_VIEW * sp)
 		}
 
 		/* set up edge coordinates for use with T3F_FILL_SCREEN */
-		if(dsx == 0)
-		{
-			t3f_current_view->left = 0;
-			t3f_current_view->right = t3f_virtual_display_width;
-			t3f_current_view->top = -voy / dsy;
-			t3f_current_view->bottom = t3f_virtual_display_height - t3f_current_view->top;
-		}
-		else
-		{
-			t3f_current_view->top = 0;
-			t3f_current_view->bottom = t3f_virtual_display_height;
-			t3f_current_view->left = -vox / dsx;
-			t3f_current_view->right = t3f_virtual_display_width - t3f_current_view->left;
-		}
+		t3f_current_view->top = -t3f_display_offset_y / t3f_display_scale_y;
+		t3f_current_view->bottom = t3f_virtual_display_height - t3f_current_view->top;
+		t3f_current_view->left = -t3f_display_offset_x / t3f_display_scale_x;
+		t3f_current_view->right = t3f_virtual_display_width - t3f_current_view->left;
 		t3f_current_view->need_update = false;
 	}
 	al_copy_transform(&t3f_current_transform, &t3f_current_view->transform);
