@@ -229,7 +229,6 @@ void t3f_stop_music(void)
 {
 	if(t3f_stream)
 	{
-		al_drain_audio_stream(t3f_stream);
 		al_destroy_audio_stream(t3f_stream);
 		t3f_stream = NULL;
 		t3f_set_music_state(T3F_MUSIC_STATE_OFF);
