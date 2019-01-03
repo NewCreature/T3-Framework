@@ -936,6 +936,19 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 	{
 		x = t3f_current_view->left;
 	}
+	else if(x > t3f_current_view->right)
+	{
+		x = t3f_current_view->right;
+	}
+	if(y < t3f_current_view->top)
+	{
+		y = t3f_current_view->top;
+	}
+	else if(y < t3f_current_view->bottom)
+	{
+		y = t3f_current_view->bottom;
+	}
+
 	/* convert virtual screen coordinates to real display coordinates */
 	al_transform_coordinates(&t3f_current_transform, &ox, &oy);
 	if(w != 0 && h != 0)
