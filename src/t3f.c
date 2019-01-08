@@ -944,7 +944,7 @@ void t3f_set_clipping_rectangle(int x, int y, int w, int h)
 	{
 		y = t3f_current_view->top;
 	}
-	else if(y < t3f_current_view->bottom)
+	else if(y > t3f_current_view->bottom)
 	{
 		y = t3f_current_view->bottom;
 	}
