@@ -53,7 +53,8 @@ typedef struct
 
 	bool active; // is this touch active?
 	bool released;
-	float x, y;
+    float real_x, real_y; // the actual screen coordinates
+	float x, y; // coordinates transformed to for a view
 	bool primary;
 
 } T3F_TOUCH;
@@ -84,12 +85,6 @@ typedef struct
 
 extern int t3f_virtual_display_width;
 extern int t3f_virtual_display_height;
-extern int t3f_display_offset_x;
-extern int t3f_display_offset_y;
-extern float t3f_display_scale_x;
-extern float t3f_display_scale_y;
-extern int t3f_display_width;
-extern int t3f_display_height;
 
 extern bool t3f_key[ALLEGRO_KEY_MAX];
 extern bool t3f_quit;
@@ -98,8 +93,8 @@ extern int t3f_option[T3F_MAX_OPTIONS];
 
 extern int t3f_real_mouse_x;
 extern int t3f_real_mouse_y;
-extern int t3f_mouse_x;
-extern int t3f_mouse_y;
+extern float t3f_mouse_x;
+extern float t3f_mouse_y;
 extern int t3f_mouse_z;
 extern int t3f_mouse_dx;
 extern int t3f_mouse_dy;
@@ -126,7 +121,6 @@ extern ALLEGRO_COLOR t3f_color_black;
 
 int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_proc)(void * data), void (*render_proc)(void * data), int flags, void * data);
 void t3f_set_option(int option, int value);
-void t3f_get_base_transform(void);
 int t3f_set_gfx_mode(int w, int h, int flags);
 void t3f_set_clipping_rectangle(int x, int y, int w, int h);
 void t3f_set_event_handler(void (*proc)(ALLEGRO_EVENT * event, void * data));
