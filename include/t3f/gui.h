@@ -52,6 +52,10 @@ typedef struct
 	int ox, oy;
 
 	int hover_element;
+    int font_margin_top;
+    int font_margin_bottom;
+    int font_margin_left;
+    int font_margin_right;
 
 } T3F_GUI;
 
