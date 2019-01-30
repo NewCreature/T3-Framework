@@ -822,6 +822,10 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		{
 			al_set_window_position(t3f_display, dx, dy);
 		}
+		if(t3f_default_view)
+		{
+			handle_view_resize();
+		}
 	}
 	#ifdef ALLEGRO_WINDOWS
 		t3f_set_windows_icon("allegro_icon");
