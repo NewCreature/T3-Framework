@@ -141,7 +141,7 @@ int t3f_read_key(int flags);
 bool t3f_key_pressed(void);
 
 /* mouse */
-void t3f_get_mouse_mickeys(int * x, int * y, int * z);
+bool t3f_get_mouse_mickeys(int * x, int * y, int * z);
 void t3f_set_mouse_xy(float x, float y);
 
 /* touch */
