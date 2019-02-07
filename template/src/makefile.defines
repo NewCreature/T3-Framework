@@ -70,6 +70,15 @@ app_clean:
 #MINGW_DEPEND_LIBS =
 #MINGW_PLATFORM_TARGET =
 
+##############
+# MSYS stuff #
+##############
+#MSYS_CFLAGS =
+#MSYS_PLATFORM_OBJECTS =
+#MSYS_PLATFORM_LIBS =
+#MSYS_DEPEND_LIBS =
+#MSYS_PLATFORM_TARGET =
+
 #################
 # Android stuff #
 #################
