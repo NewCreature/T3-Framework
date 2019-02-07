@@ -42,6 +42,7 @@ else
 	@cp template/src/makefile.iphone "$(DIR)/src"
 	@cp template/src/makefile.mingw "$(DIR)/src"
 	@cp template/src/makefile.mingw_cross "$(DIR)/src"
+	@cp template/src/makefile.msys "$(DIR)/src"
 	@cp template/src/makefile.default_config "$(DIR)/src"
 	@cp -a template/debian "$(DIR)"
 	@cp -a template/android "$(DIR)"
@@ -68,6 +69,7 @@ else
 	@cp "$(DIR)/src/makefile.iphone" template/src/makefile.iphone
 	@cp "$(DIR)/src/makefile.mingw" template/src/makefile.mingw
 	@cp "$(DIR)/src/makefile.mingw_cross" template/src/makefile.mingw_cross
+	@cp "$(DIR)/src/makefile.mingw_cross" template/src/makefile.msys
 	@cp "$(DIR)/src/makefile.default_config" template/src/makefile.default_config
 	@cp -a "$(DIR)/debian/." template/debian/
 	@cp -a "$(DIR)/android/." template/android/
