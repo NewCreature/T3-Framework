@@ -118,6 +118,11 @@ static void t3f_select_views(T3F_VIEW * base_view, T3F_VIEW * view)
 	float scale_x = 1.0;
 	float scale_y = 1.0;
 
+	if(al_is_bitmap_drawing_held())
+	{
+		al_hold_bitmap_drawing(false);
+		al_hold_bitmap_drawing(true);
+	}
 	if(!base_view)
 	{
 		base_view = t3f_default_view;
