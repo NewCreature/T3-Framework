@@ -248,8 +248,8 @@ void t3f_select_input_view(T3F_VIEW * vp)
 
 	if(vp && vp != t3f_default_view)
 	{
-		translate_x = t3f_default_view->translate_x + vp->translate_x;
-		translate_y = t3f_default_view->translate_y + vp->translate_y;
+		translate_x = t3f_default_view->translate_x + vp->translate_x * t3f_default_view->scale_x;
+		translate_y = t3f_default_view->translate_y + vp->translate_y * t3f_default_view->scale_y;
 		scale_x = t3f_default_view->scale_x * vp->scale_x;
 		scale_y = t3f_default_view->scale_y * vp->scale_y;
 	}
