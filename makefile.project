@@ -69,7 +69,7 @@ else
 	@cp "$(DIR)/src/makefile.iphone" template/src/makefile.iphone
 	@cp "$(DIR)/src/makefile.mingw" template/src/makefile.mingw
 	@cp "$(DIR)/src/makefile.mingw_cross" template/src/makefile.mingw_cross
-	@cp "$(DIR)/src/makefile.mingw_cross" template/src/makefile.msys
+	@cp "$(DIR)/src/makefile.msys" template/src/makefile.msys
 	@cp "$(DIR)/src/makefile.default_config" template/src/makefile.default_config
 	@cp -a "$(DIR)/debian/." template/debian/
 	@cp -a "$(DIR)/android/." template/android/
