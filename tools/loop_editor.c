@@ -20,7 +20,7 @@ bool le_loop_enabled = true;
 void le_logic(void * data)
 {
 	float amount = 0.001;
-	
+
 	if(t3f_key[ALLEGRO_KEY_ESCAPE])
 	{
 		t3f_exit();
@@ -79,11 +79,10 @@ void le_logic(void * data)
 
 void le_render(void * data)
 {
-	float ox, time;
-	int i, ticks;
-	
+	float ox;
+
 	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.25, 1.0));
-	
+
 	/* render overall view */
 	al_draw_filled_rectangle(16.0, LE_PROGRESS_Y - 2.0, 640.0 - 16.0 - 1.0, LE_PROGRESS_Y + 2.0, al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
 	ox = (le_loop_start / le_music_length) * (640.0 - 32.0);
@@ -107,7 +106,7 @@ bool le_initialize(void)
 	ALLEGRO_PATH * path = NULL;
 	ALLEGRO_CONFIG * config = NULL;
 	const char * val;
-	
+
 	if(!t3f_initialize("T3F Loop Editor", 640, 240, 60.0, le_logic, le_render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_SOUND, NULL))
 	{
 		return false;
@@ -174,7 +173,7 @@ void le_exit(void)
 {
 	ALLEGRO_CONFIG * config = NULL;
 	char val[256];
-	
+
 	config = al_load_config_file(le_config_filename);
 	if(!config)
 	{
