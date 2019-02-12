@@ -25,7 +25,7 @@ APP_PACKAGE_FILENAME = $(APP_PACKAGE_NAME)-src.tar.gz
 all : $(APP_EXE_NAME) $(PLATFORM_TARGET) $(APP_EXTRA_TARGET)
 	@echo All targets built!
 
-$(APP_EXE_NAME) : prepare_platform $(PROJECT_OBJECTS) update_changelog
+$(APP_EXE_NAME) : prepare_platform $(PROJECT_OBJECTS)
 	$(CC) $(LFLAGS) $(PROJECT_OBJECTS) $(PLATFORM_LIBS) $(APP_LIBS) $(T3F_DEPEND_LIBS) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
 	@echo Executable built!
 
