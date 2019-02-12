@@ -106,6 +106,10 @@ static void t3f_get_view_transformation(T3F_VIEW * view)
 		view->translate_y = 0.0;
 		view->scale_x = view->width / (float)view->virtual_width;
 		view->scale_y = view->height / (float)view->virtual_height;
+		view->left = 0;
+		view->top = 0;
+		view->right = view->virtual_width;
+		view->bottom = view->virtual_height;
 	}
 }
 
