@@ -151,7 +151,6 @@ bool dot_initialize(int argc, char * argv[])
 		return false;
 	}
 
-	printf("break 1\n");
 	dot_font = al_load_font("data/fonts/kongtext.ttf", 16, 0);
 	if(!dot_font)
 	{
