@@ -23,6 +23,8 @@ else
 	@cp -a template/iphone "$(DIR)"
 	@cp -a template/icons "$(DIR)"
 	@cp -a template/packages "$(DIR)"
+	@cp -a template/misc "$(DIR)"
+	@cp template/misc/blank_changes "$(DIR)/changes.txt"
 endif
 
 upgrade_project:
@@ -50,6 +52,7 @@ else
 	@cp -a template/macosx "$(DIR)"
 	@cp -a template/iphone "$(DIR)"
 	@cp -a template/packages "$(DIR)"
+	@cp -a template/misc "$(DIR)"
 endif
 
 import_updates:
@@ -76,4 +79,5 @@ else
 	@cp -a "$(DIR)/win32/." template/win32/
 	@cp -a "$(DIR)/macosx/." template/macosx/
 	@cp -a "$(DIR)/iphone/." template/iphone/
+	@cp -a "$(DIR)/misc/." template/misc/
 endif
