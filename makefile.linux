@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = $(COMMON_CFLAGS) -arch i386 -arch x86_64 -mmacosx-version-min=10.6 -DT3F_COMPANY="\"t3-i\""
-LFLAGS = $(COMMON_LFLAGS) -mmacosx-version-min=10.6 -L/usr/local/lib
+CFLAGS = $(COMMON_CFLAGS) -DT3F_COMPANY="\"t3-i\""
+LFLAGS = $(COMMON_LFLAGS)
 LIBS = -lallegro_image -lallegro_font -lallegro_ttf -lallegro_primitives -lallegro_audio -lallegro_acodec -lallegro_dialog -lallegro_memfile -lallegro
 EXE_SUFFIX =
 DEL_COMMAND = rm -f
