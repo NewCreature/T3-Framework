@@ -171,16 +171,22 @@ T3F_VIEW
 	functions.
 
 T3F_VIEW * t3f_create_view(float ox, float oy, float w, float h, float vpx,
-	float vpy)
+	float vpy, int flags)
 
 	Allocate a T3F_VIEW with the specified parameters. 'ox' and 'oy' represent
 	the offset of the viewport in relation to T3F's virtual display. 'w' and 'h'
 	are the viewport's dimensions. 'vpx' and 'vpy' are the coordinates of the
-	vanishing point.
+	vanishing point. 'flags' tell T3F how the view should work, using
+	T3F_FORCE_ASPECT and T3F_FILL_SCREEN flags to modify the behavior.
 
 void t3f_destroy_view(T3F_VIEW * vp)
 
 	Frees the passed T3F_VIEW from memory.
+
+void t3f_adjust_view(T3F_VIEW * vp, float ox, float oy, float w, float h, float
+	vpx, float vpy, int flags)
+
+	Adjust an existing view.
 
 void t3f_select_view(T3F_VIEW * vp)
 
@@ -189,6 +195,10 @@ void t3f_select_view(T3F_VIEW * vp)
 	the coordinate (0, 0) represents the upper left corner of the drawing area
 	and (t3f_virtual_display_width, t3f_virtual_display_height) falls just
 	outside the drawing area.
+
+void t3f_select_input_view(T3F_VIEW * vp)
+
+	Update mouse and touch coordinates for the specified view.
 
 float t3f_project_x(float x, float z)
 
@@ -785,7 +795,7 @@ void t3f_destroy_gui(T3F_GUI * pp)
 	Free all resources used by a page.
 
 int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *),
-	ALLEGRO_BITMAP * bp, int ox, int oy, int flags)
+	void ** bitmap, int ox, int oy, int flags)
 
 	Add an image element to a GUI. The image will be displayed at the specified
 	location within the page. Flags can be:
@@ -797,7 +807,7 @@ int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(int, void *),
 		T3F_GUI_ELEMENT_STATIC
 
 int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(int, void *),
-	char * text, ALLEGRO_FONT * fp, int ox, int oy, ALLEGRO_COLOR color,
+	char * text, void ** font, int ox, int oy, ALLEGRO_COLOR color,
 	int flags);
 
 	Add a text element to a GUI. The text will be displayed at the specified
