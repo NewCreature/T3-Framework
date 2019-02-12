@@ -1,4 +1,8 @@
+COMMON_CFLAGS = -O2 -Wall -I./include/t3f -I./include -I/usr/local/include
+COMMON_LFLAGS =
+
 T3F_OBJECTS = src/t3f.o src/bitmap.o src/animation.o src/sound.o src/music.o src/collision.o src/controller.o src/font.o src/gui.o src/resource.o src/rng.o src/android.o src/atlas.o src/draw.o src/view.o src/debug.o src/tilemap.o src/vector.o src/menu.o src/file.o
+T3F_LIBRARIES = $(LIBS)
 EX_BASIC_OFILES = $(T3F_OBJECTS) examples/ex_basic.o
 EX_TOUCH_OFILES = $(T3F_OBJECTS) examples/ex_touch.o
 EX_MUSIC_OFILES = $(T3F_OBJECTS) examples/ex_music.o
@@ -19,3 +23,73 @@ VECTOR_EDITOR_OFILES = $(T3F_OBJECTS) tools/vector_editor.o
 FONT_EDITOR_OFILES = $(T3F_OBJECTS) tools/font_editor.o
 LOOP_EDITOR_OFILES = $(T3F_OBJECTS) tools/loop_editor.o
 GAIN_EDITOR_OFILES = $(T3F_OBJECTS) tools/gain_editor.o
+
+examples/ex_basic$(EXE_SUFFIX) : $(EX_BASIC_OFILES)
+	gcc $(EX_BASIC_OFILES) -o examples/ex_basic$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_touch$(EXE_SUFFIX) : $(EX_TOUCH_OFILES)
+	gcc $(EX_TOUCH_OFILES) -o examples/ex_touch$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_music$(EXE_SUFFIX) : $(EX_MUSIC_OFILES)
+	gcc $(EX_MUSIC_OFILES) -o examples/ex_music$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_sound$(EXE_SUFFIX) : $(EX_SOUND_OFILES)
+	gcc $(EX_SOUND_OFILES) -o examples/ex_sound$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_3d$(EXE_SUFFIX) : $(EX_3D_OFILES)
+	gcc $(EX_3D_OFILES) -o examples/ex_3d$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_atlas$(EXE_SUFFIX) : $(EX_ATLAS_OFILES)
+	gcc $(EX_ATLAS_OFILES) -o examples/ex_atlas$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_controller$(EXE_SUFFIX) : $(EX_CONTROLLER_OFILES)
+	gcc $(EX_CONTROLLER_OFILES) -o examples/ex_controller$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_animation$(EXE_SUFFIX) : $(EX_ANIMATION_OFILES)
+	gcc $(EX_ANIMATION_OFILES) -o examples/ex_animation$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_gui$(EXE_SUFFIX) : $(EX_GUI_OFILES)
+	gcc $(EX_GUI_OFILES) -o examples/ex_gui$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_tilemap$(EXE_SUFFIX) : $(EX_TILEMAP_OFILES)
+	gcc $(EX_TILEMAP_OFILES) -o examples/ex_tilemap$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+examples/ex_collision$(EXE_SUFFIX) : $(EX_COLLISION_OFILES)
+	gcc $(EX_COLLISION_OFILES) -o examples/ex_collision$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+games/paddle$(EXE_SUFFIX) : $(PADDLE_OFILES)
+	gcc $(PADDLE_OFILES) -o games/paddle/paddle$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+games/dot2dot$(EXE_SUFFIX) : $(DOT2DOT_OFILES)
+	gcc $(DOT2DOT_OFILES) -o games/dot2dot/dot2dot$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+games/av$(EXE_SUFFIX) : $(AV_OFILES)
+	gcc $(AV_OFILES) -o games/av/av$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+tools/animator$(EXE_SUFFIX) : $(ANIMATOR_OFILES)
+	gcc $(ANIMATOR_OFILES) -o tools/animator$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+tools/mapper$(EXE_SUFFIX) : $(MAPPER_OFILES)
+	gcc $(MAPPER_OFILES) -o tools/mapper$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+tools/vector_editor$(EXE_SUFFIX) : $(VECTOR_EDITOR_OFILES)
+	gcc $(VECTOR_EDITOR_OFILES) -o tools/vector_editor$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+tools/font_editor$(EXE_SUFFIX) : $(FONT_EDITOR_OFILES)
+	gcc $(FONT_EDITOR_OFILES) -o tools/font_editor$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+tools/loop_editor$(EXE_SUFFIX) : $(LOOP_EDITOR_OFILES)
+	gcc $(LOOP_EDITOR_OFILES) -o tools/loop_editor$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+tools/gain_editor$(EXE_SUFFIX) : $(GAIN_EDITOR_OFILES)
+	gcc $(GAIN_EDITOR_OFILES) -o tools/gain_editor$(EXE_SUFFIX) $(LFLAGS) $(T3F_LIBRARIES)
+
+all: examples/ex_basic$(EXE_SUFFIX) examples/ex_touch$(EXE_SUFFIX) examples/ex_music$(EXE_SUFFIX) examples/ex_sound$(EXE_SUFFIX) examples/ex_3d$(EXE_SUFFIX) examples/ex_atlas$(EXE_SUFFIX) examples/ex_controller$(EXE_SUFFIX) examples/ex_animation$(EXE_SUFFIX) examples/ex_gui$(EXE_SUFFIX) examples/ex_tilemap$(EXE_SUFFIX) examples/ex_collision$(EXE_SUFFIX) games/paddle$(EXE_SUFFIX) games/dot2dot$(EXE_SUFFIX) games/av$(EXE_SUFFIX) tools/animator$(EXE_SUFFIX) tools/mapper$(EXE_SUFFIX) tools/vector_editor$(EXE_SUFFIX) tools/font_editor$(EXE_SUFFIX) tools/loop_editor$(EXE_SUFFIX) tools/gain_editor$(EXE_SUFFIX)
+
+clean:
+	$(DEL_COMMAND) $(T3F_OBJECTS)
+	$(DEL_COMMAND) examples/*.o
+	$(DEL_COMMAND) games/paddle/*.o
+	$(DEL_COMMAND) games/dot2dot/*.o
+	$(DEL_COMMAND) games/av/*.o
+	$(DEL_COMMAND) tools/*.o

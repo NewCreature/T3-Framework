@@ -68,10 +68,10 @@ int main(int argc, char * argv[])
 	}
 	t3f_set_gui_driver(NULL);
 	page = t3f_create_gui(0, 0);
-	t3f_add_gui_text_element(page, red_proc, "Red", font, 16, 0, t3f_color_white, T3F_GUI_ELEMENT_SHADOW);
-	t3f_add_gui_text_element(page, green_proc, "Green", font, 16, 24, t3f_color_white, T3F_GUI_ELEMENT_SHADOW);
-	t3f_add_gui_text_element(page, blue_proc, "Blue", font, 16, 48, t3f_color_white, T3F_GUI_ELEMENT_SHADOW);
-	t3f_add_gui_image_element(page, black_proc, bitmap, 16, 120, T3F_GUI_ELEMENT_SHADOW);
+	t3f_add_gui_text_element(page, red_proc, "Red", (void **)&font, 16, 0, t3f_color_white, T3F_GUI_ELEMENT_SHADOW);
+	t3f_add_gui_text_element(page, green_proc, "Green", (void **)&font, 16, 24, t3f_color_white, T3F_GUI_ELEMENT_SHADOW);
+	t3f_add_gui_text_element(page, blue_proc, "Blue", (void **)&font, 16, 48, t3f_color_white, T3F_GUI_ELEMENT_SHADOW);
+	t3f_add_gui_image_element(page, black_proc, (void **)&bitmap, 16, 120, T3F_GUI_ELEMENT_SHADOW);
 	t3f_run();
 	return 0;
 }

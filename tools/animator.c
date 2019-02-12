@@ -258,7 +258,7 @@ int menu_update_frame_iter_proc(ALLEGRO_MENU * menu, int item, void * data)
 	return 0;
 }
 
-int menu_proc_file_new(void * data)
+int menu_proc_file_new(int i, void * data)
 {
 	if(animation)
 	{
@@ -269,7 +269,7 @@ int menu_proc_file_new(void * data)
 	return 0;
 }
 
-int menu_proc_file_load(void * data)
+int menu_proc_file_load(int i, void * data)
 {
 	const char * filename;
 
@@ -288,13 +288,13 @@ int menu_proc_file_load(void * data)
 	return 0;
 }
 
-int menu_proc_file_save(void * data)
+int menu_proc_file_save(int i, void * data)
 {
 	t3f_save_animation(animation, last_animation_filename);
 	return 0;
 }
 
-int menu_proc_file_save_as(void * data)
+int menu_proc_file_save_as(int i, void * data)
 {
 	const char * filename;
 
@@ -302,33 +302,33 @@ int menu_proc_file_save_as(void * data)
 	if(filename)
 	{
 		strcpy(last_animation_filename, filename);
-		menu_proc_file_save(data);
+		menu_proc_file_save(0, data);
 		update_config();
 	}
 	return 0;
 }
 
-int menu_proc_file_quit(void * data)
+int menu_proc_file_quit(int i, void * data)
 {
 	t3f_exit();
 	return 0;
 }
 
-int menu_proc_view_bitmaps(void * data)
+int menu_proc_view_bitmaps(int i, void * data)
 {
 	view = ANIMATOR_VIEW_BITMAPS;
 	t3f_refresh_menus();
 	return 0;
 }
 
-int menu_proc_view_frames(void * data)
+int menu_proc_view_frames(int i, void * data)
 {
 	view = ANIMATOR_VIEW_FRAMES;
 	t3f_refresh_menus();
 	return 0;
 }
 
-int menu_proc_bitmap_add(void * data)
+int menu_proc_bitmap_add(int i, void * data)
 {
 	ALLEGRO_BITMAP * bp;
 	const char * fn;
@@ -349,7 +349,7 @@ int menu_proc_bitmap_add(void * data)
 	return 0;
 }
 
-int menu_proc_bitmap_delete(void * data)
+int menu_proc_bitmap_delete(int i, void * data)
 {
 	if(current_bitmap < animation->bitmaps->count)
 	{
@@ -363,7 +363,7 @@ int menu_proc_bitmap_delete(void * data)
 	return 0;
 }
 
-int menu_proc_bitmap_previous(void * data)
+int menu_proc_bitmap_previous(int i, void * data)
 {
 	current_bitmap--;
 	if(current_bitmap < 0)
@@ -373,7 +373,7 @@ int menu_proc_bitmap_previous(void * data)
 	return 0;
 }
 
-int menu_proc_bitmap_next(void * data)
+int menu_proc_bitmap_next(int i, void * data)
 {
 	current_bitmap++;
 	if(current_bitmap >= animation->bitmaps->count)
@@ -383,7 +383,7 @@ int menu_proc_bitmap_next(void * data)
 	return 0;
 }
 
-int menu_proc_bitmap_load(void * data)
+int menu_proc_bitmap_load(int i, void * data)
 {
 	ALLEGRO_BITMAP * bp;
 	const char * fn;
@@ -405,7 +405,7 @@ int menu_proc_bitmap_load(void * data)
 	return 0;
 }
 
-int menu_proc_frame_add(void * data)
+int menu_proc_frame_add(int i, void * data)
 {
 	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmaps->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmaps->bitmap[current_bitmap]), 0, 1, 0);
 	current_frame = animation->frames - 1;
@@ -414,7 +414,7 @@ int menu_proc_frame_add(void * data)
 	return 0;
 }
 
-int menu_proc_frame_delete(void * data)
+int menu_proc_frame_delete(int i, void * data)
 {
 	if(current_frame < animation->frames)
 	{
@@ -428,7 +428,7 @@ int menu_proc_frame_delete(void * data)
 	return 0;
 }
 
-int menu_proc_frame_previous_bitmap(void * data)
+int menu_proc_frame_previous_bitmap(int i, void * data)
 {
 	animation->frame[current_frame]->bitmap--;
 	if(animation->frame[current_frame]->bitmap < 0)
@@ -438,7 +438,7 @@ int menu_proc_frame_previous_bitmap(void * data)
 	return 0;
 }
 
-int menu_proc_frame_next_bitmap(void * data)
+int menu_proc_frame_next_bitmap(int i, void * data)
 {
 	animation->frame[current_frame]->bitmap++;
 	if(animation->frame[current_frame]->bitmap >= animation->bitmaps->count)
@@ -448,42 +448,42 @@ int menu_proc_frame_next_bitmap(void * data)
 	return 0;
 }
 
-int menu_proc_frame_double(void * data)
+int menu_proc_frame_double(int i, void * data)
 {
 	animation->frame[current_frame]->width *= 2.0;
 	animation->frame[current_frame]->height *= 2.0;
 	return 0;
 }
 
-int menu_proc_frame_half(void * data)
+int menu_proc_frame_half(int i, void * data)
 {
 	animation->frame[current_frame]->width /= 2.0;
 	animation->frame[current_frame]->height /= 2.0;
 	return 0;
 }
 
-int menu_proc_frame_reset(void * data)
+int menu_proc_frame_reset(int i, void * data)
 {
 	animation->frame[current_frame]->width = al_get_bitmap_width(animation->bitmaps->bitmap[animation->frame[current_frame]->bitmap]);
 	animation->frame[current_frame]->height = al_get_bitmap_height(animation->bitmaps->bitmap[animation->frame[current_frame]->bitmap]);
 	return 0;
 }
 
-int menu_proc_frame_lengthen(void * data)
+int menu_proc_frame_lengthen(int i, void * data)
 {
 	animation->frame[current_frame]->ticks++;
 	t3f_animation_build_frame_list(animation);
 	return 0;
 }
 
-int menu_proc_frame_shorten(void * data)
+int menu_proc_frame_shorten(int i, void * data)
 {
 	animation->frame[current_frame]->ticks--;
 	t3f_animation_build_frame_list(animation);
 	return 0;
 }
 
-int menu_proc_frame_previous(void * data)
+int menu_proc_frame_previous(int i, void * data)
 {
 	current_frame--;
 	if(current_frame < 0)
@@ -493,7 +493,7 @@ int menu_proc_frame_previous(void * data)
 	return 0;
 }
 
-int menu_proc_frame_next(void * data)
+int menu_proc_frame_next(int i, void * data)
 {
 	current_frame++;
 	if(current_frame >= animation->frames)
@@ -593,18 +593,18 @@ void bitmap_logic(void)
 
 	if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
 	{
-		menu_proc_bitmap_add(NULL);
+		menu_proc_bitmap_add(0, NULL);
 		t3f_key[ALLEGRO_KEY_INSERT] = 0;
 		t3f_key[ALLEGRO_KEY_I] = 0;
 	}
 	if(t3f_key[ALLEGRO_KEY_DELETE])
 	{
-		menu_proc_bitmap_delete(NULL);
+		menu_proc_bitmap_delete(0, NULL);
 		t3f_key[ALLEGRO_KEY_DELETE] = 0;
 	}
 	if(t3f_key[ALLEGRO_KEY_ENTER])
 	{
-		menu_proc_bitmap_load(NULL);
+		menu_proc_bitmap_load(0, NULL);
 		t3f_key[ALLEGRO_KEY_ENTER] = 0;
 	}
 	if(t3f_key[ALLEGRO_KEY_P])
@@ -626,12 +626,12 @@ void bitmap_logic(void)
 	{
 		if(t3f_key[ALLEGRO_KEY_LEFT])
 		{
-			menu_proc_bitmap_previous(NULL);
+			menu_proc_bitmap_previous(0, NULL);
 			t3f_key[ALLEGRO_KEY_LEFT] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_RIGHT])
 		{
-			menu_proc_bitmap_next(NULL);
+			menu_proc_bitmap_next(0, NULL);
 			t3f_key[ALLEGRO_KEY_RIGHT] = 0;
 		}
 	}
@@ -641,63 +641,63 @@ void frame_logic(void)
 {
 	if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
 	{
-		menu_proc_frame_add(NULL);
+		menu_proc_frame_add(0, NULL);
 		t3f_key[ALLEGRO_KEY_INSERT] = 0;
 		t3f_key[ALLEGRO_KEY_I] = 0;
 	}
 	if(t3f_key[ALLEGRO_KEY_DELETE])
 	{
-		menu_proc_frame_delete(NULL);
+		menu_proc_frame_delete(0, NULL);
 		t3f_key[ALLEGRO_KEY_DELETE] = 0;
 	}
 	if(animation->frames > 0)
 	{
 		if(t3f_key[ALLEGRO_KEY_LEFT])
 		{
-			menu_proc_frame_previous(NULL);
+			menu_proc_frame_previous(0, NULL);
 			t3f_key[ALLEGRO_KEY_LEFT] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_RIGHT])
 		{
-			menu_proc_frame_next(NULL);
+			menu_proc_frame_next(0, NULL);
 			t3f_key[ALLEGRO_KEY_RIGHT] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_UP])
 		{
-			menu_proc_frame_lengthen(NULL);
+			menu_proc_frame_lengthen(0, NULL);
 			t3f_key[ALLEGRO_KEY_UP] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_DOWN])
 		{
 			if(animation->frame[current_frame]->ticks > 1)
 			{
-				menu_proc_frame_shorten(NULL);
+				menu_proc_frame_shorten(0, NULL);
 			}
 			t3f_key[ALLEGRO_KEY_DOWN] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_PAD_ASTERISK])
 		{
-			menu_proc_frame_double(NULL);
+			menu_proc_frame_double(0, NULL);
 			t3f_key[ALLEGRO_KEY_PAD_ASTERISK] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_PAD_SLASH])
 		{
-			menu_proc_frame_half(NULL);
+			menu_proc_frame_half(0, NULL);
 			t3f_key[ALLEGRO_KEY_PAD_SLASH] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_PAD_ENTER])
 		{
-			menu_proc_frame_reset(NULL);
+			menu_proc_frame_reset(0, NULL);
 			t3f_key[ALLEGRO_KEY_PAD_ENTER] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_PGUP])
 		{
-			menu_proc_frame_previous_bitmap(NULL);
+			menu_proc_frame_previous_bitmap(0, NULL);
 			t3f_key[ALLEGRO_KEY_PGUP] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_PGDN])
 		{
-			menu_proc_frame_next_bitmap(NULL);
+			menu_proc_frame_next_bitmap(0, NULL);
 			t3f_key[ALLEGRO_KEY_PGDN] = 0;
 		}
 		if(t3f_key[ALLEGRO_KEY_H])

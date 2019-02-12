@@ -29,7 +29,7 @@ else
 endif
 
 top:
-	$(MAKE) -f makefile.$(SYSTEM)
+	$(MAKE) -f makefile.$(SYSTEM) all
 
 clean:
 	$(MAKE) -f makefile.$(SYSTEM) clean

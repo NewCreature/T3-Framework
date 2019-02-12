@@ -26,7 +26,7 @@ float paddle_ai_predict_y(void)
 {
 	float ox, oy, ovy;
 	float dy = 0.0;
-	
+
 	ox = ball.x;
 	oy = ball.y;
 	ovy = ball.vy;
@@ -69,7 +69,7 @@ void paddle_init_ball(float dir)
 		ball.vx = -ball.vx;
 	}
 	ball.active = true;
-	
+
 	/* handle AI */
 	if(ball.vx > 0)
 	{
@@ -81,7 +81,7 @@ void paddle_init_ball(float dir)
 void paddle_game_init(void)
 {
 	al_hide_mouse_cursor(t3f_display);
-	
+
 	/* place paddles */
 	paddle[0].x = 32.0;
 	paddle[0].y = 240.0 - 64.0 / 2.0;
@@ -93,17 +93,17 @@ void paddle_game_init(void)
 	paddle[1].object = t3f_create_collision_object(0, 0, 16, 64, 32, 32, 0);
 	t3f_move_collision_object_xy(paddle[1].object, paddle[1].x, paddle[1].y);
 	paddle[1].active = true;
-	
+
 	/* place ball */
 	ball.object = t3f_create_collision_object(0, 0, 16, 16, 32, 32, 0);
 	paddle_init_ball(1.0);
-	
+
 	/* reset scores */
 	score[0] = 0;
 	score[1] = 0;
-	
+
 	t3f_srand(&rng_state, time(0));
-	
+
 	paddle_state = EXAMPLE_STATE_GAME;
 	t3f_play_music("data/music/game.xm");
 }
@@ -124,26 +124,26 @@ void paddle_logic(void * data)
 	/* logic switch, use different logic for each state */
 	switch(paddle_state)
 	{
-		
+
 		case EXAMPLE_STATE_TITLE:
 		{
 			t3f_process_gui(paddle_menu, data);
 			break;
 		}
-		
+
 		case EXAMPLE_STATE_GAME:
 		{
-			
+
 			/* return to menu if Escape pressed */
 			if(t3f_key[ALLEGRO_KEY_ESCAPE])
 			{
 				paddle_game_exit();
 			}
-			
+
 			/* store old paddle positions */
 			paddle[0].oy = paddle[0].y;
 			paddle[1].oy = paddle[1].y;
-			
+
 			/* move paddle */
 			paddle[0].y = t3f_mouse_y - 32;
 			if(paddle[0].y < 0)
@@ -155,7 +155,7 @@ void paddle_logic(void * data)
 				paddle[0].y = 480.0 - 64.0;
 			}
 			t3f_move_collision_object_xy(paddle[0].object, paddle[0].x, paddle[0].y);
-			
+
 			/* move CPU paddle */
 			if(ball.vx > 0.0)
 			{
@@ -193,7 +193,7 @@ void paddle_logic(void * data)
 				}
 			}
 			t3f_move_collision_object_xy(paddle[1].object, paddle[1].x, paddle[1].y);
-			
+
 			/* move ball */
 			ball.x += ball.vx;
 			t3f_move_collision_object_xy(ball.object, ball.x, ball.y);
@@ -266,16 +266,16 @@ void paddle_logic(void * data)
 			}
 			break;
 		}
-		
+
 		case EXAMPLE_STATE_GAME_OVER:
 		{
-			
+
 			/* return to menu if Escape pressed */
 			if(t3f_mouse_button[0] || t3f_key[ALLEGRO_KEY_ESCAPE])
 			{
 				paddle_game_exit();
 			}
-			
+
 			break;
 		}
 	}
@@ -287,29 +287,29 @@ void paddle_render(void * data)
 	/* render switch, render graphics according to which state we are in */
 	switch(paddle_state)
 	{
-		
+
 		case EXAMPLE_STATE_TITLE:
 		{
-			
+
 			/* draw background */
 			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], 0.0, 0.0, 0);
-			
+
 			/* center logo */
 			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_LOGO], al_get_display_width(t3f_display) / 2 - al_get_bitmap_width(paddle_bitmap[EXAMPLE_BITMAP_LOGO]) / 2, 32.0, 0);
-			
+
 			/* draw menu */
 			t3f_render_gui(paddle_menu);
-			
+
 			break;
 		}
-		
+
 		case EXAMPLE_STATE_GAME:
 		{
 			int i;
-			
+
 			/* draw background */
 			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], 0.0, 0.0, 0);
-			
+
 			/* draw game objects */
 			for(i = 0; i < 2; i++)
 			{
@@ -322,27 +322,27 @@ void paddle_render(void * data)
 					al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BALL], ball.x, ball.y, 0);
 				}
 			}
-			
+
 			/* draw scores */
 			al_draw_textf(paddle_font[EXAMPLE_FONT_GAME], al_map_rgba(0, 0, 0, 255), 10.0, 0.0, 0, "Player 1: %d", score[0]);
 			al_draw_textf(paddle_font[EXAMPLE_FONT_GAME], al_map_rgba(0, 0, 0, 255), 540.0, 0.0, 0, "Player 2: %d", score[1]);
-			
+
 			break;
 		}
-		
+
 		case EXAMPLE_STATE_GAME_OVER:
 		{
-			
+
 			/* draw background */
 			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], 0.0, 0.0, 0);
-			
+
 			/* draw results */
 			al_draw_filled_circle(640.0 * t3f_drand(&rng_state), 480.0 * t3f_drand(&rng_state), 10.0 + 32.0 * t3f_drand(&rng_state), al_map_rgba(0, 0, 192, 128));
 			al_draw_filled_rectangle(220.0, 192.0, 420.0, 280.0, al_map_rgba(0, 192, 0, 128));
 			al_draw_rectangle(220.0, 192.0, 420.0, 280.0, al_map_rgba(0, 0, 0, 255), 2.0);
 			al_draw_textf(paddle_font[EXAMPLE_FONT_MENU], al_map_rgba(0, 0, 0, 255), 320.0, 200.0, ALLEGRO_ALIGN_CENTRE, "Player %d Wins!", score[0] > score[1] ? 1 : 2);
 			al_draw_textf(paddle_font[EXAMPLE_FONT_GAME], al_map_rgba(0, 0, 0, 255), 320.0, 240.0, ALLEGRO_ALIGN_CENTRE, "Click to continue...");
-			
+
 			break;
 		}
 	}
@@ -362,7 +362,7 @@ int paddle_menu_quit_proc(void * d, int i, void * p)
 
 bool paddle_initialize(void)
 {
-	
+
 	/* initialize the T^3 Framework
 	   - create 640x480 display
 	   - logic runs at 60.0 FPS, typical game refresh rate
@@ -374,7 +374,7 @@ bool paddle_initialize(void)
 		printf("Failed to initialize T^3 Framework!\n");
 		return false;
 	}
-	
+
 	/* load bitmaps */
 	paddle_bitmap[EXAMPLE_BITMAP_BG] = al_load_bitmap("data/graphics/bg.png");
 	if(!paddle_bitmap[EXAMPLE_BITMAP_BG])
@@ -400,7 +400,7 @@ bool paddle_initialize(void)
 		printf("Failed to load image!\n");
 		return false;
 	}
-	
+
 	/* load fonts */
 	paddle_font[EXAMPLE_FONT_MENU] = al_load_bitmap_font("data/fonts/title_font.png");
 	if(!paddle_font[EXAMPLE_FONT_MENU])
@@ -414,7 +414,7 @@ bool paddle_initialize(void)
 		printf("Failed to load font!\n");
 		return false;
 	}
-	
+
 	/* load sound samples */
 	paddle_sample[EXAMPLE_SAMPLE_HIT] = al_load_sample("data/sounds/hit.ogg");
 	if(!paddle_sample[EXAMPLE_SAMPLE_HIT])
@@ -428,36 +428,36 @@ bool paddle_initialize(void)
 		printf("Failed to load sample!\n");
 		return false;
 	}
-	
+
 	/* create GUI */
 	t3f_set_gui_driver(NULL);
 	paddle_menu = t3f_create_gui(0, 0);
-	t3f_add_gui_text_element(paddle_menu, paddle_menu_play_proc, "Play", paddle_font[EXAMPLE_FONT_MENU], 320, 240, t3f_color_black, T3F_GUI_ELEMENT_CENTRE);
-	t3f_add_gui_text_element(paddle_menu, paddle_menu_quit_proc, "Quit", paddle_font[EXAMPLE_FONT_MENU], 320, 270, t3f_color_black, T3F_GUI_ELEMENT_CENTRE);
-	
+	t3f_add_gui_text_element(paddle_menu, paddle_menu_play_proc, "Play", (void **)&paddle_font[EXAMPLE_FONT_MENU], 320, 240, t3f_color_black, T3F_GUI_ELEMENT_CENTRE);
+	t3f_add_gui_text_element(paddle_menu, paddle_menu_quit_proc, "Quit", (void **)&paddle_font[EXAMPLE_FONT_MENU], 320, 270, t3f_color_black, T3F_GUI_ELEMENT_CENTRE);
+
 	return true;
 }
 
 int main(int argc, char * argv[])
 {
-	
+
 	if(!paddle_initialize())
 	{
 		return 1;
 	}
-	
+
 	/* play the menu music
 	   - setting both loop points to 0.0 makes the entire song loop
 	   - if your song has loop points, pass them here (paramaters are read as seconds) */
 	t3f_play_music("data/music/menu.xm");
-	
+
 	/* run the T^3 Framework
 	   - exits when you call t3f_exit() somewhere in your logic routine
 	   - clicking the close button in windowed mode calls t3f_exit() */
 	t3f_run();
-	
+
 	/* stop the music before exiting */
 	t3f_stop_music();
-	
+
 	return 0;
 }
