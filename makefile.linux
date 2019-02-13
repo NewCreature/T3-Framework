@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = $(COMMON_CFLAGS) -DT3F_COMPANY="\"t3-i\""
 LFLAGS = $(COMMON_LFLAGS)
-LIBS = -lallegro_image -lallegro_font -lallegro_ttf -lallegro_primitives -lallegro_audio -lallegro_acodec -lallegro_dialog -lallegro_memfile -lallegro
+LIBS = -lallegro_image -lallegro_font -lallegro_ttf -lallegro_primitives -lallegro_audio -lallegro_acodec -lallegro_dialog -lallegro_memfile -lallegro -lm
 EXE_SUFFIX =
 DEL_COMMAND = rm -f
 
