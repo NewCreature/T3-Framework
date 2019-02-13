@@ -33,6 +33,9 @@ makefile.config:
 	touch makefile.config
 	@echo Generated empty 'makefile.config'.
 
+../changes.txt:
+	cp ../misc/blank_changes ../changes.txt
+
 ../docs/changelog:
 	touch ../docs/changelog
 
