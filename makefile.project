@@ -38,6 +38,7 @@ else
 	@cp template/src/makefile.include "$(DIR)/src"
 	@cp template/src/makefile.common "$(DIR)/src"
 	@cp template/src/makefile.android "$(DIR)/src"
+	@cp template/src/makefile.android_helper "$(DIR)/src"
 	@cp template/src/makefile.linux "$(DIR)/src"
 	@cp template/src/makefile.linux_static "$(DIR)/src"
 	@cp template/src/makefile.macosx "$(DIR)/src"
@@ -66,6 +67,7 @@ else
 	@cp "$(DIR)/src/makefile.include" template/src/makefile.include
 	@cp "$(DIR)/src/makefile.common" template/src/makefile.common
 	@cp "$(DIR)/src/makefile.android" template/src/makefile.android
+	@cp "$(DIR)/src/makefile.android_helper" template/src/makefile.android_helper
 	@cp "$(DIR)/src/makefile.linux" template/src/makefile.linux
 	@cp "$(DIR)/src/makefile.linux_static" template/src/makefile.linux_static
 	@cp "$(DIR)/src/makefile.macosx" template/src/makefile.macosx
