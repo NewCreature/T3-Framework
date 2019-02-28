@@ -1,0 +1,28 @@
+T3F Issues
+----------
+
+[ ]Automatically handle Windows->UTF-8 conversion for strings passed through
+   compiler flags. I think extended ASCII might map correctly to UTF-8
+   characters 128-255.
+
+[ ]Reorganize template build scripts. The makefile.* scripts should be in a
+   scripts folder instead of src. The main Makefile and makefile.defines
+   should be in the root of the project. Ideally, src will just contain the
+   project's source code files.
+
+   [ ]I'm not sure if this is possible without making the scripts more
+      convoluted. If we can get the scripts to execute with src as the working
+      folder, then it should work without having to change how we write our
+      definitions in makefile.defines.
+
+[ ]Define T3F_OBJECTS in build scripts to include all T3F object files for the
+   build platform. If there are platform specific objects, these should be
+   included here also. We can probably define T3F_CORE_OBJECTS to be all
+   objects for every platform and T3F_PLATFORM_OBJECTS to be objects for the
+   build platform.
+
+[ ]Define T3F_LIBRARIES in build scripts to include all libraries needed for
+   T3F to work.
+
+[ ]See about using pkg-config on all platforms that support it so we can
+   simplify our build scripts.
