@@ -24,6 +24,7 @@ else
 	@cp -a template/icons "$(DIR)"
 	@cp -a template/packages "$(DIR)"
 	@cp -a template/misc "$(DIR)"
+	@cp -a template/scripts "$(DIR)"
 	@cp template/misc/blank_changes "$(DIR)/changes.txt"
 endif
 
@@ -35,18 +36,6 @@ else
 	@cp include/t3f/*.h "$(DIR)/src/t3f"
 	@cp src/*.c "$(DIR)/src/t3f"
 	@cp template/src/Makefile "$(DIR)/src"
-	@cp template/src/makefile.include "$(DIR)/src"
-	@cp template/src/makefile.common "$(DIR)/src"
-	@cp template/src/makefile.android "$(DIR)/src"
-	@cp template/src/makefile.android_helper "$(DIR)/src"
-	@cp template/src/makefile.linux "$(DIR)/src"
-	@cp template/src/makefile.linux_static "$(DIR)/src"
-	@cp template/src/makefile.macosx "$(DIR)/src"
-	@cp template/src/makefile.iphone "$(DIR)/src"
-	@cp template/src/makefile.mingw "$(DIR)/src"
-	@cp template/src/makefile.mingw_cross "$(DIR)/src"
-	@cp template/src/makefile.msys "$(DIR)/src"
-	@cp template/src/makefile.default_config "$(DIR)/src"
 	@cp -a template/debian "$(DIR)"
 	@cp -a template/android "$(DIR)"
 	@cp -a template/win32 "$(DIR)"
@@ -54,6 +43,7 @@ else
 	@cp -a template/iphone "$(DIR)"
 	@cp -a template/packages "$(DIR)"
 	@cp -a template/misc "$(DIR)"
+	@cp -a template/scripts "$(DIR)"
 endif
 
 import_updates:
@@ -64,22 +54,11 @@ else
 	@cp "$(DIR)/src/t3f/"*.c src
 	@cp "$(DIR)/src/t3f/"*.h include/t3f
 	@cp "$(DIR)/src/Makefile" template/src/Makefile
-	@cp "$(DIR)/src/makefile.include" template/src/makefile.include
-	@cp "$(DIR)/src/makefile.common" template/src/makefile.common
-	@cp "$(DIR)/src/makefile.android" template/src/makefile.android
-	@cp "$(DIR)/src/makefile.android_helper" template/src/makefile.android_helper
-	@cp "$(DIR)/src/makefile.linux" template/src/makefile.linux
-	@cp "$(DIR)/src/makefile.linux_static" template/src/makefile.linux_static
-	@cp "$(DIR)/src/makefile.macosx" template/src/makefile.macosx
-	@cp "$(DIR)/src/makefile.iphone" template/src/makefile.iphone
-	@cp "$(DIR)/src/makefile.mingw" template/src/makefile.mingw
-	@cp "$(DIR)/src/makefile.mingw_cross" template/src/makefile.mingw_cross
-	@cp "$(DIR)/src/makefile.msys" template/src/makefile.msys
-	@cp "$(DIR)/src/makefile.default_config" template/src/makefile.default_config
 	@cp -a "$(DIR)/debian/." template/debian/
 	@cp -a "$(DIR)/android/." template/android/
 	@cp -a "$(DIR)/win32/." template/win32/
 	@cp -a "$(DIR)/macosx/." template/macosx/
 	@cp -a "$(DIR)/iphone/." template/iphone/
 	@cp -a "$(DIR)/misc/." template/misc/
+	@cp -a "$(DIR)/scripts/." template/scripts/
 endif
