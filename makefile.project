@@ -13,7 +13,6 @@ else
 	@cp src/*.c "$(DIR)/src/t3f"
 	@cp template/src/* "$(DIR)/src"
 	@cp template/docs/* "$(DIR)/docs"
-	@cp template/changelog "$(DIR)"
 	@cp template/bin/data/* "$(DIR)/bin/data"
 	@cp template/gitignore "$(DIR)/.gitignore"
 	@cp -a template/debian "$(DIR)"
