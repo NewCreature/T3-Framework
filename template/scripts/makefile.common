@@ -2,7 +2,7 @@
 NOTHING:=
 SPACE:=$(NOTHING) $(NOTHING)
 
-T3F_DEPEND_LIBS = -lallegro_image$(LIB_SUFFIX) -lallegro_font$(LIB_SUFFIX) -lallegro_ttf$(LIB_SUFFIX) -lallegro_primitives$(LIB_SUFFIX) -lallegro_audio$(LIB_SUFFIX) -lallegro_acodec$(LIB_SUFFIX) -lallegro_memfile$(LIB_SUFFIX) -lallegro$(LIB_SUFFIX) -lm
+T3F_DEPEND_LIBS = -lallegro_image$(ALLEGRO_SUFFIX) -lallegro_font$(ALLEGRO_SUFFIX) -lallegro_ttf$(ALLEGRO_SUFFIX) -lallegro_primitives$(ALLEGRO_SUFFIX) -lallegro_audio$(ALLEGRO_SUFFIX) -lallegro_acodec$(ALLEGRO_SUFFIX) -lallegro_memfile$(ALLEGRO_SUFFIX) -lallegro$(ALLEGRO_SUFFIX) -lm
 
 GLOBAL_CFLAGS = -DT3F_DEVELOPER_NAME="\"$(subst \ ,$(SPACE),$(APP_COMPANY))\"" -DT3F_PACKAGE_NAME="\"$(subst \ ,$(SPACE),$(APP_NAME))\"" -DT3F_APP_VERSION="\"$(subst \ ,$(SPACE),$(APP_VERSION))\"" -DT3F_APP_TITLE="\"$(subst \ ,$(SPACE),$(APP_TITLE))\"" -DT3F_APP_COPYRIGHT="\"$(subst \ ,$(SPACE),$(APP_COPYRIGHT))\"" -DT3F_APP_PUBLISHER="\"$(subst \ ,$(SPACE),$(APP_PUBLISHER))\""
 
@@ -26,7 +26,7 @@ all : $(APP_EXE_NAME) $(PLATFORM_TARGET) $(APP_EXTRA_TARGET)
 	@echo All targets built!
 
 $(APP_EXE_NAME) : prepare_platform $(PROJECT_OBJECTS)
-	$(CC) $(LFLAGS) $(PROJECT_OBJECTS) $(PLATFORM_LIBS) $(APP_LIBS) $(T3F_DEPEND_LIBS) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
+	$(CC) $(LFLAGS) $(CONFIG_LFLAGS) $(PROJECT_OBJECTS) $(PLATFORM_LIBS) $(APP_LIBS) $(T3F_DEPEND_LIBS) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
 	@echo Executable built!
 
 makefile.config:
