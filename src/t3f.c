@@ -1143,6 +1143,12 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		case ALLEGRO_EVENT_KEY_DOWN:
 		{
 			t3f_key[event->keyboard.keycode] = 1;
+			#ifdef ALLEGRO_MACOSX
+				if(event->keyboard.keycode == ALLEGRO_KEY_LSHIFT)
+				{
+					t3f_key[ALLEGRO_KEY_RSHIFT] = 1;
+				}
+			#endif
 			break;
 		}
 
@@ -1150,6 +1156,12 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		case ALLEGRO_EVENT_KEY_UP:
 		{
 			t3f_key[event->keyboard.keycode] = 0;
+			#ifdef ALLEGRO_MACOSX
+				if(event->keyboard.keycode == ALLEGRO_KEY_LSHIFT)
+				{
+					t3f_key[ALLEGRO_KEY_RSHIFT] = 0;
+				}
+			#endif
 			break;
 		}
 
