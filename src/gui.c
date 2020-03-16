@@ -104,8 +104,8 @@ static void allegro_render_element(T3F_GUI * pp, int i, bool hover)
 				{
 					if(bitmap)
 					{
-						al_draw_tinted_bitmap(bitmap, al_map_rgba_f(0.0, 0.0, 0.0, 0.5), pp->ox + pp->element[i].ox - al_get_bitmap_width(bitmap) / 2, pp->oy + pp->element[i].oy - al_get_bitmap_width(bitmap) / 2, 0);
-						al_draw_bitmap(bitmap, pp->ox + pp->element[i].ox - al_get_bitmap_width(bitmap) / 2 + sx, pp->oy + pp->element[i].oy - al_get_bitmap_width(bitmap) / 2 + sy, 0);
+						al_draw_tinted_bitmap(bitmap, al_map_rgba_f(0.0, 0.0, 0.0, 0.5), pp->ox + pp->element[i].ox - al_get_bitmap_width(bitmap) / 2, pp->oy + pp->element[i].oy - al_get_bitmap_height(bitmap) / 2, 0);
+						al_draw_bitmap(bitmap, pp->ox + pp->element[i].ox - al_get_bitmap_width(bitmap) / 2 + sx, pp->oy + pp->element[i].oy - al_get_bitmap_height(bitmap) / 2 + sy, 0);
 					}
 				}
 				else
@@ -123,7 +123,7 @@ static void allegro_render_element(T3F_GUI * pp, int i, bool hover)
 				{
 					if(bitmap)
 					{
-						al_draw_bitmap(bitmap, pp->ox + pp->element[i].ox - al_get_bitmap_width(bitmap) / 2 + sx, pp->oy + pp->element[i].oy - al_get_bitmap_width(bitmap) / 2 + sy, 0);
+						al_draw_bitmap(bitmap, pp->ox + pp->element[i].ox - al_get_bitmap_width(bitmap) / 2 + sx, pp->oy + pp->element[i].oy - al_get_bitmap_height(bitmap) / 2 + sy, 0);
 					}
 				}
 				else
@@ -223,6 +223,8 @@ int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(void *, int, void *), vo
 	pp->element[pp->elements].oy = oy;
 	pp->element[pp->elements].flags = flags;
 	pp->element[pp->elements].description = NULL;
+	pp->element[pp->elements].sx = 2;
+	pp->element[pp->elements].sy = 2;
 	pp->elements++;
 	return 1;
 }
