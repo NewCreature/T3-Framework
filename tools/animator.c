@@ -405,6 +405,20 @@ int menu_proc_bitmap_load(int i, void * data)
 	return 0;
 }
 
+int menu_proc_bitmap_save(int i, void * data)
+{
+	ALLEGRO_BITMAP * bp;
+	const char * fn;
+
+	fn = select_file(last_bitmap_filename, "Save Image", "*.*;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_SAVE);
+	if(fn)
+	{
+		al_save_bitmap(animation->bitmaps->bitmap[current_bitmap], fn);
+		strcpy(last_bitmap_filename, fn);
+	}
+	return 0;
+}
+
 int menu_proc_frame_add(int i, void * data)
 {
 	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmaps->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmaps->bitmap[current_bitmap]), 0, 1, 0);
@@ -884,6 +898,7 @@ bool setup_menus(void)
 	t3f_add_menu_item(bitmap_menu, "&Next", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_bitmap_next, menu_update_bitmap_iter_proc);
 	t3f_add_menu_item(bitmap_menu, NULL, 0, NULL, NULL, NULL);
 	t3f_add_menu_item(bitmap_menu, "&Load", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_bitmap_load, menu_update_bitmap_delete_proc);
+	t3f_add_menu_item(bitmap_menu, "&Save", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_bitmap_save, menu_update_bitmap_delete_proc);
 
 	frame_menu = al_create_menu();
 	if(!frame_menu)
