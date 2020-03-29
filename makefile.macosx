@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = $(COMMON_CFLAGS) -arch i386 -arch x86_64 -mmacosx-version-min=10.6 -DT3F_COMPANY="\"t3-i\""
 LFLAGS = $(COMMON_LFLAGS) -mmacosx-version-min=10.6 -L/usr/local/lib
-LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -lallegro_main-static -lallegro_image-static -lallegro_font-static -lallegro_ttf-static -lallegro_primitives-static -lallegro_audio-static -lallegro_acodec-static -lz -lpng -ljpeg -lvorbis -logg -lvorbisfile -ldumb -lallegro_dialog-static -lallegro_memfile-static -lallegro-static -lfreetype -lFLAC
+LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -framework CoreVideo -lallegro_main-static -lallegro_image-static -lallegro_font-static -lallegro_ttf-static -lallegro_primitives-static -lallegro_audio-static -lallegro_acodec-static -lz -lpng -ljpeg -lvorbis -logg -lvorbisfile -ldumb -lallegro_dialog-static -lallegro_memfile-static -lallegro-static -lfreetype -lFLAC
 EXE_SUFFIX =
 DEL_COMMAND = rm -f
 
