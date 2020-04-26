@@ -19,7 +19,7 @@ MACOSX_CONFIG_CFLAGS = -I/usr/local/include
 MACOSX_CONFIG_LFLAGS = -L/usr/local/lib
 MACOSX_CONFIG_PKG_CONFIG_OPTIONS = --libs --static
 MACOSX_CONFIG_ALLEGRO_SUFFIX = -static
-MACOSX_CONFIG_DEPEND_LIBS = -lz -lpng -ljpeg -lFLAC -lvorbis -logg -lvorbisfile -ldumb -lfreetype
+#MACOSX_CONFIG_DEPEND_LIBS = 
 
 ###################
 # iPhone Settings #
