@@ -5,12 +5,12 @@ T3F Issues
    compiler flags. I think extended ASCII might map correctly to UTF-8
    characters 128-255.
 
-[ ]Reorganize template build scripts. The makefile.* scripts should be in a
+[X]Reorganize template build scripts. The makefile.* scripts should be in a
    scripts folder instead of src. The main Makefile and makefile.defines
    should be in the root of the project. Ideally, src will just contain the
    project's source code files.
 
-   [ ]I'm not sure if this is possible without making the scripts more
+   [X]I'm not sure if this is possible without making the scripts more
       convoluted. If we can get the scripts to execute with src as the working
       folder, then it should work without having to change how we write our
       definitions in makefile.defines.
@@ -26,3 +26,44 @@ T3F Issues
 
 [ ]See about using pkg-config on all platforms that support it so we can
    simplify our build scripts.
+
+   [ ]Using pkg-config on MacOS does not include the needed frameworks.
+
+   [ ]We should define our depend libraries in each platform-specific build
+      script (T3F_PLATFORM_LIBRARIES) and reference that from the common build
+      script. Currently, we are linking the dependencies twice on the static
+      Linux build.
+
+[ ]Update Debian packaging to use Allegro 5.2 libraries from the repositories.
+
+   [ ]Dependency library names:
+
+      liballegro5.2
+      liballegro-acodec5.2
+      liballegro-audio5.2
+      liballegro-dialog5.2
+      liballegro-image5.2
+      liballegro-physfs5.2
+      liballegro-ttf5.2
+
+   [ ]This will make Ubuntu 18.04 the oldest supported version.
+
+   [ ]We may provide a static 32-bit build for use on older systems. We'll still
+      support creating a static build in the framework. Presumably, if a user
+      is on 64-bit they will be using a recent version of Ubuntu.
+
+   [ ]We should probably create a separate script file for handling Debian
+      packaging.
+
+   [ ]We might be able to combine the static and dynamic Linux scripts and use
+      configuration options to determine which to build. The default would be to
+      build the dynamic version.
+
+      [ ]ALLEGRO_SUFFIX would need to be configurable from the configuration
+         file.
+
+      [ ]pkg-config arguments should be configurable from the configuration
+         file.
+
+[ ]Define a platform name from the platform-specific build script that can be
+   used when naming the binary package.
