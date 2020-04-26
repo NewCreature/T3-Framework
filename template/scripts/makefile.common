@@ -14,19 +14,20 @@ DEMO_DIR = ../../$(APP_NAME)_demo
 DEMO_DATA = $(DEMO_DIR)/bin/data
 #DEMO_DELETE =
 
-T3F_OBJECTS = $(T3F_CORE_OBJECTS) $(T3F_PLATFORM_OBJECTS) $(APP_OBJECTS)
+T3F_OBJECTS = $(T3F_CORE_OBJECTS) $(T3F_PLATFORM_OBJECTS)
 
 APP_SOURCE_FILES = $(T3F_OBJECTS:.o=.c)
 
 APP_EXE_NAME = ../bin/$(APP_NAME)$(EXE_SUFFIX)
 APP_PACKAGE_NAME = $(APP_NAME)-$(APP_VERSION)
 APP_PACKAGE_FILENAME = $(APP_PACKAGE_NAME)-src.tar.gz
+APP_BINARY_PACKAGE_FILENAME = $(APP_PACKAGE_NAME)-$(T3F_PLATFORM_NAME).tar.gz
 
 all : $(APP_EXE_NAME) $(T3F_PLATFORM_TARGET) $(APP_EXTRA_TARGET)
 	@echo All targets built!
 
-$(APP_EXE_NAME) : prepare_platform $(T3F_OBJECTS)
-	$(CC) $(LFLAGS) $(CONFIG_LFLAGS) $(T3F_OBJECTS) $(APP_LIBS) $(T3F_LIBRARIES) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
+$(APP_EXE_NAME) : prepare_platform $(T3F_OBJECTS) $(APP_OBJECTS)
+	$(CC) $(LFLAGS) $(CONFIG_LFLAGS) $(T3F_OBJECTS) $(APP_OBJECTS) $(APP_LIBS) $(T3F_LIBRARIES) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
 	@echo Executable built!
 
 makefile.config:
@@ -53,6 +54,7 @@ release: ../changes.txt ../docs/changelog
 clean: app_clean
 	@$(PLATFORM_CLEAN)
 	@$(DEL_COMMAND) $(subst /,$(PATH_SEPARATOR),$(T3F_OBJECTS))
+	@$(DEL_COMMAND) $(subst /,$(PATH_SEPARATOR),$(APP_OBJECTS))
 	@$(DEL_COMMAND) $(subst /,$(PATH_SEPARATOR),$(APP_EXE_NAME)$(EXE_SUFFIX))
 ifdef APP_EXTRA_TARGET
 	@$(DEL_COMMAND) $(subst /,$(PATH_SEPARATOR),$(APP_EXTRA_TARGET))
@@ -66,7 +68,7 @@ package: clean
 	@echo Package successfully created!
 
 binary_package: $(APP_EXE_NAME)
-	$(shell rm -rf $(APP_PACKAGE_DIR)/APP_PACKAGE_NAME; mkdir ../temp; cp -a -R -L "../bin" ../temp/$(APP_PACKAGE_NAME); cd ../temp; tar -czf $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-bin.tar.gz $(APP_PACKAGE_NAME); cd ..; rm -rf temp)
+	$(shell rm -rf $(APP_PACKAGE_DIR)/$(APP_BINARY_PACKAGE_FILENAME); mkdir ../temp; cp -a -R -L "../bin" ../temp/$(APP_PACKAGE_NAME); cd ../temp; tar -czf $(APP_PACKAGE_DIR)/$(APP_BINARY_PACKAGE_FILENAME) $(APP_PACKAGE_NAME); cd ..; rm -rf temp)
 
 #make a copy of the source tree with non-demo data deleted
 demo_copy:
