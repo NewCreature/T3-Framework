@@ -37,7 +37,7 @@ $(APP_PACKAGE_DIR)/$(APP_TITLE).app : $(APP_EXE_NAME)
 	@$(DEL_FOLDER_COMMAND) $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 	@mkdir $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 	@cp $(APP_EXE_NAME) $(APP_PACKAGE_DIR)/$(APP_TITLE).app/$(APP_TITLE)
-	@cp ../icons/macosx_icon.icns $(APP_PACKAGE_DIR)/$(APP_TITLE).app/$(APP_TITLE).icns
+	@cp ../icons/macos_icon.icns $(APP_PACKAGE_DIR)/$(APP_TITLE).app/$(APP_TITLE).icns
 	@cp -a ../bin/data $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 	@cp -a ../docs $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 	@cp ../iphone/Info.plist $(APP_PACKAGE_DIR)/$(APP_TITLE).app

@@ -15,7 +15,7 @@ else
   SYSTEM=linux
  else
   ifneq (,$(findstring Darwin,$(UNAME)))
-   SYSTEM=macosx
+   SYSTEM=macos
   else
    ifneq (,$(findstring MINGW,$(UNAME)))
     SYSTEM=mingw_cross
@@ -63,7 +63,7 @@ windows_package:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts windows_zip
 
 mac_package:
-	$(MAKE) -f ../scripts/makefile.macosx -I ../scripts mac_package
+	$(MAKE) -f ../scripts/makefile.macos -I ../scripts mac_package
 
 iphone_package:
 	$(MAKE) -f ../scripts/makefile.iphone -I ../scripts iphone_package

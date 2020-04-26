@@ -15,7 +15,7 @@ else
   SYSTEM=linux
  else
   ifneq (,$(findstring Darwin,$(UNAME)))
-   SYSTEM=macosx
+   SYSTEM=macos
   else
    ifneq (,$(findstring MINGW,$(UNAME)))
     SYSTEM=mingw_cross

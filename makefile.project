@@ -18,7 +18,7 @@ else
 	@cp -a template/debian "$(DIR)"
 	@cp -a template/android "$(DIR)"
 	@cp -a template/win32 "$(DIR)"
-	@cp -a template/macosx "$(DIR)"
+	@cp -a template/macos "$(DIR)"
 	@cp -a template/iphone "$(DIR)"
 	@cp -a template/icons "$(DIR)"
 	@cp -a template/packages "$(DIR)"
@@ -38,7 +38,7 @@ else
 	@cp -a template/debian "$(DIR)"
 	@cp -a template/android "$(DIR)"
 	@cp -a template/win32 "$(DIR)"
-	@cp -a template/macosx "$(DIR)"
+	@cp -a template/macos "$(DIR)"
 	@cp -a template/iphone "$(DIR)"
 	@cp -a template/packages "$(DIR)"
 	@cp -a template/misc "$(DIR)"
@@ -56,7 +56,7 @@ else
 	@cp -a "$(DIR)/debian/." template/debian/
 	@cp -a "$(DIR)/android/." template/android/
 	@cp -a "$(DIR)/win32/." template/win32/
-	@cp -a "$(DIR)/macosx/." template/macosx/
+	@cp -a "$(DIR)/macos/." template/macos/
 	@cp -a "$(DIR)/iphone/." template/iphone/
 	@cp -a "$(DIR)/misc/." template/misc/
 	@cp -a "$(DIR)/scripts/." template/scripts/
