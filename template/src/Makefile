@@ -51,7 +51,7 @@ binary_package:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts binary_package
 
 debian_package:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM)_static -I ../scripts debian_package
+	$(MAKE) -f ../scripts/makefile.debian -I ../scripts debian_package
 
 android_package:
 	$(MAKE) -f ../scripts/makefile.android -I ../scripts android_package

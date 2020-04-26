@@ -1,13 +1,33 @@
 CC = $(MACOSX_CC)
-CFLAGS = $(T3F_CFLAGS) $(GLOBAL_CFLAGS) $(MACOSX_ARCHITECTURES) $(MACOSX_CONFIG_CFLAGS) $(MACOSX_SYS_ROOT) $(MACOSX_MIN_VERSION) $(APP_CFLAGS) $(MACOSX_CFLAGS)
+CFLAGS = $(APP_CFLAGS) $(T3F_CFLAGS) $(MACOSX_ARCHITECTURES) $(MACOSX_CONFIG_CFLAGS) $(MACOSX_SYS_ROOT) $(MACOSX_MIN_VERSION) $(APP_CFLAGS) $(MACOSX_CFLAGS)
 CXX = $(MACOSX_CXX)
 CXXFLAGS = $(CFLAGS)
 LFLAGS = $(MACOSX_CONFIG_LFLAGS) $(MACOSX_ARCHITECTURES) $(MACOSX_SYS_ROOT) $(MACOSX_MIN_VERSION)
-PLATFORM_OBJECTS = t3f/menu.o $(MACOSX_PLATFORM_OBJECTS)
 ALLEGRO_SUFFIX = $(MACOSX_CONFIG_ALLEGRO_SUFFIX)
-PLATFORM_LIBS = -framework IOKit -framework AudioToolbox -framework OpenGL -framework OpenAL -framework Cocoa -framework CoreVideo -lallegro_dialog$(ALLEGRO_SUFFIX) -lallegro_main$(ALLEGRO_SUFFIX) $(MACOSX_PLATFORM_LIBS)
+PKG_CONFIG_OPTIONS = $(MACOSX_CONFIG_PKG_CONFIG_OPTIONS)
+T3F_PLATFORM_OBJECTS = t3f/menu.o $(MACOSX_PLATFORM_OBJECTS)
+T3F_PLATFORM_LIBRARIES =\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_audio$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_image$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_acodec$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_font$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_ttf$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_primitives$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_memfile$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_dialog$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_main$(ALLEGRO_SUFFIX)-5`\
+	-framework IOKit\
+	-framework AudioToolbox\
+	-framework OpenGL\
+	-framework OpenAL\
+	-framework Cocoa\
+	-framework CoreVideo\
+	$(MACOSX_CONFIG_PLATFORM_LIBS)\
+	$(MACOSX_CONFIG_DEPEND_LIBS)
+	$(MACOSX_PLATFORM_LIBS)\
+	$(MACOSX_DEPEND_LIBS)
 PLATFORM_TARGET = $(APP_PACKAGE_DIR)/$(APP_TITLE).app
-DEPEND_LIBS = -lz -lpng -ljpeg -lFLAC -lvorbis -logg -lvorbisfile -ldumb -lfreetype $(MACOSX_DEPEND_LIBS)
 DEL_COMMAND = rm -f
 DEL_FOLDER_COMMAND = rm -rf
 SED_COMMAND = sed -i ''
