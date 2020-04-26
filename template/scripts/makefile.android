@@ -5,7 +5,7 @@ T3F_PLATFORM_LIBS =\
 	-lallegro_audio\
 	-lallegro_image\
 	-lallegro_acodec\
-	-lallegro_font$\
+	-lallegro_font\
 	-lallegro_ttf\
 	-lallegro_primitives\
 	-lallegro_memfile\
