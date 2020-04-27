@@ -94,4 +94,4 @@ demo: clean demo_copy demo_clean demo_edit
 demo_gp: demo demo_edit_gp
 
 ../win32/makeicon$(EXE_SUFFIX): ../win32/makeicon.o
-	$(CC) $(LFLAGS) ../win32/makeicon.o $(PLATFORM_LIBS) $(T3F_LIBRARIES) $(DEPEND_LIBS) -o ../win32/makeicon
+	$(CC) $(LFLAGS) ../win32/makeicon.o $(T3F_LIBRARIES) -o ../win32/makeicon
