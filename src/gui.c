@@ -236,6 +236,8 @@ int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(void *, int, void *), vo
 	pp->element[pp->elements].description = NULL;
 	pp->element[pp->elements].sx = 2;
 	pp->element[pp->elements].sy = 2;
+	pp->element[pp->elements].hx = -2;
+	pp->element[pp->elements].hy = -2;
 	pp->elements++;
 	return 1;
 }
@@ -264,6 +266,8 @@ int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(void *, int, void *), cha
 	pp->element[pp->elements].description = NULL;
 	pp->element[pp->elements].sx = 2;
 	pp->element[pp->elements].sy = 2;
+	pp->element[pp->elements].hx = -2;
+	pp->element[pp->elements].hy = -2;
 	pp->elements++;
 	return 1;
 }
