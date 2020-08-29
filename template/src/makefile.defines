@@ -28,11 +28,11 @@ app_clean:
 ##################
 # Mac OS X stuff #
 ##################
-#MACOSX_CFLAGS =
-#MACOSX_PLATFORM_OBJECTS =
-#MACOSX_PLATFORM_LIBS =
-#MACOSX_DEPEND_LIBS =
-#MACOSX_PLATFORM_TARGET =
+#MACOS_CFLAGS =
+#MACOS_PLATFORM_OBJECTS =
+#MACOS_PLATFORM_LIBS =
+#MACOS_DEPEND_LIBS =
+#MACOS_PLATFORM_TARGET =
 
 ###############
 # Linux stuff #
