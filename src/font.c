@@ -1,9 +1,10 @@
 #include "t3f.h"
 #include "font.h"
 #include "draw.h"
+#include "file_utils.h"
 
 /* make "magic pink" transparent and grays different levels of alpha */
-static void t3f_convert_grey_to_alpha(ALLEGRO_BITMAP * bitmap)
+static void convert_grey_to_alpha(ALLEGRO_BITMAP * bitmap)
 {
 	int x, y;
 	unsigned char ir, ig, ib, ia;
@@ -41,6 +42,105 @@ static void t3f_convert_grey_to_alpha(ALLEGRO_BITMAP * bitmap)
 	al_unlock_bitmap(bitmap);
 }
 
+static void * load_bitmap_font_f(ALLEGRO_FILE * fp, const char * extension)
+{
+	ALLEGRO_BITMAP * bp;
+	ALLEGRO_FONT * font = NULL;
+	int ranges[] = {32, 126};
+
+	bp = al_load_bitmap_f(fp, extension);
+	if(bp)
+	{
+		convert_grey_to_alpha(bp);
+		font = al_grab_font_from_bitmap(bp, 1, ranges);
+		al_destroy_bitmap(bp);
+	}
+	return font;
+}
+
+static void * font_engine_load_font_f_allegro(const char * fn, ALLEGRO_FILE * fp, int option, int flags)
+{
+	const char * extension = t3f_get_path_extension(fn);
+
+	if(!strcmp(extension, ".ttf"))
+	{
+		return al_load_ttf_font_f(fp, fn, option, flags);
+	}
+	return load_bitmap_font_f(fp, extension);
+}
+
+static void font_engine_destroy_font_allegro(void * font)
+{
+	al_destroy_font(font);
+}
+
+static int font_engine_get_text_width_allegro(const void * font, const char * text)
+{
+	return al_get_text_width(font, text);
+}
+
+static int font_engine_get_font_height_allegro(const void * font)
+{
+	return al_get_font_line_height(font);
+}
+
+static void font_engine_draw_glyph_allegro(const void * font, ALLEGRO_COLOR color, float x, float y, int codepoint)
+{
+	al_draw_glyph(font, color, x, y, codepoint);
+}
+
+static int font_engine_get_glyph_width_allegro(const void * font, int codepoint)
+{
+	return al_get_glyph_width(font, codepoint);
+}
+
+static bool font_engine_get_glyph_dimensions_allegro(const void * font, int codepoint, int * bbx, int * bby, int * bbw, int * bbh)
+{
+	return al_get_glyph_dimensions(font, codepoint, bbx, bby, bbw, bbh);
+}
+
+static int font_engine_get_glyph_advance_allegro(const void * font, int codepoint1, int codepoint2)
+{
+	return al_get_glyph_advance(font, codepoint1, codepoint2);
+}
+
+static void font_engine_draw_text_allegro(const void * font, ALLEGRO_COLOR color, float x, float y, float z, int flags, char const * text)
+{
+	al_draw_text(font, color, x, y, flags, text);
+}
+
+static void font_engine_draw_textf_allegro(const void * font, ALLEGRO_COLOR color, float x, float y, float z, int flags, const char * format, ...)
+{
+	char buf[1024] = {0};
+	va_list vap;
+
+	va_start(vap, format);
+	vsnprintf(buf, 1024, format, vap);
+	va_end(vap);
+
+	al_draw_text(font, color, x, y, flags, buf);
+}
+
+static T3F_FONT_ENGINE font_engine[] =
+{
+	{
+		font_engine_load_font_f_allegro,
+		font_engine_destroy_font_allegro,
+
+		font_engine_get_text_width_allegro,
+		font_engine_get_font_height_allegro,
+		font_engine_draw_glyph_allegro,
+		font_engine_get_glyph_width_allegro,
+		font_engine_get_glyph_dimensions_allegro,
+		font_engine_get_glyph_advance_allegro,
+		font_engine_draw_text_allegro,
+		font_engine_draw_textf_allegro
+	},
+	{
+		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+	}
+};
+
 /* loads the old anti-aliased fonts created with TTF2PCX */
 ALLEGRO_FONT * t3f_load_bitmap_font(const char * fn)
 {
@@ -56,7 +156,7 @@ ALLEGRO_FONT * t3f_load_bitmap_font(const char * fn)
 	{
 		return NULL;
 	}
-	t3f_convert_grey_to_alpha(fimage);
+	convert_grey_to_alpha(fimage);
 	al_restore_state(&old_state);
 	fp = al_grab_font_from_bitmap(fimage, 1, ranges);
 	al_destroy_bitmap(fimage);
@@ -224,7 +324,7 @@ T3F_FONT * t3f_generate_font(const char * fn, int size, int flags)
 	return fp;
 }
 
-void t3f_destroy_font(T3F_FONT * fp)
+void t3f_destroy_font_old(T3F_FONT * fp)
 {
 	int i;
 
@@ -236,7 +336,7 @@ void t3f_destroy_font(T3F_FONT * fp)
 	al_free(fp);
 }
 
-T3F_FONT * t3f_load_font(const char * fn, int flags)
+T3F_FONT * t3f_load_font_old(const char * fn, int flags)
 {
 	T3F_FONT * fp;
 	ALLEGRO_PATH * pp;
@@ -349,6 +449,7 @@ float t3f_get_text_width(T3F_FONT * fp, const char * text)
 	float w = 0.0;
 	unsigned int i;
 
+	return fp->engine->get_text_width(fp->font, text);
 	for(i = 0; i < strlen(text); i++)
 	{
 		w += ((float)al_get_bitmap_width(fp->character[(int)utext[i]].bitmap) - fp->adjust) * fp->scale;
@@ -361,6 +462,7 @@ float t3f_get_font_line_height(T3F_FONT * fp)
 {
 	float h = 0.0;
 
+	return fp->engine->get_font_height(fp->font);
 	h = ((float)al_get_bitmap_height(fp->character[' '].bitmap) - fp->adjust * 2.0) * fp->scale;
 	return h;
 }
@@ -437,13 +539,13 @@ void t3f_draw_text_lines(T3F_TEXT_LINE_DATA * lines, ALLEGRO_COLOR color, float 
 
 	for(i = 0; i < lines->lines; i++)
 	{
-		t3f_draw_text(lines->font, color, px, py, z, 0.0, 0.0, 0, lines->line[i].text);
+		t3f_draw_text(lines->font, color, px, py, z, 0, lines->line[i].text);
 		px = x + lines->tab;
 		py += t3f_get_font_line_height(lines->font);
 	}
 }
 
-void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * text)
+void t3f_draw_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * text)
 {
 	const unsigned char * utext = (const unsigned char *)text;
 	T3F_TEXT_LINE_DATA line_data;
@@ -474,9 +576,19 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 	{
 		t3f_create_text_line_data(&line_data, fp, w, tab, text);
 		t3f_draw_text_lines(&line_data, color, x, y, z);
+		if(!held)
+		{
+			al_hold_bitmap_drawing(false);
+		}
 	}
 	else
 	{
+		fp->engine->draw_text(fp->font, color, x, y, z, flags, text);
+		if(!held)
+		{
+			al_hold_bitmap_drawing(false);
+		}
+		return;
 		for(i = 0; i < strlen(text); i++)
 		{
 			fw = (float)al_get_bitmap_width(fp->character[(int)utext[i]].bitmap) * fp->scale;
@@ -496,7 +608,7 @@ void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z
 	}
 }
 
-void t3f_draw_textf(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * format, ...)
+void t3f_draw_multiline_textf(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * format, ...)
 {
 	char buf[1024] = {0};
 	va_list vap;
@@ -505,5 +617,129 @@ void t3f_draw_textf(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, float 
 	vsnprintf(buf, 1024, format, vap);
 	va_end(vap);
 
-	t3f_draw_text(vf, color, x, y, z, w, tab, flags, buf);
+	t3f_draw_multiline_text(vf, color, x, y, z, w, tab, flags, buf);
+}
+
+void t3f_draw_text(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, float z, int flags, const char * text)
+{
+	t3f_draw_multiline_text(vf, color, x, y, z, 0, 0, flags, text);
+}
+
+void t3f_draw_textf(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, float z, int flags, const char * format, ...)
+{
+	char buf[1024] = {0};
+	va_list vap;
+
+	va_start(vap, format);
+	vsnprintf(buf, 1024, format, vap);
+	va_end(vap);
+
+	t3f_draw_text(vf, color, x, y, z, flags, buf);
+}
+
+static int detect_font_type(const char * fn)
+{
+	const char * extension;
+
+	extension = t3f_get_path_extension(fn);
+	if(!strcmp(extension, ".ttf"))
+	{
+		return 0;
+	}
+	else if(!strcmp(extension, ".ini"))
+	{
+		return 1;
+	}
+	return 0;
+}
+
+T3F_FONT * t3f_load_font_with_engine_f(T3F_FONT_ENGINE * engine, const char * fn, ALLEGRO_FILE * fp, int option, int flags)
+{
+	T3F_FONT * font;
+
+	font = malloc(sizeof(T3F_FONT));
+	if(!font)
+	{
+		goto fail;
+	}
+	memset(font, 0, sizeof(T3F_FONT));
+
+	font->engine = engine;
+	font->font = font->engine->load(fn, fp, option, flags);
+	if(!font->font)
+	{
+		goto fail;
+	}
+	return font;
+
+	fail:
+	{
+		t3f_destroy_font(font);
+	}
+	return NULL;
+}
+
+T3F_FONT * t3f_load_font_with_engine(T3F_FONT_ENGINE * engine, const char * fn, int option, int flags)
+{
+	ALLEGRO_FILE * fp;
+	T3F_FONT * font = NULL;
+
+	fp = al_fopen(fn, "rb");
+	if(!fp)
+	{
+		goto fail;
+	}
+	font = t3f_load_font_with_engine_f(engine, fn, fp, option, flags);
+	al_fclose(fp);
+
+	return font;
+
+	fail:
+	{
+		t3f_destroy_font(font);
+	}
+	return NULL;
+}
+
+T3F_FONT * t3f_load_font_f(const char * fn, ALLEGRO_FILE * fp, int type, int option, int flags)
+{
+	if(type == T3F_FONT_TYPE_AUTO)
+	{
+		type = detect_font_type(fn);
+	}
+	return t3f_load_font_with_engine_f(&font_engine[type], fn, fp, option, flags);
+}
+
+T3F_FONT * t3f_load_font(const char * fn, int type, int option, int flags)
+{
+	ALLEGRO_FILE * fp;
+	T3F_FONT * font = NULL;
+
+	fp = al_fopen(fn, "rb");
+	if(!fp)
+	{
+		goto fail;
+	}
+	font = t3f_load_font_f(fn, fp, type, option, flags);
+	al_fclose(fp);
+
+	return font;
+
+	fail:
+	{
+		t3f_destroy_font(font);
+	}
+	return NULL;
+}
+
+void t3f_destroy_font(T3F_FONT * fp)
+{
+	if(fp)
+	{
+		if(fp->font)
+		{
+			fp->engine->destroy(fp->font);
+		}
+		free(fp);
+	}
 }

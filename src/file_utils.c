@@ -188,3 +188,17 @@ bool t3f_remove_directory(const char * path)
 	al_remove_filename(path);
 	return ret;
 }
+
+const char * t3f_get_path_extension(const char * path)
+{
+	int i;
+
+	for(i = strlen(path) - 1; i >= 0; i--)
+	{
+		if(path[i] == '.')
+		{
+			return &path[i];
+		}
+	}
+	return path;
+}
