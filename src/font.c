@@ -62,7 +62,7 @@ static void * font_engine_load_font_f_allegro(const char * fn, ALLEGRO_FILE * fp
 {
 	const char * extension = t3f_get_path_extension(fn);
 
-	if(!strcmp(extension, ".ttf"))
+	if(!strcasecmp(extension, ".ttf"))
 	{
 		return al_load_ttf_font_f(fp, fn, option, flags);
 	}
@@ -448,7 +448,10 @@ float t3f_get_text_width(T3F_FONT * fp, const char * text)
 	const unsigned char * utext = (const unsigned char *)text;
 	float w = 0.0;
 	unsigned int i;
+	int iw;
 
+	return al_get_text_width(fp->font, text);
+	iw = fp->engine->get_text_width(fp->font, text);
 	return fp->engine->get_text_width(fp->font, text);
 	for(i = 0; i < strlen(text); i++)
 	{
@@ -637,6 +640,16 @@ void t3f_draw_textf(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, float 
 	t3f_draw_text(vf, color, x, y, z, flags, buf);
 }
 
+void t3f_draw_glyph(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, int cp)
+{
+	vf->engine->draw_glyph(vf->font, color, x, y, cp);
+}
+
+int t3f_get_glyph_advance(T3F_FONT * vf, int cp1, int cp2)
+{
+	return vf->engine->get_glyph_advance(vf->font, cp1, cp2);
+}
+
 static int detect_font_type(const char * fn)
 {
 	const char * extension;
@@ -665,11 +678,13 @@ T3F_FONT * t3f_load_font_with_engine_f(T3F_FONT_ENGINE * engine, const char * fn
 	memset(font, 0, sizeof(T3F_FONT));
 
 	font->engine = engine;
+//	font->font = al_load_font(fn, option, flags);
 	font->font = font->engine->load(fn, fp, option, flags);
 	if(!font->font)
 	{
 		goto fail;
 	}
+
 	return font;
 
 	fail:
@@ -683,6 +698,13 @@ T3F_FONT * t3f_load_font_with_engine(T3F_FONT_ENGINE * engine, const char * fn, 
 {
 	ALLEGRO_FILE * fp;
 	T3F_FONT * font = NULL;
+	const char * extension = t3f_get_path_extension(fn);
+	bool is_ttf = false;
+
+	if(!strcasecmp(extension, ".ttf"))
+	{
+		is_ttf = true;
+	}
 
 	fp = al_fopen(fn, "rb");
 	if(!fp)
@@ -690,12 +712,22 @@ T3F_FONT * t3f_load_font_with_engine(T3F_FONT_ENGINE * engine, const char * fn, 
 		goto fail;
 	}
 	font = t3f_load_font_with_engine_f(engine, fn, fp, option, flags);
-	al_fclose(fp);
+	if(!is_ttf)
+	{
+		al_fclose(fp);
+	}
 
 	return font;
 
 	fail:
 	{
+		if(fp)
+		{
+			if(!is_ttf)
+			{
+				al_fclose(fp);
+			}
+		}
 		t3f_destroy_font(font);
 	}
 	return NULL;
@@ -714,6 +746,13 @@ T3F_FONT * t3f_load_font(const char * fn, int type, int option, int flags)
 {
 	ALLEGRO_FILE * fp;
 	T3F_FONT * font = NULL;
+	const char * extension = t3f_get_path_extension(fn);
+	bool is_ttf = false;
+
+	if(!strcasecmp(extension, ".ttf"))
+	{
+		is_ttf = true;
+	}
 
 	fp = al_fopen(fn, "rb");
 	if(!fp)
@@ -721,13 +760,23 @@ T3F_FONT * t3f_load_font(const char * fn, int type, int option, int flags)
 		goto fail;
 	}
 	font = t3f_load_font_f(fn, fp, type, option, flags);
-	al_fclose(fp);
+	if(!is_ttf)
+	{
+		al_fclose(fp);
+	}
 
 	return font;
 
 	fail:
 	{
-		t3f_destroy_font(font);
+		if(fp)
+		{
+			al_fclose(fp);
+		}
+		if(font)
+		{
+			t3f_destroy_font(font);
+		}
 	}
 	return NULL;
 }
