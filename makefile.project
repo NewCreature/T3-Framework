@@ -51,6 +51,7 @@ ifndef DIR
 else
 	@echo "Importing T3F changes from project in '$(DIR)'..."
 	@cp "$(DIR)/src/t3f/"*.c src
+	@cp "$(DIR)/src/t3f/"*.inc src
 	@cp "$(DIR)/src/t3f/"*.h include/t3f
 	@cp "$(DIR)/src/Makefile" template/src/Makefile
 	@cp -a "$(DIR)/debian/." template/debian/
