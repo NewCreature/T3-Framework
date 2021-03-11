@@ -11,6 +11,7 @@ else
 	@mkdir "$(DIR)/docs"
 	@cp include/t3f/*.h "$(DIR)/src/t3f"
 	@cp src/*.c "$(DIR)/src/t3f"
+	@cp src/*.inc "$(DIR)/src/t3f"
 	@cp template/src/* "$(DIR)/src"
 	@cp template/docs/* "$(DIR)/docs"
 	@cp template/bin/data/* "$(DIR)/bin/data"
