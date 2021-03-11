@@ -34,6 +34,7 @@ else
 	@echo "Upgrading project in '$(DIR)'..."
 	@cp include/t3f/*.h "$(DIR)/src/t3f"
 	@cp src/*.c "$(DIR)/src/t3f"
+	@cp src/*.inc "$(DIR)/src/t3f"
 	@cp template/src/Makefile "$(DIR)/src"
 	@cp -a template/debian "$(DIR)"
 	@cp -a template/android "$(DIR)"
