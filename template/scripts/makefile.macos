@@ -59,7 +59,7 @@ prepare_platform:
 	@iconutil --convert icns temp.iconset -o ../icons/macos_icon.icns
 	@rm -rf temp.iconset
 
-mac_build_bundle : ../icons/macos_icon.icns
+mac_bundle : ../icons/macos_icon.icns
 	@$(DEL_FOLDER_COMMAND) $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 	@mkdir $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 	@mkdir $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents
@@ -80,7 +80,7 @@ mac_build_bundle : ../icons/macos_icon.icns
 	@sed -i '' "s|T3F_APP_PACKAGE|$(APP_ANDROID_PACKAGE)|" $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Info.plist
 	@echo Application bundle created!
 
-mac_bundle:
+mac_universal_bundle:
 	make clean
 	make MACOS_ARCHITECTURES="-arch i386" APP_EXE_SUFFIX=-i386 MACOS_SDK=MacOSX10.13.sdk MACOS_CXX_STDLIB=stdc++ MACOS_MIN_VERSION=-mmacos-version-min=10.6
 	make clean
@@ -91,6 +91,6 @@ mac_bundle:
 	rm $(APP_EXE_NAME)-i386 $(APP_EXE_NAME)-x86_64 $(APP_EXE_NAME)-arm64
 	make mac_build_bundle
 
-mac_package: mac_bundle
+mac_package: mac_universal_bundle
 	rm -rf $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos.dmg
 	../macos/create-dmg --volname $(APP_TITLE) --volicon $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Resources/$(APP_TITLE).icns --window-size 400 232 --icon-size 96 --icon "$(APP_TITLE)" 110 100 --app-drop-link 280 100 $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos.dmg $(APP_PACKAGE_DIR)/$(APP_TITLE).app

@@ -684,6 +684,10 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			t3f_flags |= T3F_USE_MENU;
 		}
 
+		if(flags & T3F_NO_SCALE)
+		{
+			t3f_flags |= T3F_NO_SCALE;
+		}
 		/* if we are using console (for a server, for instance) don't create display */
 		if(w > h)
 		{
