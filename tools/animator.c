@@ -413,7 +413,7 @@ int menu_proc_bitmap_save(int i, void * data)
 	fn = select_file(last_bitmap_filename, "Save Image", "*.*;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_SAVE);
 	if(fn)
 	{
-		al_save_bitmap(animation->bitmaps->bitmap[current_bitmap], fn);
+		al_save_bitmap(fn, animation->bitmaps->bitmap[current_bitmap]);
 		strcpy(last_bitmap_filename, fn);
 	}
 	return 0;
