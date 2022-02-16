@@ -507,7 +507,9 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	t3f_color_white = al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
 	t3f_color_black = al_map_rgba_f(0.0, 0.0, 0.0, 1.0);
 	al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
-	al_inhibit_screensaver(true); // stop screensaver from showing
+	#ifndef T3F_NO_KEEP_AWAKE
+		al_inhibit_screensaver(true); // stop screensaver from showing
+	#endif
 
 	t3f_logic_proc = logic_proc;
 	t3f_render_proc = render_proc;
