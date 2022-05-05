@@ -320,6 +320,42 @@ static bool t3f_locate_resource(const char * filename)
 			return true;
 		}
 	}
+
+	/* look in "/usr/share" if a package name is defined */
+	if(t3f_package_name)
+	{
+		file_path = al_create_path(filename);
+		if(!file_path)
+		{
+			return false;
+		}
+		path = al_create_path("/usr/local/share/");
+		if(path)
+		{
+			al_append_path_component(path, t3f_package_name);
+			al_join_paths(path, file_path);
+			if(al_filename_exists(al_path_cstr(path, '/')))
+			{
+				al_change_directory(al_path_cstr(path, '/'));
+				found = true;
+			}
+//			printf("%s\n", al_path_cstr(path, '/'));
+			al_destroy_path(path);
+		}
+		al_destroy_path(file_path);
+	}
+
+	if(found)
+	{
+		path = al_create_path("/usr/local/share/");
+		if(path)
+		{
+			al_append_path_component(path, t3f_package_name);
+			al_change_directory(al_path_cstr(path, '/'));
+			al_destroy_path(path);
+			return true;
+		}
+	}
 	return false;
 }
 

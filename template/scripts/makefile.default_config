@@ -79,6 +79,8 @@ LINUX_CONFIG_PKG_CONFIG_OPTIONS = --libs
 #LINUX_CONFIG_PKG_CONFIG_OPTIONS = --libs --static
 #LINUX_CONFIG_ALLEGRO_SUFFIX = -static
 LINUX_CONFIG_DEPEND_LIBS = -lm -lstdc++
+LINUX_CONFIG_GTK_LIBS = `pkg-config gtk+-x11-2.0 --libs`
+LINUX_CONFIG_INSTALL_PREFIX = /usr/local
 
 #############################
 # Debian Packaging Settings #
