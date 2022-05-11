@@ -60,6 +60,7 @@ else
 	@cp -a "$(DIR)/android/." template/android/
 	@cp -a "$(DIR)/win32/." template/win32/
 	@cp -a "$(DIR)/macos/." template/macos/
+	@rm -rf template/macos/Info.plist
 	@cp -a "$(DIR)/iphone/." template/iphone/
 	@cp -a "$(DIR)/misc/." template/misc/
 	@cp -a "$(DIR)/scripts/." template/scripts/
