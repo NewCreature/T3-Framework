@@ -18,12 +18,9 @@ else
     echo "Uninstalling T3F_APP_TITLE..."
     rm -rf $prefix/share/$app_name
     rm -rf $prefix/share/doc/$app_name
-    cp -a bin/data $prefix/share/$app_name
-    rm -f $prefix/share/doc/$app_name/changelog
-    rm -f $prefix/share/doc/$app_name/README
-    rm -f $prefix/share/doc/$app_name/copyright
-    rm -f $prefix/share/icons/$app_name.svg
-    rm -f $prefix/share/icons/$app_name.png
+    rm -rf $prefix/share/$app_name
+    rm -f $prefix/share/icons/$app_name.svg 2>/dev/null
+    rm -f $prefix/share/icons/$app_name.png 2>/dev/null
     rm -f $prefix/$app_dir/$app_name
     rm -f $prefix/share/applications/$app_name.desktop
     update-desktop-database

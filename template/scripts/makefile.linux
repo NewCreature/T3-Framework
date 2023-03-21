@@ -44,7 +44,7 @@ install: $(APP_EXE_NAME)
 	mkdir -p $(INSTALL_PREFIX)/share/applications
 	mkdir -p $(INSTALL_PREFIX)/share/menu
 	cp -a ../bin/data $(INSTALL_PREFIX)/share/$(DEBIAN_APP_NAME)
-	cp ../docs/changelog $(INSTALL_PREFIX)/share/doc/$(DEBIAN_APP_NAME)/changelog
+	-cp ../docs/changelog $(INSTALL_PREFIX)/share/doc/$(DEBIAN_APP_NAME)/changelog
 	cp ../docs/README $(INSTALL_PREFIX)/share/doc/$(DEBIAN_APP_NAME)/README
 	cp ../docs/copyright $(INSTALL_PREFIX)/share/doc/$(DEBIAN_APP_NAME)/copyright
 	cp ../icons/icon.svg $(INSTALL_PREFIX)/share/icons/$(DEBIAN_APP_NAME).svg
@@ -53,7 +53,7 @@ install: $(APP_EXE_NAME)
 	chmod 755 $(INSTALL_PREFIX)/$(DEBIAN_DIR)/$(DEBIAN_APP_NAME)
 	find $(INSTALL_PREFIX)/share/$(DEBIAN_APP_NAME) -type f -exec chmod 644 {} \;
 	chmod 644 $(INSTALL_PREFIX)/share/doc/$(DEBIAN_APP_NAME)/README
-	chmod 644 $(INSTALL_PREFIX)/share/doc/$(DEBIAN_APP_NAME)/changelog
+	-chmod 644 $(INSTALL_PREFIX)/share/doc/$(DEBIAN_APP_NAME)/changelog
 	chmod 644 $(INSTALL_PREFIX)/share/doc/$(DEBIAN_APP_NAME)/copyright
 	chmod 644 $(INSTALL_PREFIX)/share/icons/$(DEBIAN_APP_NAME).svg
 	chmod 644 $(INSTALL_PREFIX)/share/applications/$(DEBIAN_APP_NAME).desktop
