@@ -1,6 +1,17 @@
 T3F Issues
 ----------
 
+[ ]Look into building custom PNG loader/saver using spng. This may be required
+   to get Linux static builds working fully. Currently, there is a crash issue
+   when using static libpng if the user tries to use a native file dialog. We
+   would only use this on Linux builds by default. The user shouldn't notice a
+   difference since T3F would register the loader/saver with Allegro.
+
+   Alternatively, we could just build a prefixed libpng and supply our own
+   loader saver routines and register those instead of using Allegro's built-in
+   PNG support. We could just copy Allegro's PNG handler code and modify it to
+   use the prefixed libpng symbols.
+
 [ ]Automatically handle Windows->UTF-8 conversion for strings passed through
    compiler flags. I think extended ASCII might map correctly to UTF-8
    characters 128-255.
