@@ -40,8 +40,6 @@ make
 merge_libs ./ ../_build_x86 libdumb.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # OGG
@@ -65,8 +63,6 @@ make
 merge_libs ./ ../_build_x86 libogg.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # Vorbis
@@ -92,8 +88,6 @@ merge_libs lib ../_build_x86/lib libvorbisenc.a
 merge_libs lib ../_build_x86/lib libvorbisfile.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # Opus
@@ -117,8 +111,6 @@ make
 merge_libs ./ ../_build_x86 libopus.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # Opusfile
@@ -142,8 +134,6 @@ make
 merge_libs ./ ../_build_x86 libopusfile.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # FLAC
@@ -168,8 +158,6 @@ merge_libs src/libFLAC ../_build_x86/src/libFLAC libFLAC.a
 merge_libs src/libFLAC++ ../_build_x86/src/libFLAC++ libFLAC++.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # zlib
@@ -194,8 +182,6 @@ merge_libs ./ ../_build_x86 libz.a
 sudo make install
 sudo rm -rf /usr/local/lib/libz*.dylib /usr/local/lib/libz.dylib
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # libpng
@@ -220,8 +206,6 @@ make
 merge_libs ./ ../_build_x86 libpng16.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # libjpeg
@@ -245,8 +229,6 @@ make
 merge_libs ./ ../_build_x86 libjpeg.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # libwebp
@@ -271,8 +253,6 @@ merge_libs ./ ../_build_x86 libwebp.a
 merge_libs ./ ../_build_x86 libsharpyuv.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # FreeType
@@ -296,8 +276,6 @@ make
 merge_libs ./ ../_build_x86 libfreetype.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # PhysFS
@@ -321,8 +299,6 @@ make
 merge_libs ./ ../_build_x86 libphysfs.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # Allegro
@@ -357,8 +333,6 @@ merge_libs lib ../_build_x86/lib liballegro_primitives-static.a
 merge_libs lib ../_build_x86/lib liballegro_ttf-static.a
 sudo make install
 cd ..
-rm -rf build_x64
-rm -rf build_arm
 cd ..
 
 # return to original location
