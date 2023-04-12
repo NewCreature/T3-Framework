@@ -90,6 +90,19 @@ sudo make install
 cd ..
 cd ..
 
+# libiconv (needed by FLAC)
+if [ ! -d "libiconv" ];
+then
+  remake_dir libiconv
+fi
+cd libiconv
+wget https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz
+tar xzf libiconv-1.17.tar.gz
+cd libiconv-1.17
+./configure --enable-static=yes --enable-shared=no
+make
+sudo make install
+
 # FLAC
 if [ ! -d "flac" ];
 then
@@ -103,6 +116,17 @@ cmake .. -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_PROGRAMS=OFF -DBUILD_TEST
 make
 sudo make install
 cd ..
+cd ..
+
+# minimp3
+if [ ! -d "minimp3" ];
+then
+  git clone https://github.com/lieff/minimp3.git
+fi
+cd minimp3
+git pull
+sudo cp minimp3.h /usr/local/include
+sudo cp minimp3_ex.h /usr/local/include
 cd ..
 
 # zlib
