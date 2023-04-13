@@ -15,6 +15,17 @@ START_PATH=$(pwd)
 mkdir -p $1
 cd $1
 
+# CMake (most dependencies are built with it)
+if [ ! -d "CMake" ];
+then
+  git clone https://github.com/Kitware/CMake.git
+fi
+cd CMake
+./bootstrap -- -DCMAKE_USE_OPENSSL=OFF
+make
+sudo make install
+cd ..
+
 # DUMB
 if [ ! -d "dumb" ];
 then
