@@ -113,6 +113,8 @@ cd libiconv-1.17
 ./configure --enable-static=yes --enable-shared=no
 make
 sudo make install
+cd ..
+cd ..
 
 # FLAC
 if [ ! -d "flac" ];
