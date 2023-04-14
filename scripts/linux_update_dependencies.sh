@@ -6,7 +6,7 @@ function remake_dir() {
 }
 
 if [ "$#" -ne 1 ]; then
-  echo "Usage: linux_set_up_dependencies <path>"
+  echo "Usage: linux_update_dependencies <path>"
   exit 1
 fi
 
