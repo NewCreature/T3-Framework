@@ -136,6 +136,27 @@ sudo make install
 cd ..
 cd ..
 
+# libiconv (needed by FLAC)
+if [ ! -d "libiconv" ];
+then
+  remake_dir libiconv
+fi
+cd libiconv
+curl https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz --output libiconv-1.17.tar.gz
+tar xzf libiconv-1.17.tar.gz
+cd libiconv-1.17
+./configure CFLAGS="-arch i386 -arch x86_64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk -mmacos-version-min=10.6" --enable-shared=no --enable-static=yes
+make clean
+make
+mv lib/.libs/libiconv.a libiconv.a
+./configure CFLAGS="-arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk -mmacos-version-min=11.0" --enable-shared=no --enable-static=yes
+make clean
+make
+merge_libs lib/.libs . libiconv.a
+sudo make install
+cd ..
+cd ..
+
 # FLAC
 SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
 if [ ! -d "flac" ];
