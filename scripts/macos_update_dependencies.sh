@@ -15,12 +15,14 @@ if [ "$#" -ne 1 ]; then
 fi
 
 START_PATH=$(pwd)
+X86_SDK=MacOSX10.13.sdk
+ARM_SDK=MacOSX11.sdk
 
 mkdir -p $1
 cd $1
 
 # DUMB
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "dumb" ];
 then
   git clone https://github.com/kode54/dumb.git
@@ -32,7 +34,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DBUILD_ALLEGRO4=OFF -DBUILD_EXAMPLES=OFF
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DBUILD_ALLEGRO4=OFF -DBUILD_EXAMPLES=OFF
@@ -43,7 +45,7 @@ cd ..
 cd ..
 
 # OGG
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "ogg" ];
 then
   git clone https://github.com/xiph/ogg.git
@@ -55,7 +57,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
@@ -66,7 +68,7 @@ cd ..
 cd ..
 
 # Vorbis
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "vorbis" ];
 then
   git clone https://github.com/xiph/vorbis.git
@@ -78,7 +80,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DBUILD_TESTING=OFF
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DBUILD_TESTING=OFF
@@ -91,7 +93,7 @@ cd ..
 cd ..
 
 # Opus
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "opus" ];
 then
   git clone https://github.com/xiph/opus.git
@@ -103,7 +105,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DOPUS_USE_NEON=OFF
@@ -114,7 +116,7 @@ cd ..
 cd ..
 
 # Opusfile
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "opusfile" ];
 then
   git clone https://github.com/xiph/opusfile.git
@@ -126,7 +128,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DOP_DISABLE_DOCS=ON -DOP_DISABLE_EXAMPLES=ON -DOP_DISABLE_HTTP=ON
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DOP_DISABLE_DOCS=ON -DOP_DISABLE_EXAMPLES=ON -DOP_DISABLE_HTTP=ON
@@ -145,11 +147,11 @@ cd libiconv
 curl https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz --output libiconv-1.17.tar.gz
 tar xzf libiconv-1.17.tar.gz
 cd libiconv-1.17
-./configure CFLAGS="-arch i386 -arch x86_64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk -mmacos-version-min=10.6" --enable-shared=no --enable-static=yes
+./configure CFLAGS="-arch i386 -arch x86_64 -isysroot /Library/Developer/CommandLineTools/SDKs/$X86_SDK -mmacos-version-min=10.6" --enable-shared=no --enable-static=yes
 make clean
 make
 mv lib/.libs/libiconv.a libiconv.a
-./configure CFLAGS="-arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk -mmacos-version-min=11.0" --enable-shared=no --enable-static=yes --host=`uname -m`-apple-darwin
+./configure CFLAGS="-arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/$ARM_SDK -mmacos-version-min=11.0" --enable-shared=no --enable-static=yes --host=`uname -m`-apple-darwin
 make clean
 make
 merge_libs lib/.libs . libiconv.a
@@ -158,7 +160,7 @@ cd ..
 cd ..
 
 # FLAC
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "flac" ];
 then
   git clone https://github.com/xiph/flac.git
@@ -170,7 +172,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_PROGRAMS=OFF -DBUILD_TESTING=OFF -DINSTALL_MANPAGES=OFF -DIconv_INCLUDE_DIR=/usr/local/include -DIconv_LIBRARY=/usr/local/lib/libiconv.a
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_PROGRAMS=OFF -DBUILD_TESTING=OFF -DINSTALL_MANPAGES=OFF -DIconv_INCLUDE_DIR=/usr/local/include -DIconv_LIBRARY=/usr/local/lib/libiconv.a
@@ -193,7 +195,7 @@ sudo cp minimp3_ex.h /usr/local/include
 cd ..
 
 # zlib
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "zlib" ];
 then
   git clone https://github.com/madler/zlib.git
@@ -205,7 +207,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
@@ -217,7 +219,7 @@ cd ..
 cd ..
 
 # libpng
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "libpng" ];
 then
   git clone git://git.code.sf.net/p/libpng/code
@@ -230,7 +232,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DPNG_EXECUTABLES=OFF -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DPNG_BUILD_ZLIB=ON -DCMAKE_C_FLAGS="-arch x86_64"
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DPNG_EXECUTABLES=OFF -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DPNG_ARM_NEON=off -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DPNG_BUILD_ZLIB=ON
@@ -241,7 +243,7 @@ cd ..
 cd ..
 
 # libjpeg
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "libjpeg-turbo" ];
 then
   git clone https://github.com/libjpeg-turbo/libjpeg-turbo.git
@@ -253,7 +255,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DENABLE_SHARED=OFF
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DENABLE_SHARED=OFF
@@ -264,7 +266,7 @@ cd ..
 cd ..
 
 # libwebp
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "libwebp" ];
 then
   git clone https://chromium.googlesource.com/webm/libwebp
@@ -276,7 +278,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
@@ -288,7 +290,7 @@ cd ..
 cd ..
 
 # FreeType
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "freetype" ];
 then
   git clone https://gitlab.freedesktop.org/freetype/freetype.git
@@ -300,7 +302,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DFT_DISABLE_BROTLI=ON -DFT_DISABLE_BZIP2=ON -DFT_DISABLE_HARFBUZZ=ON -DFT_DISABLE_PNG=ON -DFT_DISABLE_ZLIB=OB
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DFT_DISABLE_BROTLI=ON -DFT_DISABLE_BZIP2=ON -DFT_DISABLE_HARFBUZZ=ON -DFT_DISABLE_PNG=ON -DFT_DISABLE_ZLIB=OB
@@ -311,7 +313,7 @@ cd ..
 cd ..
 
 # PhysFS
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "physfs" ];
 then
   git clone https://github.com/icculus/physfs.git
@@ -323,7 +325,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DPHYSFS_BUILD_SHARED=OFF -DPHYSFS_BUILD_DOCS=OFF
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DPHYSFS_BUILD_SHARED=OFF -DPHYSFS_BUILD_DOCS=OFF
@@ -334,7 +336,7 @@ cd ..
 cd ..
 
 # Allegro
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "allegro5" ];
 then
   git clone https://github.com/liballeg/allegro5.git
@@ -346,7 +348,7 @@ cd _build_x86
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DSHARED=OFF -DWANT_DEMO=OFF -DWANT_DOCS=OFF -DWANT_EXAMPLES=OFF -DWANT_NATIVE_IMAGE_LOADER=OFF -DWANT_TESTS=NO -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DWANT_IMAGE_FREEIMAGE=NO
 make
 cd ..
-SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
+SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DSHARED=OFF -DWANT_DEMO=OFF -DWANT_DOCS=OFF -DWANT_EXAMPLES=OFF -DWANT_NATIVE_IMAGE_LOADER=OFF -DWANT_TESTS=NO -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DWANT_IMAGE_FREEIMAGE=NO
