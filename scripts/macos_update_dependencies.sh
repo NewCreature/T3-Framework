@@ -149,7 +149,7 @@ cd libiconv-1.17
 make clean
 make
 mv lib/.libs/libiconv.a libiconv.a
-./configure CFLAGS="-arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk -mmacos-version-min=11.0" --enable-shared=no --enable-static=yes
+./configure CFLAGS="-arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk -mmacos-version-min=11.0" --enable-shared=no --enable-static=yes --host=`uname -m`-apple-darwin
 make clean
 make
 merge_libs lib/.libs . libiconv.a
@@ -167,18 +167,29 @@ cd flac
 git pull
 remake_dir _build_x86
 cd _build_x86
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_PROGRAMS=OFF -DBUILD_TESTING=OFF -DINSTALL_MANPAGES=OFF
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_PROGRAMS=OFF -DBUILD_TESTING=OFF -DINSTALL_MANPAGES=OFF -DIconv_INCLUDE_DIR=/usr/local/include -DIconv_LIBRARY=/usr/local/lib/libiconv.a
 make
 cd ..
 SDK_PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk
 remake_dir _build_arm
 cd _build_arm
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_PROGRAMS=OFF -DBUILD_TESTING=OFF -DINSTALL_MANPAGES=OFF
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_PROGRAMS=OFF -DBUILD_TESTING=OFF -DINSTALL_MANPAGES=OFF -DIconv_INCLUDE_DIR=/usr/local/include -DIconv_LIBRARY=/usr/local/lib/libiconv.a
 make
 merge_libs src/libFLAC ../_build_x86/src/libFLAC libFLAC.a
 merge_libs src/libFLAC++ ../_build_x86/src/libFLAC++ libFLAC++.a
 sudo make install
 cd ..
+cd ..
+
+# minimp3
+if [ ! -d "minimp3" ];
+then
+  git clone https://github.com/lieff/minimp3.git
+fi
+cd minimp3
+git pull
+sudo cp minimp3.h /usr/local/include
+sudo cp minimp3_ex.h /usr/local/include
 cd ..
 
 # zlib
