@@ -1,9 +1,26 @@
 T3F To-Do List
 --------------
 
+[ ]Add notes on Android port.
 
-0.95
-----
+   [ ]Allegro's Android port doesn't stay up to date with the latest build
+      processes for Andriod.
+
+      [ ]In 'build/android/gradle_project/gradle/wrapper/gradle-wrapper.properties',
+         'distributionUrl' needs to be set to the latest release (see
+         https://gradle.org/releases/).
+
+      [ ]In 'build/android/gradle_project/build.gradle', 'classpath' should be
+         updated to use the latest available Gradle version. This version might
+         not match the latest release version used above.
+      
+      [ ]A namespace needs to be added to the Allegro 'build.gradle' file. This
+         namespace should match the one specified in the Android manifest file.
+
+[ ]Update Android build scripts to utilize the development environment
+   configuration (makefile.config) to locate Allegro libraries. Ideally, this
+   will be able to be updated by changing one variable to point to the place
+   the 'android_update_dependencies.sh' script was told to put libraries.
 
 [ ]Finish mapper.
 
