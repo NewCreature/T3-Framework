@@ -223,6 +223,7 @@ function update_dependencies_for()
   cmake .. $CMAKE_SETTINGS -DWANT_DEMO=OFF -DWANT_DOCS=OFF -DWANT_EXAMPLES=OFF -DWANT_NATIVE_IMAGE_LOADER=OFF -DWANT_TESTS=NO -DZLIB_INCLUDE_DIR=$INSTALL_PREFIX/include -DZLIB_LIBRARY_RELEASE=$INSTALL_PREFIX/lib/libz.a -DWANT_IMAGE_FREEIMAGE=NO -DWANT_OPENAL=NO
   make
   make install
+  cp lib/allegro-release.aar $INSTALL_PREFIX/lib
   cd ..
   cd ..
 
@@ -239,6 +240,6 @@ mkdir -p $1
 cd $1
 
 update_dependencies_for $1 "armeabi-v7a";
-#update_dependencies_for $1 "arm64-v8a";
-#update_dependencies_for $1 "x86";
-#update_dependencies_for $1 "x86_64";
+update_dependencies_for $1 "arm64-v8a";
+update_dependencies_for $1 "x86";
+update_dependencies_for $1 "x86_64";
