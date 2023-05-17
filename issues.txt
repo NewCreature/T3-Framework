@@ -1,7 +1,10 @@
 T3F Issues
 ----------
 
-[ ]Look into building custom PNG loader/saver using spng. This may be required
+[ ]Only build PhysFS with ZIP support. One or more of the other archive readers
+   in PhysFS causes a crash on Android. We only need ZIP anyway.
+
+[X]Look into building custom PNG loader/saver using spng. This may be required
    to get Linux static builds working fully. Currently, there is a crash issue
    when using static libpng if the user tries to use a native file dialog. We
    would only use this on Linux builds by default. The user shouldn't notice a
@@ -11,6 +14,8 @@ T3F Issues
    loader saver routines and register those instead of using Allegro's built-in
    PNG support. We could just copy Allegro's PNG handler code and modify it to
    use the prefixed libpng symbols.
+
+   [X]Used libpng reference library with suffix to work around issue.
 
 [ ]Automatically handle Windows->UTF-8 conversion for strings passed through
    compiler flags. I think extended ASCII might map correctly to UTF-8
