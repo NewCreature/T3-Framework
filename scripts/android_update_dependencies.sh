@@ -15,7 +15,7 @@ function update_dependencies_for()
   CMAKE_SETTINGS="-DCMAKE_TOOLCHAIN_FILE=$ANDROID_TOOLCHAIN_FILE -DANDROID_ABI=$2 -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX -DCMAKE_PREFIX_PATH=$1/android_$2"
 
   export ANDROID_HOME=$HOME/Library/Android
-  export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jbr/Contents/Home
+  export JAVA_HOME=$ANDROID_STUDIO_PATH/Contents/jbr/Contents/Home
 
   # DUMB
   if [ ! -d "dumb" ];
@@ -235,6 +235,13 @@ if [ "$#" -ne 1 ]; then
 fi
 
 START_PATH=$(pwd)
+if [ -f "/Applications/Android Studio.app" ];
+then
+  export ANDROID_STUDIO_PATH="/Applications/Android Studio.app"
+else
+  echo "Android Studio not found in standard location, searching..."
+  export ANDROID_STUDIO_PATH=`find -L /Applications -name "Android Studio.app"` -quit
+fi
 
 mkdir -p $1
 cd $1
