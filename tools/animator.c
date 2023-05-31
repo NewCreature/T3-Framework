@@ -407,7 +407,6 @@ int menu_proc_bitmap_load(int i, void * data)
 
 int menu_proc_bitmap_save(int i, void * data)
 {
-	ALLEGRO_BITMAP * bp;
 	const char * fn;
 
 	fn = select_file(last_bitmap_filename, "Save Image", "*.*;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_SAVE);
@@ -421,9 +420,9 @@ int menu_proc_bitmap_save(int i, void * data)
 
 int menu_proc_new_from_images(int index, void * data)
 {
-	ALLEGRO_FILECHOOSER * fc;
-	ALLEGRO_BITMAP * bp;
-	const char * fn;
+	ALLEGRO_FILECHOOSER * fc = NULL;
+	ALLEGRO_BITMAP * bp = NULL;
+	const char * fn = NULL;
 	int i;
 
 	animation = t3f_create_animation();
@@ -542,16 +541,40 @@ int menu_proc_frame_reset(int i, void * data)
 	return 0;
 }
 
-int menu_proc_frame_lengthen(int i, void * data)
+int menu_proc_frame_lengthen(int index, void * data)
 {
-	animation->frame[current_frame]->ticks++;
+	int i;
+
+	if(t3f_key[ALLEGRO_KEY_LCTRL] || t3f_key[ALLEGRO_KEY_RCTRL] || t3f_key[ALLEGRO_KEY_COMMAND])
+	{
+		animation->frame[current_frame]->ticks++;
+	}
+	else
+	{
+		for(i = 0; i < animation->frames; i++)
+		{
+			animation->frame[i]->ticks++;
+		}
+	}
 	t3f_animation_build_frame_list(animation);
 	return 0;
 }
 
-int menu_proc_frame_shorten(int i, void * data)
+int menu_proc_frame_shorten(int index, void * data)
 {
-	animation->frame[current_frame]->ticks--;
+	int i;
+
+	if(t3f_key[ALLEGRO_KEY_LCTRL] || t3f_key[ALLEGRO_KEY_RCTRL] || t3f_key[ALLEGRO_KEY_COMMAND])
+	{
+		animation->frame[current_frame]->ticks--;
+	}
+	else
+	{
+		for(i = 0; i < animation->frames; i++)
+		{
+			animation->frame[i]->ticks--;
+		}
+	}
 	t3f_animation_build_frame_list(animation);
 	return 0;
 }
