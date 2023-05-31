@@ -1,7 +1,7 @@
 CC = gcc
-CFLAGS = $(COMMON_CFLAGS) -DT3F_COMPANY="\"t3-i\""
+CFLAGS = $(COMMON_CFLAGS) -DT3F_COMPANY="\"t3-i\"" -DT3F_PNG
 LFLAGS = $(COMMON_LFLAGS)
-LIBS = -lallegro_image -lallegro_font -lallegro_ttf -lallegro_primitives -lallegro_audio -lallegro_acodec -lallegro_dialog -lallegro_memfile -lallegro -lm
+LIBS = `pkg-config --libs --static allegro_image-static-5` `pkg-config --libs --static allegro_font-static-5` `pkg-config --libs --static allegro_ttf-static-5` `pkg-config --libs --static allegro_primitives-static-5` `pkg-config --libs --static allegro_audio-static-5` `pkg-config --libs --static allegro_acodec-static-5` `pkg-config --libs --static allegro_dialog-static-5` `pkg-config --libs --static allegro_memfile-static-5` `pkg-config --libs --static allegro_color-static-5` `pkg-config --libs --static allegro-static-5` -lm -lsharpyuv
 EXE_SUFFIX =
 DEL_COMMAND = rm -f
 
