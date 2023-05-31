@@ -419,6 +419,65 @@ int menu_proc_bitmap_save(int i, void * data)
 	return 0;
 }
 
+int menu_proc_new_from_images(int index, void * data)
+{
+	ALLEGRO_FILECHOOSER * fc;
+	ALLEGRO_BITMAP * bp;
+	const char * fn;
+	int i;
+
+	animation = t3f_create_animation();
+	if(!animation)
+	{
+		goto fail;
+	}
+	fc = al_create_native_file_dialog(last_bitmap_filename, "Select Images", "*.pcx;*.png;*.tga;*.jpg;*.webp", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST | ALLEGRO_FILECHOOSER_MULTIPLE);
+	if(!fc)
+	{
+		goto fail;
+	}
+	if(al_show_native_file_dialog(t3f_display, fc))
+	{
+		for(i = 0; i < al_get_native_file_dialog_count(fc); i++)
+		{
+			fn = al_get_native_file_dialog_path(fc, i);
+			if(fn)
+			{
+				bp = al_load_bitmap(fn);
+				if(!bp)
+				{
+					goto fail;
+				}
+				t3f_animation_add_bitmap(animation, bp);
+				t3f_animation_add_frame(animation, i, 0, 0, 0, al_get_bitmap_width(animation->bitmaps->bitmap[i]), al_get_bitmap_height(animation->bitmaps->bitmap[i]), 0, 1, 0);
+			}
+		}
+	}
+	else
+	{
+		goto fail;
+	}
+	al_destroy_native_file_dialog(fc);
+	t3f_animation_build_frame_list(animation);
+	t3f_refresh_menus();
+
+	return 0;
+
+	fail:
+	{
+		if(fc)
+		{
+			al_destroy_native_file_dialog(fc);
+		}
+		if(animation)
+		{
+			t3f_destroy_animation(animation);
+			animation = NULL;
+		}
+	}
+	return 0;
+}
+
 int menu_proc_frame_add(int i, void * data)
 {
 	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmaps->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmaps->bitmap[current_bitmap]), 0, 1, 0);
@@ -869,6 +928,7 @@ bool setup_menus(void)
 		return false;
 	}
 	t3f_add_menu_item(file_menu, "&New", 0, NULL, menu_proc_file_new, NULL);
+	t3f_add_menu_item(file_menu, "New from Images", 0, NULL, menu_proc_new_from_images, NULL);
 	t3f_add_menu_item(file_menu, "&Load", 0, NULL, menu_proc_file_load, NULL);
 	t3f_add_menu_item(file_menu, NULL, 0, NULL, NULL, NULL);
 	t3f_add_menu_item(file_menu, "&Save", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_file_save, menu_update_proc);
