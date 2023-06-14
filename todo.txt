@@ -1,6 +1,15 @@
 T3F To-Do List
 --------------
 
+[ ]Consider implementing a gamepad/controller module which can map controllers
+   to structures that reperesent the typical gamepad. This should be separate
+   from the controller module and should be able to work in conjunction with
+   that or conversely incorporating the functionality of that module into the
+   new module and eliminating it.
+
+   [ ]Controllers should be able to be remapped to receive input from arbitrary
+      sources for maximum flexibility.
+
 [ ]Add notes on Android port.
 
    [ ]Allegro's Android port doesn't stay up to date with the latest build
