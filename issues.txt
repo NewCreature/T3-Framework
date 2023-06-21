@@ -1,7 +1,40 @@
 T3F Issues
 ----------
 
-[ ]Only build PhysFS with ZIP support. One or more of the other archive readers
+[ ]Add input module.
+
+   [ ]Should handle construction of generic input devices.
+
+      [ ]Input device construction API should be simple for basic use cases.
+         Consider providing shortcut functions for typical input types, e.g.
+         't3f_create_input_handler(T3F_INPUT_STANDARD_GAMEPAD)'.
+
+   [ ]Should handle mapping of gamepads through various APIs.
+
+   [ ]Should be configurable. Input should not be limited to coming from a
+      single device.
+   
+   [ ]Use SteamInput if available.
+
+      [ ]SteamInput provides better handling of gamepads than Allegro. We
+         should handle gamepad support through SteamInput if it is available.
+
+         [ ]See if we can use dlopen()/LoadLibrary() to dynamically handle
+            choosing an input handling method. Primrarily, we would like
+            gamepad input to be handled through SteamInput if it is available.
+
+[ ]Add achievements module.
+
+   [ ]Handle achievements internally.
+
+      [ ]API should allow constructing a set of achievements at program startup.
+
+      [ ]API should allow updating achievement state at arbitrary locations in
+         game code.
+
+   [ ]Use SteamUserStats if available.
+
+[X]Only build PhysFS with ZIP support. One or more of the other archive readers
    in PhysFS causes a crash on Android. We only need ZIP anyway.
 
 [X]Look into building custom PNG loader/saver using spng. This may be required
