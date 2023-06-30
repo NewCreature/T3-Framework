@@ -8,7 +8,12 @@ T3F To-Do List
    new module and eliminating it.
 
    [ ]Controllers should be able to be remapped to receive input from arbitrary
-      sources for maximum flexibility.
+      sources for maximum flexibility. Remappings should be connected to device
+      types. Arbitrary in-game actions should be bindable to any input.
+   
+   [ ]Controllers should attempt to be mapped according to the 'standard'
+      layout. We need to test controllers on Linux, Windows, and MacOS to
+      determine how this will work.
 
 [ ]Add notes on Android port.
 
