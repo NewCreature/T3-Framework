@@ -19,9 +19,9 @@ T3F Issues
       [ ]SteamInput provides better handling of gamepads than Allegro. We
          should handle gamepad support through SteamInput if it is available.
 
-         [ ]See if we can use dlopen()/LoadLibrary() to dynamically handle
-            choosing an input handling method. Primrarily, we would like
-            gamepad input to be handled through SteamInput if it is available.
+         [ ]See if we can use 'dlopen()'/'LoadLibrary()' to dynamically handle
+            choosing an input handling method. If SteamInput is available, we
+            should 
 
 [ ]Add achievements module.
 
