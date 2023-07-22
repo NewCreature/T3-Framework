@@ -32,6 +32,8 @@ upgrade_project:
 ifndef DIR
 	@echo "Usage: make upgrade_project DIR=location"
 else
+	@echo "Verifying '$(DIR)' is a valid project directory..."
+	@find $(DIR)/src/makefile.defines > /dev/null
 	@echo "Upgrading project in '$(DIR)'..."
 	@cp include/t3f/*.h "$(DIR)/src/t3f"
 	@cp src/*.c "$(DIR)/src/t3f"
@@ -51,6 +53,8 @@ import_updates:
 ifndef DIR
 	@echo "Usage: make import_project_updates DIR=location"
 else
+	@echo "Verifying '$(DIR)' is a valid project directory..."
+	@find $(DIR)/src/makefile.defines > /dev/null
 	@echo "Importing T3F changes from project in '$(DIR)'..."
 	@cp "$(DIR)/src/t3f/"*.c src
 	@cp "$(DIR)/src/t3f/"*.inc src
