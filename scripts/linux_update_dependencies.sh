@@ -183,7 +183,7 @@ cd libjpeg-turbo
 git pull
 remake_dir _build
 cd _build
-cmake .. -DENABLE_SHARED=OFF
+cmake .. -DENABLE_SHARED=OFF -DCMAKE_INSTALL_PREFIX=/usr/local
 make
 sudo make install
 cd ..
@@ -233,6 +233,9 @@ make
 sudo make install
 cd ..
 cd ..
+
+# Packaged Allegro dependencies
+sudo apt install libgl1-mesa-dev libglu1-mesa-dev libgtk-3-dev libpulse-dev libxext-dev libxxf86vm-dev libxrandr-dev libxinerama-dev libxpm-dev
 
 # Allegro
 if [ ! -d "allegro5" ];
