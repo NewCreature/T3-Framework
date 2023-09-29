@@ -67,7 +67,6 @@ bool create_windows_icon(ALLEGRO_BITMAP ** bp, ALLEGRO_PATH * path)
 		{
 			w = al_get_bitmap_width(bp[i]);
 			h = al_get_bitmap_height(bp[i]);
-			al_save_bitmap("temp.png", bp[i]);
 			al_fputc(fp, w < 256 ? w : 0);
 			al_fputc(fp, h < 256 ? h : 0);
 			al_fputc(fp, 0);

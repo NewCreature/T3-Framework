@@ -37,11 +37,13 @@ else
 	@echo "Upgrading project in '$(DIR)'..."
 	@cp include/t3f/*.h "$(DIR)/src/t3f"
 	@cp src/*.c "$(DIR)/src/t3f"
+	@cp src/*.cpp "$(DIR)/src/t3f"
 	@cp src/*.inc "$(DIR)/src/t3f"
 	@cp template/src/Makefile "$(DIR)/src"
 	@cp -a template/debian "$(DIR)"
 	@cp -a template/android "$(DIR)"
-	@cp -a template/win32 "$(DIR)"
+	@cp -a template/linux "$(DIR)"
+	@cp -a template/windows "$(DIR)"
 	@cp -a template/macos "$(DIR)"
 	@cp -a template/iphone "$(DIR)"
 	@cp -a template/packages "$(DIR)"
@@ -54,17 +56,20 @@ ifndef DIR
 	@echo "Usage: make import_project_updates DIR=location"
 else
 	@echo "Verifying '$(DIR)' is a valid project directory..."
-	@find $(DIR)/src/makefile.defines > /dev/null
+	@find "$(DIR)/src/makefile.defines" > /dev/null
 	@echo "Importing T3F changes from project in '$(DIR)'..."
 	@cp "$(DIR)/src/t3f/"*.c src
+	@cp "$(DIR)/src/t3f/"*.cpp src
 	@cp "$(DIR)/src/t3f/"*.inc src
 	@cp "$(DIR)/src/t3f/"*.h include/t3f
 	@cp "$(DIR)/src/Makefile" template/src/Makefile
 	@cp -a "$(DIR)/debian/." template/debian/
 	@cp -a "$(DIR)/android/." template/android/
-	@cp -a "$(DIR)/win32/." template/win32/
+	@cp -a "$(DIR)/linux/." template/linux/
+	@cp -a "$(DIR)/windows/." template/windows/
 	@cp -a "$(DIR)/macos/." template/macos/
 	@rm -rf template/macos/Info.plist
+	@rm -rf template/macos/entitlements.plist
 	@cp -a "$(DIR)/iphone/." template/iphone/
 	@cp -a "$(DIR)/misc/." template/misc/
 	@cp -a "$(DIR)/scripts/." template/scripts/
