@@ -33,7 +33,7 @@ ifndef DIR
 	@echo "Usage: make upgrade_project DIR=location"
 else
 	@echo "Verifying '$(DIR)' is a valid project directory..."
-	@find $(DIR)/src/makefile.defines > /dev/null
+	@find "$(DIR)/src/makefile.defines" > /dev/null
 	@echo "Upgrading project in '$(DIR)'..."
 	@cp include/t3f/*.h "$(DIR)/src/t3f"
 	@cp src/*.c "$(DIR)/src/t3f"
