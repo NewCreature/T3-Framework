@@ -18,7 +18,7 @@ else
 	@cp template/.gitignore "$(DIR)/.gitignore"
 	@cp -a template/debian "$(DIR)"
 	@cp -a template/android "$(DIR)"
-	@cp -a template/win32 "$(DIR)"
+	@cp -a template/windows "$(DIR)"
 	@cp -a template/macos "$(DIR)"
 	@cp -a template/iphone "$(DIR)"
 	@cp -a template/icons "$(DIR)"
