@@ -144,5 +144,10 @@ data_package: source_only_package
 	cd ../bin && touch data/steam.dat && zip -9 -r $(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-data.zip data -x data/.\* && rm data/steam.dat && cd ../ && zip -9 -r packages/$(APP_NAME)-$(APP_VERSION)-data.zip docs && cd packages && zip -9 $(APP_NAME)-$(APP_VERSION)-data.zip $(APP_NAME)-$(APP_VERSION)-src.tar.gz
 
 steam_binary_package: $(APP_EXE_NAME)
+ifndef CONFIG_STEAMWORKS_SDK_PATH
+	@echo Please define 'CONFIG_STEAMWORKS_SDK_PATH' as the path to the root of the Steamworks SDK and 'CONFIG_STEAMWORKS_PLATFORM' as the name of the platform (osx or linux64) if you are not building for Windows.
+else
 	rm -f $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-$(T3F_PLATFORM_NAME)-binaries.zip
 	cd ../bin && zip -9 $(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-$(T3F_PLATFORM_NAME)-binaries.zip * -x data\*; cd ../$(T3F_PLATFORM_NAME)/blobs/$(T3F_PLATFORM_ARCHITECTURE) && zip -9 -r ../../$(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-$(T3F_PLATFORM_NAME)-binaries.zip * -x binaries.here || true
+	cd $(CONFIG_STEAMWORKS_SDK_PATH)/redistributable_bin/$(CONFIG_STEAMWORKS_PLATFORM) && zip -9 -r $(PWD)/$(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-$(T3F_PLATFORM_NAME)-binaries.zip *.dll *.so *.dylib || true
+endif
