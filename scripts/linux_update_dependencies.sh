@@ -21,6 +21,7 @@ then
   git clone https://github.com/Kitware/CMake.git
 fi
 cd CMake
+git pull
 ./bootstrap -- -DCMAKE_USE_OPENSSL=OFF
 make
 sudo make install
