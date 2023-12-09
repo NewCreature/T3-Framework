@@ -11,8 +11,6 @@ static void _reset_input_state_fudging(void)
   #ifdef ALLEGRO_MACOSX
     for(i = 0; i < T3F_MAX_JOYSTICKS; i++)
     {
-      _input_state_fudging_helper[i].stick[4].axis[0] = 100.0;
-      _input_state_fudging_helper[i].stick[4].axis[1] = 100.0;
       _input_state_fudging_helper[i].stick[2].axis[0] = 100.0;
       _input_state_fudging_helper[i].stick[3].axis[0] = 100.0;
     }
@@ -399,13 +397,13 @@ bool t3f_map_input_for_xbox_controller(T3F_INPUT_HANDLER * input_handler, int jo
     input_handler->element[T3F_GAMEPAD_R3].device_number = joystick;
     input_handler->element[T3F_GAMEPAD_R3].device_element = 12;
 
-    /* Start */
-    input_handler->element[T3F_GAMEPAD_START].device_number = joystick;
-    input_handler->element[T3F_GAMEPAD_START].device_element = 14;
-
     /* Select */
     input_handler->element[T3F_GAMEPAD_SELECT].device_number = joystick;
-    input_handler->element[T3F_GAMEPAD_SELECT].device_element = 15;
+    input_handler->element[T3F_GAMEPAD_SELECT].device_element = 14;
+
+    /* Start */
+    input_handler->element[T3F_GAMEPAD_START].device_number = joystick;
+    input_handler->element[T3F_GAMEPAD_START].device_element = 15;
 
     return true;
 
@@ -532,72 +530,6 @@ static void update_input_device(int device)
   #ifdef ALLEGRO_MACOSX
     if(t3f_joystick_state_updated[device])
     {
-      if(_input_state_fudging_helper[device].stick[4].axis[0] < 100.0 || _input_state_fudging_helper[device].stick[4].axis[1] < 100.0)
-      {
-        /* up */
-        if(t3f_joystick_state[device].stick[4].axis[0] >= 1.0 && t3f_joystick_state[device].stick[4].axis[1] <= -1.0)
-        {
-          t3f_joystick_state[device].stick[4].axis[0] = 0.0;
-          t3f_joystick_state[device].stick[4].axis[1] = -1.0;
-        }
-
-        /* down */
-        else if(t3f_joystick_state[device].stick[4].axis[0] <= -1.0 && t3f_joystick_state[device].stick[4].axis[1] >= 1.0)
-        {
-          t3f_joystick_state[device].stick[4].axis[0] = 0.0;
-          t3f_joystick_state[device].stick[4].axis[1] = 1.0;
-        }
-
-        /* left */
-        else if(t3f_joystick_state[device].stick[4].axis[0] <= -1.0 && t3f_joystick_state[device].stick[4].axis[1] <= -1.0)
-        {
-          t3f_joystick_state[device].stick[4].axis[0] = -1.0;
-          t3f_joystick_state[device].stick[4].axis[1] = 0.0;
-        }
-
-        /* right */
-        else if(t3f_joystick_state[device].stick[4].axis[0] >= 1.0 && t3f_joystick_state[device].stick[4].axis[1] >= 1.0)
-        {
-          t3f_joystick_state[device].stick[4].axis[0] = 1.0;
-          t3f_joystick_state[device].stick[4].axis[1] = 0.0;
-        }
-
-        /* up-right */
-        else if(t3f_joystick_state[device].stick[4].axis[0] >= 1.0)
-        {
-          t3f_joystick_state[device].stick[4].axis[0] = 1.0;
-          t3f_joystick_state[device].stick[4].axis[1] = -1.0;
-        }
-
-        /* down-right */
-        else if(t3f_joystick_state[device].stick[4].axis[1] >= 1.0)
-        {
-          t3f_joystick_state[device].stick[4].axis[0] = 1.0;
-          t3f_joystick_state[device].stick[4].axis[1] = 1.0;
-        }
-
-        /* down-left */
-        else if(t3f_joystick_state[device].stick[4].axis[0] <= -1.0)
-        {
-          t3f_joystick_state[device].stick[4].axis[0] = -1.0;
-          t3f_joystick_state[device].stick[4].axis[1] = 1.0;
-        }
-
-        /* up-left */
-        else if(t3f_joystick_state[device].stick[4].axis[0] == 0.0 && t3f_joystick_state[device].stick[4].axis[1] == 0.0)
-        {
-          t3f_joystick_state[device].stick[4].axis[0] = -1.0;
-          t3f_joystick_state[device].stick[4].axis[1] = -1.0;
-        }
-
-        /* idle */
-        else
-        {
-          t3f_joystick_state[device].stick[4].axis[0] = 0.0;
-          t3f_joystick_state[device].stick[4].axis[1] = 0.0;
-        }
-      }
-
       /* triggers */
       if(_input_state_fudging_helper[device].stick[2].axis[0] < 100.0)
       {
@@ -892,16 +824,7 @@ void _t3f_input_handle_joystick_event(ALLEGRO_EVENT * event)
   #ifdef ALLEGRO_MACOSX
     if(event->type == ALLEGRO_EVENT_JOYSTICK_AXIS)
     {
-      if(event->joystick.stick == 4)
-      {
-        joy_num = t3f_get_joystick_number(event->joystick.id);
-        if(joy_num >= 0)
-        {
-          _input_state_fudging_helper[joy_num].stick[4].axis[0] = 0.0;
-          _input_state_fudging_helper[joy_num].stick[4].axis[1] = 0.0;
-        }
-      }
-      else if(event->joystick.stick == 2)
+      if(event->joystick.stick == 2)
       {
         joy_num = t3f_get_joystick_number(event->joystick.id);
         if(joy_num >= 0)

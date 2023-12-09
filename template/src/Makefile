@@ -115,6 +115,9 @@ data_package:
 steam_binary_package:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts steam_binary_package SYSTEM=$(SYSTEM)
 
+steam_packages:
+	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts steam_packages
+
 mac_sign_bundle:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_sign_bundle
 

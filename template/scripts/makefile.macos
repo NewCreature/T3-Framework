@@ -76,11 +76,13 @@ mac_bundle : ../icons/macos_icon.icns ../macos/Info.plist
 	@mkdir $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Resources/$(APP_TITLE)
 	@cp $(APP_EXE_NAME) $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/MacOS/$(APP_TITLE)
 	@cp ../macos/blobs/$(T3F_PLATFORM_ARCHITECTURE)/* $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/MacOS
+ifdef CONFIG_STEAMWORKS_SDK_PATH
+	@cp $(CONFIG_STEAMWORKS_SDK_PATH)/redistributable_bin/osx/*.dylib $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/MacOS
+endif
 	@mv ../icons/macos_icon.icns $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Resources/$(APP_TITLE).icns
 	@cp -a ../bin/data $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Resources/$(APP_TITLE)
 	@cp -a ../docs $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Resources/$(APP_TITLE)
 	@cp ../macos/Info.plist $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents
-#	@cp ../macos/Pkginfo $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents
 	@sed -i '' "s|T3F_APP_EXECUTABLE|$(APP_TITLE)|" $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Info.plist
 	@sed -i '' "s|T3F_APP_ICON|$(APP_TITLE).icns|" $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Info.plist
 	@sed -i '' "s|T3F_APP_DISPLAY_NAME|$(APP_TITLE)|" $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Info.plist
@@ -113,6 +115,12 @@ mac_universal_bundle:
 	rm $(APP_EXE_NAME)-i386 $(APP_EXE_NAME)-x86_64 $(APP_EXE_NAME)-arm64
 	make mac_bundle
 
+mac_steam_touch:
+	touch ../bin/data/steam.dat
+
+mac_steam_cleanup:
+	rm -rf ../bin/data/steam.dat
+
 mac_package: $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 	rm -rf $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos.dmg
 	../macos/create-dmg --volname $(APP_TITLE) --volicon $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Resources/$(APP_TITLE).icns --window-size 400 232 --icon-size 96 --icon "$(APP_TITLE)" 110 100 --app-drop-link 280 100 $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos.dmg $(APP_PACKAGE_DIR)/$(APP_TITLE).app
@@ -124,10 +132,10 @@ mac_sign_bundle: $(APP_PACKAGE_DIR)/$(APP_TITLE).app ../macos/entitlements.plist
 mac_notarize_bundle:
 	ditto -c -k --keepParent $(APP_PACKAGE_DIR)/$(APP_TITLE).app $(APP_PACKAGE_DIR)/$(APP_TITLE).zip
 	xcode-select -p > _xcode_dir.txt
-	xcode-select -s $(MACOS_CONFIG_XCODE_PATH)
+	sudo xcode-select -s $(MACOS_CONFIG_XCODE_PATH)
 	xcrun notarytool submit $(APP_PACKAGE_DIR)/$(APP_TITLE).zip --apple-id $(MACOS_CONFIG_APPLE_ID) --team-id $(MACOS_CONFIG_APPLE_TEAM_ID) --password $(MACOS_CONFIG_APPLE_ID_PASSWORD) --wait
 	xcrun stapler staple $(APP_PACKAGE_DIR)/$(APP_TITLE).app
-	xcode-select -s `cat _xcode_dir.txt`
+	sudo xcode-select -s `cat _xcode_dir.txt`
 	rm _xcode_dir.txt
 	rm $(APP_PACKAGE_DIR)/$(APP_TITLE).zip
 
@@ -137,5 +145,9 @@ mac_sign_and_notarize_bundle: mac_sign_bundle mac_notarize_bundle
 mac_sign_package: $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos.dmg
 	codesign -s "$(MACOS_CONFIG_CERT_NAME)" --timestamp -i "$(APP_ANDROID_PACKAGE)" $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos.dmg
 
-mac_steam_package:
+mac_steam_package: source_only_package mac_steam_touch mac_universal_bundle mac_steam_cleanup mac_sign_and_notarize_bundle
 	ditto -c -k --keepParent $(APP_PACKAGE_DIR)/$(APP_TITLE).app $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos-steam.zip
+	cd $(APP_PACKAGE_DIR) && zip -9 $(APP_PACKAGE_NAME)-macos-steam.zip $(APP_PACKAGE_FILENAME)
+
+steam_packages: mac_steam_package
+	@Sucessfully built Steam packages for the current platform.

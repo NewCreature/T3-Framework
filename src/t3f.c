@@ -78,9 +78,7 @@ int t3f_requested_flags = 0;
 int t3f_flags = 0;
 int t3f_option[T3F_MAX_OPTIONS] = {0};
 static int _t3f_logic_ticks = 0;
-static bool _t3f_mouse_warped = false;
-static float _t3f_mouse_warp_x = 0.0;
-static float _t3f_mouse_warp_y = 0.0;
+static double _t3f_mouse_warp_time = 0.0;
 
 void (*t3f_logic_proc)(void * data) = NULL;
 void (*t3f_render_proc)(void * data) = NULL;
@@ -1126,9 +1124,7 @@ void t3f_set_mouse_xy(float x, float y)
 	al_transform_coordinates(&t3f_current_view->transform, &x, &y);
 	al_set_mouse_xy(t3f_display, x, y);
 	_t3f_update_mouse_xy(x, y);
-	_t3f_mouse_warped = true;
-	_t3f_mouse_warp_x = x;
-	_t3f_mouse_warp_y = y;
+	_t3f_mouse_warp_time = al_get_time();
 }
 
 void t3f_clear_touch_data(void)
@@ -1344,27 +1340,33 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		}
 		case ALLEGRO_EVENT_MOUSE_AXES:
 		{
-			t3f_real_mouse_x = event->mouse.x;
-			t3f_real_mouse_y = event->mouse.y;
-			t3f_mouse_z = event->mouse.z;
-
-			if(t3f_touch[0].active)
+			if(event->any.timestamp > _t3f_mouse_warp_time)
 			{
-				t3f_touch[0].real_x = t3f_real_mouse_x;
-				t3f_touch[0].real_y = t3f_real_mouse_y;
+				t3f_real_mouse_x = event->mouse.x;
+				t3f_real_mouse_y = event->mouse.y;
+				t3f_mouse_z = event->mouse.z;
+
+				if(t3f_touch[0].active)
+				{
+					t3f_touch[0].real_x = t3f_real_mouse_x;
+					t3f_touch[0].real_y = t3f_real_mouse_y;
+				}
+				t3f_mouse_moved = true;
 			}
-			t3f_mouse_moved = true;
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_WARPED:
 		{
-			t3f_real_mouse_x = event->mouse.x;
-			t3f_real_mouse_y = event->mouse.y;
-
-			if(t3f_touch[0].active)
+			if(event->any.timestamp > _t3f_mouse_warp_time)
 			{
-				t3f_touch[0].real_x = t3f_real_mouse_x;
-				t3f_touch[0].real_y = t3f_real_mouse_y;
+				t3f_real_mouse_x = event->mouse.x;
+				t3f_real_mouse_y = event->mouse.y;
+
+				if(t3f_touch[0].active)
+				{
+					t3f_touch[0].real_x = t3f_real_mouse_x;
+					t3f_touch[0].real_y = t3f_real_mouse_y;
+				}
 			}
 			break;
 		}
@@ -1555,11 +1557,6 @@ void t3f_run(void)
 			t3f_event_handler(&event);
 		}
 
-		if(_t3f_mouse_warped)
-		{
-			_t3f_update_mouse_xy(_t3f_mouse_warp_x, _t3f_mouse_warp_y);
-			_t3f_mouse_warped = false;
-		}
 		for(i = 0; i < _t3f_logic_ticks && !t3f_quit; i++)
 		{
 			t3f_android_support_helper();

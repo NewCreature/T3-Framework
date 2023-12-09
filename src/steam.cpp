@@ -3,24 +3,19 @@
   #include "steam/steam_api_flat.h"
 #endif
 
-#define T3F_STEAM_STORE_STATE_NONE        0
-#define T3F_STEAM_STORE_STATE_IN_PROGRESS 1
-#define T3F_STEAM_STORE_STATE_DONE        2
-#define T3F_STEAM_STORE_STATE_ERROR       3
-
-#define T3F_STEAM_STATS_STORE_INTERVAL 10.0
-
 #ifdef T3F_ENABLE_STEAM_INTEGRATION
   static bool _t3f_steam_integration_enabled = false;
   static bool _t3f_steam_stats_ready = false;
-  static bool _t3f_steam_stats_store_state = T3F_STEAM_STORE_STATE_NONE;
-  static double _t3f_steam_store_time = -T3F_STEAM_STATS_STORE_INTERVAL;
+  static double _t3f_steam_store_time_interval = 7.0;
+  static double _t3f_steam_store_time = -_t3f_steam_store_time_interval;
   static T3F_ACHIEVEMENTS_LIST * _t3f_achievements_list = NULL;
 #endif
 
 bool t3f_init_steam_integration(T3F_ACHIEVEMENTS_LIST * achievements_list)
 {
   #ifdef T3F_ENABLE_STEAM_INTEGRATION
+    const char * val;
+
     if(!SteamAPI_Init())
     {
       goto fail;
@@ -29,6 +24,11 @@ bool t3f_init_steam_integration(T3F_ACHIEVEMENTS_LIST * achievements_list)
     _t3f_achievements_list = achievements_list;
     _t3f_steam_integration_enabled = true;
     SteamAPI_ISteamUserStats_RequestCurrentStats(SteamUserStats());
+    val = al_get_config_value(t3f_config, "Setting", "Steam Notification Interval");
+    if(val)
+    {
+      _t3f_steam_store_time_interval = atof(val);
+    }
     return true;
 
     fail:
@@ -86,6 +86,7 @@ const char * t3f_get_steam_user_display_name(void)
 }
 
 #ifdef T3F_ENABLE_STEAM_INTEGRATION
+
   static void _t3f_run_steam_callbacks(void)
   {
     HSteamPipe hSteamPipe = SteamAPI_GetHSteamPipe();
@@ -116,7 +117,14 @@ const char * t3f_get_steam_user_display_name(void)
         }
         else if(callback.m_iCallback == UserStatsStored_t::k_iCallback)
         {
-          _t3f_steam_stats_store_state = T3F_STEAM_STORE_STATE_DONE;
+          if(_t3f_achievements_list)
+          {
+            if(_t3f_achievements_list->store_entry >= 0)
+            {
+              _t3f_achievements_list->entry[_t3f_achievements_list->store_entry].store_state = T3F_ACHIEVEMENTS_STATE_STORED;
+              _t3f_steam_store_time = al_get_time();
+            }
+          }
         }
       }
       SteamAPI_ManualDispatch_FreeLastCallback( hSteamPipe );
@@ -127,19 +135,27 @@ const char * t3f_get_steam_user_display_name(void)
   {
     int i;
 
-    if(_t3f_steam_integration_enabled && _t3f_achievements_list && _t3f_achievements_list->modified && _t3f_steam_stats_ready)
+    if(_t3f_steam_integration_enabled && _t3f_achievements_list && _t3f_achievements_list->updated && _t3f_steam_stats_ready && al_get_time() - _t3f_steam_store_time >= _t3f_steam_store_time_interval)
     {
       for(i = 0; i < achievements_list->entries; i++)
       {
-        if(achievements_list->entry[i].step >= achievements_list->entry[i].steps)
+        if(achievements_list->entry[i].step >= achievements_list->entry[i].steps && achievements_list->entry[i].store_state != T3F_ACHIEVEMENTS_STATE_STORED)
         {
           SteamAPI_ISteamUserStats_SetAchievement(SteamUserStats(), achievements_list->entry[i].steam_id);
+          achievements_list->entry[i].store_state = T3F_ACHIEVEMENTS_STATE_STORING;
+          achievements_list->store_entry = i;
+          break;
         }
       }
-      SteamAPI_ISteamUserStats_StoreStats(SteamUserStats());
-      _t3f_achievements_list->modified = false;
-      _t3f_steam_stats_store_state = T3F_STEAM_STORE_STATE_IN_PROGRESS;
-      al_set_config_value(t3f_user_data, "Achievements", "Stored", "false");
+      if(i >= achievements_list->entries)
+      {
+        _t3f_achievements_list->updated = false;
+      }
+      else
+      {
+        SteamAPI_ISteamUserStats_StoreStats(SteamUserStats());
+        _t3f_steam_store_time = al_get_time();
+      }
       return true;
     }
     return false;
@@ -147,31 +163,24 @@ const char * t3f_get_steam_user_display_name(void)
 
 #endif
 
+bool t3f_reset_steam_stats(void)
+{
+  #ifdef T3F_ENABLE_STEAM_INTEGRATION
+  if(_t3f_steam_integration_enabled && _t3f_steam_stats_ready)
+  {
+    return SteamAPI_ISteamUserStats_ResetAllStats(SteamUserStats(), true);
+  }
+  #endif
+  return false;
+}
 
 void t3f_steam_integration_logic(void)
 {
   #ifdef T3F_ENABLE_STEAM_INTEGRATION
-    const char * val;
-
     if(_t3f_steam_integration_enabled)
     {
       _t3f_synchronize_achievements_with_steam(_t3f_achievements_list);
       _t3f_run_steam_callbacks();
-
-      /* attempt to store current achievements if it is needed and store isn't currently processing */
-      if(_t3f_steam_stats_ready && _t3f_steam_stats_store_state != T3F_STEAM_STORE_STATE_IN_PROGRESS)
-      {
-        val = al_get_config_value(t3f_user_data, "Achievements", "Stored");
-        if(val && !strcmp(val, "false"))
-        {
-          if(al_get_time() - _t3f_steam_store_time >= T3F_STEAM_STATS_STORE_INTERVAL)
-          {
-            SteamAPI_ISteamUserStats_StoreStats(SteamUserStats());
-            _t3f_steam_store_time = al_get_time();
-            _t3f_steam_stats_store_state = T3F_STEAM_STORE_STATE_IN_PROGRESS;
-          }
-        }
-      }
     }
   #endif
 }
