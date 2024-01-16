@@ -46,7 +46,6 @@ int t3f_key_buffer[T3F_KEY_BUFFER_MAX] = {0};
 int t3f_key_buffer_keys = 0;
 
 /* mouse data */
-static bool t3f_mouse_moved = false;
 int t3f_real_mouse_x = 0;
 int t3f_real_mouse_y = 0;
 float t3f_mouse_x = 0;
@@ -1086,27 +1085,22 @@ bool t3f_key_pressed(void)
 
 bool t3f_get_mouse_mickeys(int * x, int * y, int * z)
 {
-	if(t3f_mouse_moved)
+	if(x)
 	{
-		if(x)
-		{
-			*x = t3f_mouse_dx - t3f_mouse_x;
-			t3f_mouse_dx = t3f_mouse_x;
-		}
-		if(y)
-		{
-			*y = t3f_mouse_dy - t3f_mouse_y;
-			t3f_mouse_dy = t3f_mouse_y;
-		}
-		if(z)
-		{
-			*z = t3f_mouse_dz - t3f_mouse_z;
-			t3f_mouse_dz = t3f_mouse_z;
-		}
-		t3f_mouse_moved = false;
-		return true;
+		*x = t3f_mouse_dx;
+		t3f_mouse_dx = 0;
 	}
-	return false;
+	if(y)
+	{
+		*y = t3f_mouse_dy;
+		t3f_mouse_dy = 0;
+	}
+	if(z)
+	{
+		*z = t3f_mouse_dz;
+		t3f_mouse_dz = 0;
+	}
+	return true;
 }
 
 static void _t3f_update_mouse_xy(float x, float y)
@@ -1340,7 +1334,7 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 		}
 		case ALLEGRO_EVENT_MOUSE_AXES:
 		{
-			if(event->any.timestamp > _t3f_mouse_warp_time)
+			if(event->any.timestamp >= _t3f_mouse_warp_time)
 			{
 				t3f_real_mouse_x = event->mouse.x;
 				t3f_real_mouse_y = event->mouse.y;
@@ -1351,13 +1345,14 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 					t3f_touch[0].real_x = t3f_real_mouse_x;
 					t3f_touch[0].real_y = t3f_real_mouse_y;
 				}
-				t3f_mouse_moved = true;
 			}
+			t3f_mouse_dx += event->mouse.dx;
+			t3f_mouse_dy += event->mouse.dy;
 			break;
 		}
 		case ALLEGRO_EVENT_MOUSE_WARPED:
 		{
-			if(event->any.timestamp > _t3f_mouse_warp_time)
+			if(event->any.timestamp >= _t3f_mouse_warp_time)
 			{
 				t3f_real_mouse_x = event->mouse.x;
 				t3f_real_mouse_y = event->mouse.y;

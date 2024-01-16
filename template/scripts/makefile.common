@@ -60,7 +60,7 @@ release: ../changes.txt ../docs/changelog
 	$(SED_COMMAND) "s|BUILD_DATE|`date -u +"%a, %d %b %Y %T"`|" ../docs/changelog
 	$(SED_COMMAND) "s|REMOVE_THIS_EMPTY_LINE||" ../docs/changelog
 
-clean: app_clean
+clean: steam_cleanup app_clean
 	@$(PLATFORM_CLEAN)
 	@$(DEL_COMMAND) $(subst /,$(PATH_SEPARATOR),$(T3F_OBJECTS))
 	@$(DEL_COMMAND) $(subst /,$(PATH_SEPARATOR),$(APP_OBJECTS))
@@ -71,7 +71,7 @@ endif
 	@echo Cleanup complete!
 
 clean_packages:
-	@echo Cleaning up old paclages...
+	@echo Cleaning up old packages...
 	@rm -f $(APP_PACKAGE_DIR)/*.tar.gz
 	@rm -f $(APP_PACKAGE_DIR)/*.zip
 	@rm -f $(APP_PACKAGE_DIR)/*.apk
@@ -80,7 +80,7 @@ clean_packages:
 	@rm -rf $(APP_PACKAGE_DIR)/*/
 
 #create tar.gz package for source code distribution
-package: clean clean_packages
+source_package: clean clean_packages
 	$(shell rm -rf $(APP_TEMP_DIR); mkdir -p $(APP_TEMP_DIR); cp -a -R -L "../bin" $(APP_TEMP_DIR); cp -a -R -L "../src" $(APP_TEMP_DIR); cp -a -R -L "../scripts" $(APP_TEMP_DIR); cp -a -R -L "../docs" $(APP_TEMP_DIR); cp -a -R -L "../android" $(APP_TEMP_DIR); cp -a -R -L "../debian" $(APP_TEMP_DIR); cp -a -R -L "../linux" $(APP_TEMP_DIR);  cp -a -R -L "../macos" $(APP_TEMP_DIR); cp -a -R -L  "../windows" $(APP_TEMP_DIR); cp -a -R -L "../icons" $(APP_TEMP_DIR); cp -a -R -L "../iphone" $(APP_TEMP_DIR); cp -a -R -L "../graphics_src" $(APP_TEMP_DIR); cp -a -R -L "../packages" $(APP_TEMP_DIR); cp -a -R -L "../misc" $(APP_TEMP_DIR); cp "../changes.txt" $(APP_TEMP_DIR); cp "../issues.txt" $(APP_TEMP_DIR); cd ../temp; rm -f $(APP_PACKAGE_FILENAME); export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; export COPYFILE_DISABLE=true; tar --exclude="." --exclude=".DS_Store" --exclude="old" --exclude="makefile.config" $(PACKAGE_EXCLUSIONS) --dereference -czf $(APP_PACKAGE_DIR)/$(APP_PACKAGE_FILENAME) $(APP_PACKAGE_NAME); cd ..; rm -rf temp)
 	@echo Package successfully created!
 
@@ -109,7 +109,7 @@ binary_package_temp: $(APP_EXE_NAME)
 	@$(SED_COMMAND) 's|T3F_APP_DIR|$(DEBIAN_DIR)|' ../temp/$(APP_PACKAGE_NAME)/uninstall.sh
 	@$(SED_COMMAND) 's|T3F_APP_CATEGORIES|$(DEBIAN_DESKTOP_CATEGORIES)|' ../temp/$(APP_PACKAGE_NAME)/uninstall.sh
 
-binary_package: binary_package_temp
+binary_package_common: clean binary_package_temp
 	@echo "Build archive..."
 	$(shell cd ../temp; tar -czf $(APP_PACKAGE_DIR)/$(APP_BINARY_PACKAGE_FILENAME) $(APP_PACKAGE_NAME); cd ..; rm -rf temp)
 
@@ -139,9 +139,18 @@ demo_gp: demo demo_edit_gp
 ../windows/makeicon$(EXE_SUFFIX): ../windows/makeicon.o
 	$(CC) $(LFLAGS) ../windows/makeicon.o $(T3F_LIBRARIES) -o ../windows/makeicon
 
-data_package: source_only_package
+data_package_helper:
 	rm -f $(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-data.zip
 	cd ../bin && touch data/steam.dat && zip -9 -r $(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-data.zip data -x data/.\* && rm data/steam.dat && cd ../ && zip -9 -r packages/$(APP_NAME)-$(APP_VERSION)-data.zip docs && cd packages && zip -9 $(APP_NAME)-$(APP_VERSION)-data.zip $(APP_NAME)-$(APP_VERSION)-src.tar.gz
+
+data_package: source_only_package steam_touch data_package_helper steam_cleanup
+	@echo Data backage successfully created.
+
+steam_touch:
+	touch ../bin/data/steam.dat
+
+steam_cleanup:
+	rm -rf ../bin/data/steam.dat
 
 steam_binary_package: $(APP_EXE_NAME)
 ifndef CONFIG_STEAMWORKS_SDK_PATH

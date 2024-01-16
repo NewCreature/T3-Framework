@@ -90,5 +90,8 @@ install_flatpak:
 	@$(SED_COMMAND) 's|T3F_APP_PUBLISHER|$(APP_PUBLISHER)|' $(INSTALL_PREFIX)/share/metainfo/$(APP_ID).metainfo.xml
 	@$(SED_COMMAND) 's|T3F_APP_URL|$(APP_URL)|' $(INSTALL_PREFIX)/share/metainfo/$(APP_ID).metainfo.xml
 
+binary_package: binary_package_common
+	@echo Successfully built distributable binary package for the current platform.
+
 steam_packages: steam_packages_common
 	@echo Sucessfully built Steam packages for the current platform.

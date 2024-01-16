@@ -102,9 +102,6 @@ extern int t3f_real_mouse_y;
 extern float t3f_mouse_x;
 extern float t3f_mouse_y;
 extern int t3f_mouse_z;
-extern int t3f_mouse_dx;
-extern int t3f_mouse_dy;
-extern int t3f_mouse_dz;
 extern bool t3f_mouse_button[16];
 extern bool t3f_mouse_hidden;
 

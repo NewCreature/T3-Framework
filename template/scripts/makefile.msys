@@ -47,9 +47,12 @@ icon.o : ../icons/windows_icon.ico ../windows/icon.rc
 ../windows/info_fixer: ../windows/info_fixer.o
 	$(CC) $(T3F_CFLAGS) ../windows/info_fixer.o -o ../windows/info_fixer
 
-windows_zip: $(APP_EXE_NAME)
+windows_zip: clean clean_packages $(APP_EXE_NAME)
 	@cd ../bin; zip -9 -r $(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-windows.zip *; cd ../windows/blobs/i386 && zip -9 ../../$(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-windows.zip *; cd ../../../; cp -a docs windows; cd windows/docs; mv changelog history.txt; mv README readme.txt; mv copyright license.txt; cd ..; zip -9 -r $(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-windows.zip docs; rm -rf docs
 	@echo Windows package created!
+
+binary_package: windows_zip
+	@echo Successfully built distributable binary package for the current platform.
 
 steam_packages: steam_packages_common
 	@echo Sucessfully built Steam packages for the current platform.

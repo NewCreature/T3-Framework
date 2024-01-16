@@ -31,20 +31,14 @@ endif
 top:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts all
 
-static:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM)_static -I ../scripts all
-
 clean:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts clean
-
-clean_all:
-	$(MAKE) -f ../makefile.$(SYSTEM) -I ../scripts clean
 
 release:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts release
 
-package:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts package
+source_package:
+	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts source_package
 
 source_only_package:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts source_only_package
@@ -67,17 +61,20 @@ android_install:
 android_debug:
 	$(MAKE) -f ../scripts/makefile.android -I ../scripts android_debug
 
-windows_package:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts windows_zip
+mac_i386:
+	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_i386
+
+mac_x86_64:
+	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_x86_64
+
+mac_arm64:
+	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_arm64
 
 mac_universal_bundle:
 	$(MAKE) -f ../scripts/makefile.macos -I ../scripts mac_universal_bundle
 
 mac_bundle:
 	$(MAKE) -f ../scripts/makefile.macos -I ../scripts mac_bundle
-
-mac_package:
-	$(MAKE) -f ../scripts/makefile.macos -I ../scripts mac_package
 
 iphone_package:
 	$(MAKE) -f ../scripts/makefile.iphone -I ../scripts iphone_package
@@ -112,32 +109,17 @@ install_flatpak:
 data_package:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts data_package
 
-steam_binary_package:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts steam_binary_package SYSTEM=$(SYSTEM)
-
 steam_packages:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts steam_packages
 
-mac_sign_bundle:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_sign_bundle
-
-mac_notarize_bundle:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_notarize_bundle
-
-mac_sign_and_notarize_bundle:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_sign_and_notarize_bundle
-
-mac_sign_package:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_sign_package
-
-mac_steam_package:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_steam_package
-
-mac_i386:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_i386
-
-mac_x86_64:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_x86_64
-
-mac_arm64:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts mac_arm64
+help:
+	@echo "\nRun 'make' without arguments to build en executable for the current plaform."
+	@echo "\nTargets available on all platforms:\n"
+	@echo "  install:             Install application onto the system (Linux only)"
+	@echo "  uninstall:           Uninstall appplication from the system (Linux only)"
+	@echo "  clean:               Clean up files produced by the build process."
+	@echo "  release:             Update 'docs/changelog' based on data in 'changes.txt'."
+	@echo "  source_package:      Create source code package with bundled data."
+	@echo "  source_only_package: Create source code package without bundled data."
+	@echo "  binary_package:      Create data and binary executable standalone package\n                       suitable for distrubition."
+	@echo "  steam_packages:      Create data and binary packages suitable for distribution\n                       through Steam."
