@@ -235,12 +235,12 @@ if [ "$#" -ne 1 ]; then
 fi
 
 START_PATH=$(pwd)
-if [ -f "/Applications/Android Studio.app" ];
+if [ -d "/Applications/Android Studio.app" ];
 then
   export ANDROID_STUDIO_PATH="/Applications/Android Studio.app"
 else
   echo "Android Studio not found in standard location, searching..."
-  export ANDROID_STUDIO_PATH=`find -L /Applications -name "Android Studio.app" -quit`
+  export ANDROID_STUDIO_PATH=`find -L /Applications -name "Android Studio.app"`
 fi
 
 mkdir -p $1
