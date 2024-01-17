@@ -222,6 +222,9 @@ function update_dependencies_for()
   ln -s $INSTALL_PREFIX deps
   cmake .. $CMAKE_SETTINGS -DWANT_DEMO=OFF -DWANT_DOCS=OFF -DWANT_EXAMPLES=OFF -DWANT_NATIVE_IMAGE_LOADER=OFF -DWANT_TESTS=NO -DZLIB_INCLUDE_DIR=$INSTALL_PREFIX/include -DZLIB_LIBRARY_RELEASE=$INSTALL_PREFIX/lib/libz.a -DWANT_IMAGE_FREEIMAGE=NO -DWANT_OPENAL=NO -DANDROID_TARGET=android-26
   make
+	sed -i '' "s|3.2.0|7.4.2|" android/gradle_project/build.gradle
+	sed -i '' "s|gradle-5.0-bin.zip|gradle-8.1.1-bin.zip|" android/gradle_project/gradle/wrapper/gradle-wrapper.properties
+  make
   make install
   cp lib/allegro-release.aar $INSTALL_PREFIX/lib
   cd ..
