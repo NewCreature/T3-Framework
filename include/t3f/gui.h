@@ -90,7 +90,7 @@ void t3f_select_previous_gui_element(T3F_GUI * pp);
 void t3f_select_next_gui_element(T3F_GUI * pp);
 void t3f_activate_selected_gui_element(T3F_GUI * pp, void * data);
 void t3f_reset_gui_input(T3F_GUI * pp);
-void t3f_process_gui(T3F_GUI * pp, void * data);
+bool t3f_process_gui(T3F_GUI * pp, void * data);
 void t3f_render_gui(T3F_GUI * pp);
 
 #ifdef __cplusplus

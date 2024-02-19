@@ -75,8 +75,10 @@ clean_packages:
 	@rm -f $(APP_PACKAGE_DIR)/*.tar.gz
 	@rm -f $(APP_PACKAGE_DIR)/*.zip
 	@rm -f $(APP_PACKAGE_DIR)/*.apk
+	@rm -f $(APP_PACKAGE_DIR)/*.aab
 	@rm -f $(APP_PACKAGE_DIR)/*.dmg
 	@rm -rf $(APP_PACKAGE_DIR)/*.app
+	@rm -rf $(APP_PACKAGE_DIR)/*.idsig
 	@rm -rf $(APP_PACKAGE_DIR)/*/
 
 #create tar.gz package for source code distribution

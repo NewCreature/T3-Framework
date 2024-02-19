@@ -480,12 +480,13 @@ void t3f_reset_gui_input(T3F_GUI * pp)
 	t3f_gui_mouse_y = t3f_mouse_y;
 }
 
-void t3f_process_gui(T3F_GUI * pp, void * data)
+bool t3f_process_gui(T3F_GUI * pp, void * data)
 {
 	int i;
 	bool mouse_moved = false;
 	bool touched = false;
 	float mouse_x = 0.0, mouse_y = 0.0;
+	bool ret = false;
 
 	/* check if the mouse has been moved */
 	if(check_mouse_moved())
@@ -531,8 +532,10 @@ void t3f_process_gui(T3F_GUI * pp, void * data)
 		if(touched && pp->hover_element >= 0)
 		{
 			t3f_activate_selected_gui_element(pp, data);
+			ret = true;
 		}
 	}
+	return ret;
 }
 
 void t3f_render_gui_element(T3F_GUI * pp, int i, bool hover)

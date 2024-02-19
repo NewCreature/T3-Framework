@@ -49,11 +49,17 @@ binary_package:
 debian_package:
 	$(MAKE) -f ../scripts/makefile.debian -I ../scripts debian_package
 
-android_package:
-	$(MAKE) -f ../scripts/makefile.android -I ../scripts android_package
+android_apk:
+	$(MAKE) -f ../scripts/makefile.android -I ../scripts android_apk
 
-android_bundle:
-	$(MAKE) -f ../scripts/makefile.android -I ../scripts android_bundle
+android_debug_apk:
+	$(MAKE) -f ../scripts/makefile.android -I ../scripts android_debug_apk
+
+android_aab:
+	$(MAKE) -f ../scripts/makefile.android -I ../scripts android_aab
+
+android_packages:
+	$(MAKE) -f ../scripts/makefile.android -I ../scripts android_packages
 
 android_install:
 	$(MAKE) -f ../scripts/makefile.android -I ../scripts android_install
@@ -115,11 +121,14 @@ steam_packages:
 help:
 	@echo "\nRun 'make' without arguments to build en executable for the current plaform."
 	@echo "\nTargets available on all platforms:\n"
-	@echo "  install:             Install application onto the system (Linux only)"
-	@echo "  uninstall:           Uninstall appplication from the system (Linux only)"
 	@echo "  clean:               Clean up files produced by the build process."
 	@echo "  release:             Update 'docs/changelog' based on data in 'changes.txt'."
 	@echo "  source_package:      Create source code package with bundled data."
 	@echo "  source_only_package: Create source code package without bundled data."
 	@echo "  binary_package:      Create data and binary executable standalone package\n                       suitable for distrubition."
 	@echo "  steam_packages:      Create data and binary packages suitable for distribution\n                       through Steam."
+	@echo "  android_package:     Create Android APK for standalone distribution."
+	@echo "  android_bundle:      Create Android AAB for distribution through the\n                       Google Play Store."
+	@echo "\nLinux-only targets:\n"
+	@echo "  install:             Install application onto the system."
+	@echo "  uninstall:           Uninstall appplication from the system.\n"

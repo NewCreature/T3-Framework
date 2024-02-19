@@ -34,6 +34,8 @@
 #define T3F_USE_MENU           2048
 #define T3F_NO_SCALE           4096
 #define T3F_USE_FIXED_PIPELINE 8192
+#define T3F_ANY_ORIENTATION   16384
+#define T3F_RESET_DISPLAY     32768
 #define T3F_DEFAULT (T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_JOYSTICK | T3F_USE_TOUCH | T3F_USE_SOUND | T3F_FORCE_ASPECT)
 
 #define T3F_MAX_OPTIONS                 64
@@ -47,17 +49,20 @@
 
 #define T3F_MAX_JOYSTICKS 16
 
-#define T3F_MAX_TOUCHES   64
+#define T3F_MAX_TOUCHES   16
 
 #define T3F_MAX_STACK     16
 
 typedef struct
 {
 
+	int id; // track which id this touch is associated with
+
+	/* user-facing members */
 	bool active; // is this touch active?
 	bool pressed;
 	bool released;
-  float real_x, real_y; // the actual screen coordinates
+	float real_x, real_y; // the actual screen coordinates
 	float x, y; // coordinates transformed to for a view
 	bool primary;
 

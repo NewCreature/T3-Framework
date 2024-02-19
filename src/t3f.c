@@ -64,6 +64,7 @@ bool t3f_joystick_state_updated[T3F_MAX_JOYSTICKS] = {false};
 
 /* touch data */
 T3F_TOUCH t3f_touch[T3F_MAX_TOUCHES];
+static int _t3f_touch_slot = 1; // reserve slot 0 for mouse
 
 //ALLEGRO_TRANSFORM t3f_base_transform;
 ALLEGRO_TRANSFORM t3f_current_transform;
@@ -503,6 +504,10 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 		{
 			t3f_flags |= T3F_USE_TOUCH;
 		}
+		for(i = 0; i < T3F_MAX_TOUCHES; i++)
+		{
+			t3f_touch[i].id = -1;
+		}
 	}
 	al_init_primitives_addon();
 	#ifndef ALLEGRO_ANDROID
@@ -699,6 +704,13 @@ static int t3f_set_new_gfx_mode(int w, int h, int flags)
 	/* update settings if we successfully set the new mode */
 	if(ret == 1)
 	{
+		if(flags & T3F_RESET_DISPLAY)
+		{
+			t3f_default_view->virtual_width = w;
+			t3f_default_view->virtual_height = h;
+			t3f_virtual_display_width = w;
+			t3f_virtual_display_height = h;
+		}
 		handle_view_resize();
 		if(t3f_flags & T3F_USE_FULLSCREEN)
 		{
@@ -775,15 +787,23 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 		{
 			t3f_flags |= T3F_NO_SCALE;
 		}
-		/* if we are using console (for a server, for instance) don't create display */
-		if(w > h)
+		if(flags & T3F_ANY_ORIENTATION)
 		{
-			al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
+			al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_ALL, ALLEGRO_REQUIRE);
+			t3f_flags |= T3F_ANY_ORIENTATION;
 		}
 		else
 		{
-			al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT, ALLEGRO_REQUIRE);
+			if(w > h)
+			{
+				al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_REQUIRE);
+			}
+			else
+			{
+				al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT, ALLEGRO_REQUIRE);
+			}
 		}
+		/* if we are using console (for a server, for instance) don't create display */
 		cvalue = al_get_config_value(t3f_config, "T3F", "force_fullscreen");
 		cvalue2 = al_get_config_value(t3f_config, "T3F", "force_window");
 		if(((flags & T3F_USE_FULLSCREEN || (cvalue && !strcmp(cvalue, "true"))) && !(cvalue2 && !strcmp(cvalue2, "true"))) || no_windowed)
@@ -1225,6 +1245,20 @@ bool t3f_copy_file(const char * src, const char * dest)
 	return true;
 }
 
+static int _get_touch_slot_by_id(int id)
+{
+	int i;
+
+	for(i = 0; i < T3F_MAX_TOUCHES; i++)
+	{
+		if(t3f_touch[i].id == id)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
 void t3f_event_handler(ALLEGRO_EVENT * event)
 {
 	switch(event->type)
@@ -1262,6 +1296,11 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 			t3f_unload_resources();
 			t3f_reload_resources();
 			t3f_rebuild_atlases();
+			break;
+		}
+
+		case ALLEGRO_EVENT_DISPLAY_ORIENTATION:
+		{
 			break;
 		}
 
@@ -1410,28 +1449,43 @@ void t3f_event_handler(ALLEGRO_EVENT * event)
 
 		case ALLEGRO_EVENT_TOUCH_BEGIN:
 		{
-			t3f_touch[event->touch.id + 1].active = true;
-			t3f_touch[event->touch.id + 1].real_x = event->touch.x;
-			t3f_touch[event->touch.id + 1].real_y = event->touch.y;
-			t3f_touch[event->touch.id + 1].primary = event->touch.primary;
-			t3f_touch[event->touch.id + 1].pressed = true;
+			t3f_touch[_t3f_touch_slot].id = event->touch.id;
+			t3f_touch[_t3f_touch_slot].active = true;
+			t3f_touch[_t3f_touch_slot].real_x = event->touch.x;
+			t3f_touch[_t3f_touch_slot].real_y = event->touch.y;
+			t3f_touch[_t3f_touch_slot].primary = event->touch.primary;
+			t3f_touch[_t3f_touch_slot].pressed = true;
+			_t3f_touch_slot++;
+			if(_t3f_touch_slot >= T3F_MAX_TOUCHES)
+			{
+				_t3f_touch_slot = 1;
+			}
 			break;
 		}
 
 		case ALLEGRO_EVENT_TOUCH_MOVE:
 		{
-			t3f_touch[event->touch.id + 1].real_x = event->touch.x;
-			t3f_touch[event->touch.id + 1].real_y = event->touch.y;
+			int touch_slot = _get_touch_slot_by_id(event->touch.id);
+			if(touch_slot >= 0)
+			{
+				t3f_touch[touch_slot].real_x = event->touch.x;
+				t3f_touch[touch_slot].real_y = event->touch.y;
+			}
 			break;
 		}
 
 		case ALLEGRO_EVENT_TOUCH_END:
 		case ALLEGRO_EVENT_TOUCH_CANCEL:
 		{
-			t3f_touch[event->touch.id + 1].active = false;
-			t3f_touch[event->touch.id + 1].real_x = event->touch.x;
-			t3f_touch[event->touch.id + 1].real_y = event->touch.y;
-			t3f_touch[event->touch.id + 1].released = true;
+			int touch_slot = _get_touch_slot_by_id(event->touch.id);
+			if(touch_slot >= 0)
+			{
+				t3f_touch[touch_slot].active = false;
+				t3f_touch[touch_slot].real_x = event->touch.x;
+				t3f_touch[touch_slot].real_y = event->touch.y;
+				t3f_touch[touch_slot].released = true;
+				t3f_touch[touch_slot].id = -1; // invalidate slot
+			}
 			break;
 		}
 
