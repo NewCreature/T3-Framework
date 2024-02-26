@@ -116,7 +116,7 @@ data_package:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts data_package
 
 steam_packages:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts steam_packages
+	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts steam_packages CL_CFLAGS=-DT3F_ENABLE_STEAM_INTEGRATION CL_STEAM_BUILD=1
 
 help:
 	@echo "\nRun 'make' without arguments to build en executable for the current plaform."
@@ -127,8 +127,7 @@ help:
 	@echo "  source_only_package: Create source code package without bundled data."
 	@echo "  binary_package:      Create data and binary executable standalone package\n                       suitable for distrubition."
 	@echo "  steam_packages:      Create data and binary packages suitable for distribution\n                       through Steam."
-	@echo "  android_package:     Create Android APK for standalone distribution."
-	@echo "  android_bundle:      Create Android AAB for distribution through the\n                       Google Play Store."
+	@echo "  android_packages:    Create Android APK for standalone distribution and\n                       Android AAB for distribution through the Google Play\n                       Store."
 	@echo "\nLinux-only targets:\n"
 	@echo "  install:             Install application onto the system."
 	@echo "  uninstall:           Uninstall appplication from the system.\n"

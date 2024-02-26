@@ -3,7 +3,7 @@ T3F_PLATFORM_NAME = macos
 T3F_PLATFORM_ARCHITECTURE = any
 T3F_CXX_STDLIB = -l$(MACOS_CXX_STDLIB)
 CC = $(MACOS_CC)
-CFLAGS = $(APP_CFLAGS) $(T3F_CFLAGS) $(MACOS_ARCHITECTURES) $(MACOS_CONFIG_CFLAGS) $(MACOS_SYS_ROOT) $(MACOS_MIN_VERSION) $(MACOS_CXX_STANDARD) $(APP_CFLAGS) $(MACOS_CFLAGS) -I/usr/local/include
+CFLAGS = $(APP_CFLAGS) $(T3F_CFLAGS) $(CL_CFLAGS) $(MACOS_ARCHITECTURES) $(MACOS_CONFIG_CFLAGS) $(MACOS_SYS_ROOT) $(MACOS_MIN_VERSION) $(MACOS_CXX_STANDARD) $(APP_CFLAGS) $(MACOS_CFLAGS) -I/usr/local/include
 CXX = $(MACOS_CXX)
 CXXFLAGS = $(APP_CXXFLAGS) $(MACOS_CXXFLAGS) $(CFLAGS) $(MACOS_CONFIG_CXXFLAGS) -stdlib=lib$(MACOS_CXX_STDLIB)
 LFLAGS = $(MACOS_CONFIG_LFLAGS) $(MACOS_ARCHITECTURES) $(MACOS_SYS_ROOT) $(MACOS_MIN_VERSION) -L/usr/local/lib -stdlib=lib$(MACOS_CXX_STDLIB)
@@ -158,4 +158,4 @@ binary_package: mac_package mac_sign_package
 	@echo Successfully built distributable binary package for the current platform.
 
 steam_packages: mac_steam_package
-	@Sucessfully built Steam packages for the current platform.
+	@echo Sucessfully built Steam packages for the current platform.

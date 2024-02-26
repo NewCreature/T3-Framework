@@ -5,6 +5,15 @@
 ########################################################
 #CONFIG_SETTING =
 
+##################
+# Steam Settings #
+##################
+#ifdef CL_STEAM_BUILD
+#  CONFIG_STEAMWORKS_SDK_PATH =
+#  CONFIG_STEAMWORKS_PLATFORM =
+#  CONFIG_STEAMWORKS_LFLAGS =
+#endif
+
 ####################
 # Android Settings #
 ####################
