@@ -94,8 +94,11 @@ demo:
 demo_gp:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts demo_gp
 
+windows_icon:
+	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts ../icons/windows_icon.ico
+
 makeicon:
-	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts ../windows/makeicon
+	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts ../tools/makeicon
 
 reset_config:
 	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts reset_config

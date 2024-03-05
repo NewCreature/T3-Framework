@@ -116,7 +116,7 @@ mac_universal_bundle:
 	make mac_bundle
 
 mac_package: clean clean_packages mac_universal_bundle mac_sign_and_notarize_bundle
-	../macos/create-dmg --volname $(APP_TITLE) --volicon $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Resources/$(APP_TITLE).icns --window-size 400 232 --icon-size 96 --icon "$(APP_TITLE)" 110 100 --app-drop-link 280 100 $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos.dmg $(APP_PACKAGE_DIR)/$(APP_TITLE).app
+	../tools/create-dmg/create-dmg --volname $(APP_TITLE) --volicon $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Resources/$(APP_TITLE).icns --window-size 400 232 --icon-size 96 --icon "$(APP_TITLE)" 110 100 --app-drop-link 280 100 $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos.dmg $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 
 mac_sign_bundle: $(APP_PACKAGE_DIR)/$(APP_TITLE).app ../macos/entitlements.plist
 ifdef MACOS_CONFIG_APPLE_TEAM_ID
