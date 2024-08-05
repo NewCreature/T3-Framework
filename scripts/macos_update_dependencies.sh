@@ -108,7 +108,7 @@ cd ..
 SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DOPUS_USE_NEON=OFF
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
 make
 merge_libs ./ ../_build_x86 libopus.a
 sudo make install
@@ -227,17 +227,23 @@ then
 fi
 cd libpng
 git pull
-remake_dir _build_x86
-cd _build_x86
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DPNG_EXECUTABLES=OFF -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DPNG_BUILD_ZLIB=ON -DCMAKE_C_FLAGS="-arch x86_64"
+remake_dir _build_i386
+cd _build_i386
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DPNG_TOOLS=OFF -DPNG_SHARED=OFF -DPNG_FRAMEWORK=OFF -DPNG_TESTS=OFF -DZLIB_ROOT=/usr/local
+make
+cd ..
+remake_dir _build_x86_64
+cd _build_x86_64
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DPNG_TOOLS=OFF -DPNG_SHARED=OFF -DPNG_FRAMEWORK=OFF -DPNG_TESTS=OFF -DZLIB_ROOT=/usr/local
 make
 cd ..
 SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DPNG_EXECUTABLES=OFF -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DPNG_ARM_NEON=off -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DPNG_BUILD_ZLIB=ON
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DPNG_TOOLS=OFF -DPNG_SHARED=OFF -DPNG_FRAMEWORK=OFF -DPNG_TESTS=OFF -DPNG_ARM_NEON=off -DZLIB_ROOT=/usr/local
 make
-merge_libs ./ ../_build_x86 libpng16.a
+merge_libs ./ ../_build_i386 libpng16.a
+merge_libs ./ ../_build_x86_64 libpng16.a
 sudo make install
 cd ..
 cd ..
@@ -250,9 +256,14 @@ then
 fi
 cd libjpeg-turbo
 git pull
-remake_dir _build_x86
-cd _build_x86
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DENABLE_SHARED=OFF
+remake_dir _build_i386
+cd _build_i386
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DENABLE_SHARED=OFF
+make
+cd ..
+remake_dir _build_x86_64
+cd _build_x86_64
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DENABLE_SHARED=OFF
 make
 cd ..
 SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
@@ -260,7 +271,8 @@ remake_dir _build_arm
 cd _build_arm
 cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DENABLE_SHARED=OFF
 make
-merge_libs ./ ../_build_x86 libjpeg.a
+merge_libs ./ ../_build_i386 libjpeg.a
+merge_libs ./ ../_build_x86_64 libjpeg.a
 sudo make install
 cd ..
 cd ..
@@ -275,13 +287,13 @@ cd libwebp
 git pull
 remake_dir _build_x86
 cd _build_x86
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DWEBP_BUILD_CWEBP=OFF -DWEBP_BUILD_DWEBP=OFF
 make
 cd ..
 SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
 remake_dir _build_arm
 cd _build_arm
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DWEBP_BUILD_CWEBP=OFF -DWEBP_BUILD_DWEBP=OFF
 make
 merge_libs ./ ../_build_x86 libwebp.a
 merge_libs ./ ../_build_x86 libsharpyuv.a
