@@ -220,8 +220,8 @@ void dot_game_move_player(void)
 	{
 		ox = dot_game.player.x;
 		oy = dot_game.player.y;
-		dot_game.player.x = t3f_mouse_x - 8.0;
-		dot_game.player.y = t3f_mouse_y - 8.0;
+		dot_game.player.x = t3f_get_mouse_x() - 8.0;
+		dot_game.player.y = t3f_get_mouse_y() - 8.0;
 		
 		/* prevent player from moving past the edge */
 		if(dot_game.player.x < 0.0)
@@ -357,9 +357,8 @@ void dot_game_logic(void)
 				dot_game.state = DOT_GAME_STATE_PLAY;
 				dot_game.state_tick = 0;
 				dot_game.player.active = true;
+				t3f_set_mouse_xy(240, 240);
 				al_set_mouse_xy(t3f_display, 240, 240);
-				t3f_mouse_x = 240.0;
-				t3f_mouse_y = 240.0;
 			}
 			
 			/* handle ball logic */
@@ -402,7 +401,7 @@ void dot_game_render_hud(void)
 	char buffer[256] = {0};
 	ALLEGRO_COLOR shadow = al_map_rgba_f(0.0, 0.0, 0.0, 0.25);
 	
-	al_draw_bitmap(dot_bitmap[DOT_BITMAP_HUD], 480.0, 0.0, 0);
+	al_draw_bitmap(dot_bitmap[DOT_BITMAP_HUD]->bitmap, 480.0, 0.0, 0);
 	sprintf(buffer, "High");
 	dot_shadow_text(dot_font, t3f_color_black, shadow, 480 + 8, 8, 2, 2, 0, buffer);
 	sprintf(buffer, "  %07d", dot_game.high_score);
@@ -424,8 +423,8 @@ void dot_game_render_hud(void)
 	sprintf(buffer, "       %02d", dot_game.lives);
 	dot_shadow_text(dot_font, t3f_color_black, shadow, 480 + 8, 184, 2, 2, 0, buffer);
 	
-	al_draw_scaled_bitmap(dot_bitmap[DOT_BITMAP_BALL_RED + dot_game.player.type], 0, 0, 16, 16, 480 + 16, 336, 128, 128, 0);
-	al_draw_scaled_rotated_bitmap(dot_bitmap[DOT_BITMAP_BALL_EYES], 8.0, 8.0, 480.0 + 80.0, 336 + 64 + 16, 8, 8, ALLEGRO_PI / 2.0, 0);
+	al_draw_scaled_bitmap(dot_bitmap[DOT_BITMAP_BALL_RED + dot_game.player.type]->bitmap, 0, 0, 16, 16, 480 + 16, 336, 128, 128, 0);
+	al_draw_scaled_rotated_bitmap(dot_bitmap[DOT_BITMAP_BALL_EYES]->bitmap, 8.0, 8.0, 480.0 + 80.0, 336 + 64 + 16, 8, 8, ALLEGRO_PI / 2.0, 0);
 }
 
 /* main game render function */

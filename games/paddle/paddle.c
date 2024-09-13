@@ -127,7 +127,7 @@ void paddle_logic(void * data)
 
 		case EXAMPLE_STATE_TITLE:
 		{
-			t3f_process_gui(paddle_menu, data);
+			t3f_process_gui(paddle_menu, 0, data);
 			break;
 		}
 
@@ -135,7 +135,7 @@ void paddle_logic(void * data)
 		{
 
 			/* return to menu if Escape pressed */
-			if(t3f_key[ALLEGRO_KEY_ESCAPE])
+			if(t3f_key_held(ALLEGRO_KEY_ESCAPE))
 			{
 				paddle_game_exit();
 			}
@@ -145,7 +145,7 @@ void paddle_logic(void * data)
 			paddle[1].oy = paddle[1].y;
 
 			/* move paddle */
-			paddle[0].y = t3f_mouse_y - 32;
+			paddle[0].y = t3f_get_mouse_y() - 32;
 			if(paddle[0].y < 0)
 			{
 				paddle[0].y = 0;
@@ -271,7 +271,7 @@ void paddle_logic(void * data)
 		{
 
 			/* return to menu if Escape pressed */
-			if(t3f_mouse_button[0] || t3f_key[ALLEGRO_KEY_ESCAPE])
+			if(t3f_mouse_button_pressed(0) || t3f_key_held(ALLEGRO_KEY_ESCAPE))
 			{
 				paddle_game_exit();
 			}
@@ -298,7 +298,7 @@ void paddle_render(void * data)
 			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_LOGO], al_get_display_width(t3f_display) / 2 - al_get_bitmap_width(paddle_bitmap[EXAMPLE_BITMAP_LOGO]) / 2, 32.0, 0);
 
 			/* draw menu */
-			t3f_render_gui(paddle_menu);
+			t3f_render_gui(paddle_menu, 0);
 
 			break;
 		}

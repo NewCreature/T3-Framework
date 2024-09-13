@@ -23,4 +23,8 @@ T3F_CORE_OBJECTS =\
     t3f/png.o\
     t3f/input.o\
     t3f/achievements.o\
-    t3f/steam.o
+    t3f/steam.o\
+    t3f/async.o\
+    t3f/mouse.o\
+    t3f/keyboard.o\
+    t3f/touch.o

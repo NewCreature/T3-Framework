@@ -9,29 +9,29 @@ int text_pos = 0;
 
 void logic(void * data)
 {
-	if(t3f_key[ALLEGRO_KEY_ESCAPE])
+	if(t3f_key_held(ALLEGRO_KEY_ESCAPE))
 	{
 		t3f_exit();
 	}
-	else if(t3f_key[ALLEGRO_KEY_LEFT])
+	else if(t3f_key_held(ALLEGRO_KEY_LEFT))
 	{
 		x -= 0.5;
 	}
-	else if(t3f_key[ALLEGRO_KEY_RIGHT])
+	else if(t3f_key_held(ALLEGRO_KEY_RIGHT))
 	{
 		x += 0.5;
 	}
-	else if(t3f_key[ALLEGRO_KEY_UP])
+	else if(t3f_key_held(ALLEGRO_KEY_UP))
 	{
 		y -= 0.5;
 	}
-	else if(t3f_key[ALLEGRO_KEY_DOWN])
+	else if(t3f_key_held(ALLEGRO_KEY_DOWN))
 	{
 		y += 0.5;
 	}
 	else
 	{
-		int k = t3f_read_key(0);
+		int k = t3f_get_char(0);
 		switch(k)
 		{
 			case '\b':

@@ -22,7 +22,7 @@ void ve_logic(void * data)
 {
 	int i, j;
 	
-	if(t3f_key[ALLEGRO_KEY_F2] && object)
+	if(t3f_key_pressed(ALLEGRO_KEY_F2) && object)
 	{
 		ALLEGRO_FILECHOOSER * file_save_dialog = NULL;
 		ALLEGRO_PATH * save_path = NULL;
@@ -44,9 +44,9 @@ void ve_logic(void * data)
 			al_destroy_native_file_dialog(file_save_dialog);
 			al_start_timer(t3f_timer);
 		}
-		t3f_key[ALLEGRO_KEY_F2] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F2);
 	}
-	if(t3f_key[ALLEGRO_KEY_F3])
+	if(t3f_key_pressed(ALLEGRO_KEY_F3))
 	{
 		ALLEGRO_FILECHOOSER * file_load_dialog = NULL;
 		const char * rp = NULL;
@@ -68,21 +68,21 @@ void ve_logic(void * data)
 			al_destroy_native_file_dialog(file_load_dialog);
 			al_start_timer(t3f_timer);
 		}
-		t3f_key[ALLEGRO_KEY_F3] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F3);
 	}
-	if(t3f_key[ALLEGRO_KEY_F4])
+	if(t3f_key_pressed(ALLEGRO_KEY_F4))
 	{
 		if(object)
 		{
 			t3f_destroy_vector_object(object);
 		}
 		object = t3f_create_vector_object();
-		t3f_key[ALLEGRO_KEY_F4] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F4);
 	}
 	
 	if(object)
 	{
-		if(t3f_key[ALLEGRO_KEY_DELETE])
+		if(t3f_key_pressed(ALLEGRO_KEY_DELETE))
 		{
 			if(segment < object->segments)
 			{
@@ -92,9 +92,9 @@ void ve_logic(void * data)
 					segment = 0;
 				}
 			}
-			t3f_key[ALLEGRO_KEY_DELETE] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_DELETE);
 		}
-		if(!t3f_mouse_button[0])
+		if(!t3f_mouse_button_held(0))
 		{
 			hover_segment = -1;
 			hover_point = -1;
@@ -102,7 +102,7 @@ void ve_logic(void * data)
 			{
 				for(j = 0; j < 2; j++)
 				{
-					if(t3f_mouse_x >= 32 + (object->segment[i]->point[j].x) * scale - 4.0 && t3f_mouse_x <= 32 + (object->segment[i]->point[j].x) * scale + 4.0 && t3f_mouse_y >= 32 + (object->segment[i]->point[j].y) * scale - 4.0 && t3f_mouse_y <= 32 + (object->segment[i]->point[j].y) * scale + 4.0)
+					if(t3f_get_mouse_x() >= 32 + (object->segment[i]->point[j].x) * scale - 4.0 && t3f_get_mouse_x() <= 32 + (object->segment[i]->point[j].x) * scale + 4.0 && t3f_get_mouse_y() >= 32 + (object->segment[i]->point[j].y) * scale - 4.0 && t3f_get_mouse_y() <= 32 + (object->segment[i]->point[j].y) * scale + 4.0)
 					{
 						hover_segment = i;
 						hover_point = j;
@@ -112,7 +112,7 @@ void ve_logic(void * data)
 			}
 		}
 		
-		if(t3f_mouse_button[0])
+		if(t3f_mouse_button_held(0))
 		{
 			if(hover_segment >= 0 && hover_point >= 0)
 			{
@@ -123,18 +123,18 @@ void ve_logic(void * data)
 			{
 				if(grid_snap)
 				{
-					object->segment[segment]->point[point].x = (int)((float)(t3f_mouse_x - 32) / scale + 0.5);
-					object->segment[segment]->point[point].y = (int)((float)(t3f_mouse_y - 32) / scale + 0.5);
+					object->segment[segment]->point[point].x = (int)((float)(t3f_get_mouse_x() - 32) / scale + 0.5);
+					object->segment[segment]->point[point].y = (int)((float)(t3f_get_mouse_y() - 32) / scale + 0.5);
 				}
 				else
 				{
-					object->segment[segment]->point[point].x = (float)(t3f_mouse_x - 32) / scale;
-					object->segment[segment]->point[point].y = (float)(t3f_mouse_y - 32) / scale;
+					object->segment[segment]->point[point].x = (float)(t3f_get_mouse_x() - 32) / scale;
+					object->segment[segment]->point[point].y = (float)(t3f_get_mouse_y() - 32) / scale;
 				}
 			}
 		}
 		
-		if(t3f_mouse_button[1])
+		if(t3f_mouse_button_held(1))
 		{
 			if(!old_mouse_b[1])
 			{
@@ -142,11 +142,11 @@ void ve_logic(void * data)
 				{
 					if(grid_snap)
 					{
-						t3f_add_vector_segment(object, (int)((float)(t3f_mouse_x - 32) / scale + 0.5), (int)((float)(t3f_mouse_y - 32) / scale + 0.5), 0.0, (int)((float)(t3f_mouse_x - 32) / scale + 0.5), (int)((float)(t3f_mouse_y - 32) / scale + 0.5), 0.0, color, 1.0);
+						t3f_add_vector_segment(object, (int)((float)(t3f_get_mouse_x() - 32) / scale + 0.5), (int)((float)(t3f_get_mouse_y() - 32) / scale + 0.5), 0.0, (int)((float)(t3f_get_mouse_x() - 32) / scale + 0.5), (int)((float)(t3f_get_mouse_y() - 32) / scale + 0.5), 0.0, color, 1.0);
 					}
 					else
 					{
-						t3f_add_vector_segment(object, (float)(t3f_mouse_x - 32) / scale, (float)(t3f_mouse_y - 32) / scale, 0.0, (float)(t3f_mouse_x - 32) / scale, (float)(t3f_mouse_y - 32) / scale, 0.0, color, 1.0);
+						t3f_add_vector_segment(object, (float)(t3f_get_mouse_x() - 32) / scale, (float)(t3f_get_mouse_y() - 32) / scale, 0.0, (float)(t3f_get_mouse_x() - 32) / scale, (float)(t3f_get_mouse_y() - 32) / scale, 0.0, color, 1.0);
 					}
 					segment = object->segments - 1;
 					segment_started = true;
@@ -166,23 +166,23 @@ void ve_logic(void * data)
 		{
 			if(grid_snap)
 			{
-				object->segment[object->segments - 1]->point[1].x = (int)((float)(t3f_mouse_x - 32) / scale + 0.5);
-				object->segment[object->segments - 1]->point[1].y = (int)((float)(t3f_mouse_y - 32) / scale + 0.5);
+				object->segment[object->segments - 1]->point[1].x = (int)((float)(t3f_get_mouse_x() - 32) / scale + 0.5);
+				object->segment[object->segments - 1]->point[1].y = (int)((float)(t3f_get_mouse_y() - 32) / scale + 0.5);
 			}
 			else
 			{
-				object->segment[object->segments - 1]->point[1].x = (float)(t3f_mouse_x - 32) / scale;
-				object->segment[object->segments - 1]->point[1].y = (float)(t3f_mouse_y - 32) / scale;
+				object->segment[object->segments - 1]->point[1].x = (float)(t3f_get_mouse_x() - 32) / scale;
+				object->segment[object->segments - 1]->point[1].y = (float)(t3f_get_mouse_y() - 32) / scale;
 			}
-			if(t3f_key[ALLEGRO_KEY_UP])
+			if(t3f_key_pressed(ALLEGRO_KEY_UP))
 			{
 				object->segment[object->segments - 1]->thickness += 0.5;
-				t3f_key[ALLEGRO_KEY_UP] = 0;
+				t3f_use_key_press(ALLEGRO_KEY_UP);
 			}
-			if(t3f_key[ALLEGRO_KEY_DOWN] && object->segment[object->segments - 1]->thickness > 0.0)
+			if(t3f_key_pressed(ALLEGRO_KEY_DOWN) && object->segment[object->segments - 1]->thickness > 0.0)
 			{
 				object->segment[object->segments - 1]->thickness -= 0.5;
-				t3f_key[ALLEGRO_KEY_DOWN] = 0;
+				t3f_use_key_press(ALLEGRO_KEY_DOWN);
 			}
 		}
 	}

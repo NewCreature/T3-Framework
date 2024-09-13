@@ -6,11 +6,11 @@ bool playing = false;
 
 void logic(void * data)
 {
-	if(t3f_key[ALLEGRO_KEY_ESCAPE])
+	if(t3f_key_held(ALLEGRO_KEY_ESCAPE))
 	{
 		t3f_exit();
 	}
-	if(t3f_key[ALLEGRO_KEY_SPACE])
+	if(t3f_key_pressed(ALLEGRO_KEY_SPACE))
 	{
 		if(playing)
 		{
@@ -22,7 +22,7 @@ void logic(void * data)
 			t3f_resume_music();
 			playing = true;
 		}
-		t3f_key[ALLEGRO_KEY_SPACE] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_SPACE);
 	}
 }
 

@@ -13,17 +13,17 @@ ALLEGRO_COLOR bgcolor;
 
 void logic(void * data)
 {
-	if(t3f_key[ALLEGRO_KEY_ESCAPE])
+	if(t3f_key_held(ALLEGRO_KEY_ESCAPE))
 	{
 		t3f_exit();
 	}
-	t3f_process_gui(page, data);
+	t3f_process_gui(page, 0, data);
 }
 
 void render(void * data)
 {
 	al_clear_to_color(bgcolor);
-	t3f_render_gui(page);
+	t3f_render_gui(page, 0);
 }
 
 int red_proc(void * d, int i, void * p)

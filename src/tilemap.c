@@ -97,7 +97,7 @@ T3F_TILESET * t3f_load_tileset_f(ALLEGRO_FILE * fp, const char * fn)
 			for(i = 0; i < tsp->tiles; i++)
 			{
 				tsp->tile[i] = t3f_create_tile();
-				tsp->tile[i]->ap = t3f_load_animation_f(fp, fn);
+				tsp->tile[i]->ap = t3f_load_animation_f(fp, fn, 0);
 				if(!tsp->tile[i]->ap)
 				{
 					printf("load animation failed\n");

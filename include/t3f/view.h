@@ -12,11 +12,21 @@ typedef struct
 	int virtual_width;
 	int virtual_height;
 
-	/* offset of viewport */
+	/* aspect ratio */
+	float aspect_min;
+	float aspect_max;
+
+	/* user-specified offset of viewport */
 	float offset_x;
 	float offset_y;
 	float width;
 	float height;
+
+	/* adjusted offset of viewport (fot constraining aspect ratio) */
+	float adjusted_offset_x;
+	float adjusted_offset_y;
+	float adjusted_width;
+	float adjusted_height;
 
 	/* vanishing point */
 	float vp_x;
@@ -43,6 +53,7 @@ extern T3F_VIEW * t3f_default_view;
 extern T3F_VIEW * t3f_current_view;
 
 T3F_VIEW * t3f_create_view(float ox, float oy, float w, float h, float vpx, float vpy, int flags);
+void t3f_constrain_view_aspect_ratio(T3F_VIEW * vp, float min, float max);
 void t3f_set_view_virtual_dimensions(T3F_VIEW * vp, int w, int h);
 void t3f_adjust_view(T3F_VIEW * vp, float ox, float oy, float w, float h, float vpx, float vpy, int flags);
 void t3f_destroy_view(T3F_VIEW * vp);

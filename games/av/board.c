@@ -9,7 +9,7 @@ void generate_board_layout(GAME * gp)
 	rn = 1;
 	if(gp->board.layout)
 	{
-		al_destroy_bitmap(gp->board.layout);
+		t3f_destroy_bitmap(gp->board.layout);
 	}
 	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
@@ -17,21 +17,21 @@ void generate_board_layout(GAME * gp)
 	{
 		case 0:
 		{
-			gp->board.layout = al_load_bitmap("data/graphics/layout1.pcx");
+			gp->board.layout = t3f_load_bitmap("data/graphics/layout1.pcx", 0, false);
 			break;
 		}
 		case 1:
 		{
-			gp->board.layout = al_load_bitmap("data/graphics/layout2.pcx");
+			gp->board.layout = t3f_load_bitmap("data/graphics/layout2.pcx", 0, false);
 			break;
 		}
 		case 2:
 		{
-			gp->board.layout = al_load_bitmap("data/graphics/layout3.pcx");
+			gp->board.layout = t3f_load_bitmap("data/graphics/layout3.pcx", 0, false);
 			break;
 		}
 	}
-	al_convert_mask_to_alpha(gp->board.layout, al_map_rgb(255, 0, 255));
+	al_convert_mask_to_alpha(gp->board.layout->bitmap, al_map_rgb(255, 0, 255));
 	al_restore_state(&old_state);
 }
 
@@ -96,7 +96,7 @@ void board_add_virus(GAME * gp)
 	{
 		for(j = 0; j < BOARD_RX; j++)
 		{
-			pixel = al_get_pixel(gp->board.layout, j, i + top - 1);
+			pixel = al_get_pixel(gp->board.layout->bitmap, j, i + top - 1);
 			al_unmap_rgba(pixel, &r, &g, &b, &a);
 			if(gp->board.data[i + top][j] == 0 && a)
 			{

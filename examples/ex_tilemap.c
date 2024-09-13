@@ -23,12 +23,12 @@ void logic(void * data)
 {
 	int mx, my, mz;
 	
-	if(t3f_key[ALLEGRO_KEY_ESCAPE])
+	if(t3f_key_held(ALLEGRO_KEY_ESCAPE))
 	{
 		t3f_exit();
 	}
 	t3f_get_mouse_mickeys(&mx, &my, &mz);
-	if(t3f_mouse_button[0])
+	if(t3f_mouse_button_pressed(0))
 	{
 		camera.x += mx;
 		camera.y += my;

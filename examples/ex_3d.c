@@ -8,19 +8,19 @@ typedef struct
 	
 } OBJECT;
 
-ALLEGRO_BITMAP * bitmap = NULL;
+T3F_BITMAP * bitmap = NULL;
 float camera_x = 0.0;
 float camera_z = 0.0;
 OBJECT object[20];
 
 void logic(void * data)
 {
-	if(t3f_key[ALLEGRO_KEY_ESCAPE])
+	if(t3f_key_held(ALLEGRO_KEY_ESCAPE))
 	{
 		t3f_exit();
 	}
-	camera_x = t3f_mouse_x;
-	camera_z = t3f_mouse_y * 2 - 480;
+	camera_x = t3f_get_mouse_x();
+	camera_z = t3f_get_mouse_y() * 2 - 480;
 }
 
 void render(void * data)
@@ -63,7 +63,7 @@ int main(int argc, char * argv[])
 		return 1;
 	}
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
-	bitmap = al_load_bitmap("data/bitmap.png");
+	bitmap = t3f_load_bitmap("data/bitmap.png", 0, false);
 	if(!bitmap)
 	{
 		return 1;

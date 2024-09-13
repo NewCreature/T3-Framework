@@ -10,24 +10,21 @@ void logic(void * data)
 {
 	float vol, pan;
 	
-	if(t3f_key[ALLEGRO_KEY_ESCAPE])
+	if(t3f_key_held(ALLEGRO_KEY_ESCAPE))
 	{
 		t3f_exit();
 	}
-	if(t3f_key[ALLEGRO_KEY_SPACE])
+	if(t3f_key_pressed(ALLEGRO_KEY_SPACE))
 	{
 		t3f_queue_sample(queue_sample);
-		t3f_key[ALLEGRO_KEY_SPACE] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_SPACE);
 	}
-	if(t3f_mouse_button[0])
+	if(t3f_mouse_button_pressed(0))
 	{
-		if(!was_clicked)
-		{
-			vol = t3f_get_sound_gain(320, 240, t3f_mouse_x, t3f_mouse_y, 320);
-			pan = t3f_get_sound_position(320, 240, t3f_mouse_x, t3f_mouse_y);
-			t3f_play_sample(sample, vol, pan, 1.0);
-			was_clicked = true;
-		}
+		vol = t3f_get_sound_gain(320, 240, t3f_get_mouse_x(), t3f_get_mouse_y(), 320);
+		pan = t3f_get_sound_position(320, 240, t3f_get_mouse_x(), t3f_get_mouse_y());
+		t3f_play_sample(sample, vol, pan, 1.0);
+		t3f_use_mouse_button_press(0);
 	}
 	else
 	{

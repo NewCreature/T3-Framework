@@ -14,7 +14,7 @@ typedef struct
     char data[BOARD_RY][BOARD_RX];
     char color_data[BOARD_RY][BOARD_RX];
     char match_data[BOARD_RY][BOARD_RX];
-    ALLEGRO_BITMAP * layout;
+    T3F_BITMAP * layout;
     
 } BOARD;
 
@@ -41,8 +41,8 @@ typedef struct
 typedef struct
 {
 	
-    ALLEGRO_BITMAP * backdrop;
-    ALLEGRO_BITMAP * block[THEME_BLOCK_TYPES];
+    T3F_BITMAP * backdrop;
+    T3F_BITMAP * block[THEME_BLOCK_TYPES];
     T3F_ANIMATION * virus[3];
     ALLEGRO_SAMPLE * sound[THEME_SOUND_TYPES];
     

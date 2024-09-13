@@ -15,7 +15,10 @@ T3F_ATLAS * t3f_create_atlas(int w, int h)
 	{
 		return NULL;
 	}
+	al_store_state(&old_state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
+	al_set_new_bitmap_flags(al_get_new_bitmap_flags() | ALLEGRO_NO_PRESERVE_TEXTURE);
 	ap->page = al_create_bitmap(w, h);
+	al_restore_state(&old_state);
 	if(!ap->page)
 	{
 		al_free(ap);
@@ -60,30 +63,41 @@ void t3f_destroy_atlas(T3F_ATLAS * ap)
 	}
 }
 
-static void t3f_actually_put_bitmap_on_atlas_fbo(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, int type)
+static void t3f_actually_put_bitmap_on_atlas_fbo(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, int flags)
 {
-	switch(type)
+	if(flags & T3F_ATLAS_TILE_CONNECT_LEFT)
 	{
-		case T3F_ATLAS_TILE:
+		if(flags & T3F_ATLAS_TILE_CONNECT_TOP)
 		{
-			/* need to extend edges of tiles so they don't have soft edges */
 			al_draw_bitmap(bp, ap->x, ap->y, 0);
-			al_draw_bitmap(bp, ap->x + 2, ap->y, 0);
-			al_draw_bitmap(bp, ap->x, ap->y + 2, 0);
-			al_draw_bitmap(bp, ap->x + 2, ap->y + 2, 0);
-			al_draw_bitmap(bp, ap->x + 1, ap->y, 0);
-			al_draw_bitmap(bp, ap->x + 1, ap->y + 2, 0);
-			al_draw_bitmap(bp, ap->x, ap->y + 1, 0);
-			al_draw_bitmap(bp, ap->x + 2, ap->y + 1, 0);
-			al_draw_bitmap(bp, ap->x + 1, ap->y + 1, 0);
-			break;
 		}
-		case T3F_ATLAS_SPRITE:
+		if(flags & T3F_ATLAS_TILE_CONNECT_BOTTOM)
 		{
-			al_draw_bitmap(bp, ap->x + 1, ap->y + 1, 0);
-			break;
+			al_draw_bitmap(bp, ap->x, ap->y + 2, 0);
 		}
+		al_draw_bitmap(bp, ap->x, ap->y + 1, 0);
 	}
+	if(flags & T3F_ATLAS_TILE_CONNECT_RIGHT)
+	{
+		if(flags & T3F_ATLAS_TILE_CONNECT_TOP)
+		{
+			al_draw_bitmap(bp, ap->x + 2, ap->y, 0);
+		}
+		if(flags & T3F_ATLAS_TILE_CONNECT_BOTTOM)
+		{
+			al_draw_bitmap(bp, ap->x + 2, ap->y + 2, 0);
+		}
+		al_draw_bitmap(bp, ap->x + 2, ap->y + 1, 0);
+	}
+	if(flags & T3F_ATLAS_TILE_CONNECT_TOP)
+	{
+		al_draw_bitmap(bp, ap->x + 1, ap->y, 0);
+	}
+	if(flags & T3F_ATLAS_TILE_CONNECT_BOTTOM)
+	{
+		al_draw_bitmap(bp, ap->x + 1, ap->y + 2, 0);
+	}
+	al_draw_bitmap(bp, ap->x + 1, ap->y + 1, 0);
 }
 
 static void t3f_pixel_copy_bitmap(ALLEGRO_BITMAP * src, ALLEGRO_BITMAP * dest, int x, int y)
@@ -133,13 +147,13 @@ static void t3f_actually_put_bitmap_on_atlas_pixel_copy(T3F_ATLAS * ap, ALLEGRO_
 	}
 }
 
-ALLEGRO_BITMAP * t3f_put_bitmap_on_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int type)
+ALLEGRO_BITMAP * t3f_put_bitmap_on_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int flags)
 {
 	ALLEGRO_STATE old_state;
 	ALLEGRO_BITMAP * retbp = NULL;
 	ALLEGRO_TRANSFORM identity_transform;
 
-	if(ap->y >= al_get_bitmap_height(ap->page))
+	if(ap->y + al_get_bitmap_height(*bp) + 2 >= al_get_bitmap_height(ap->page))
 	{
 		return NULL;
 	}
@@ -157,13 +171,13 @@ ALLEGRO_BITMAP * t3f_put_bitmap_on_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, i
 		ap->y += ap->line_height;
 
 		/* if it still doesn't fit, fail */
-		if(ap->y  + al_get_bitmap_height(*bp) + 2 >= al_get_bitmap_height(ap->page))
+		if(ap->y + al_get_bitmap_height(*bp) + 2 >= al_get_bitmap_height(ap->page))
 		{
 			al_restore_state(&old_state);
 			return NULL;
 		}
 	}
-	t3f_actually_put_bitmap_on_atlas_fbo(ap, *bp, type);
+	t3f_actually_put_bitmap_on_atlas_fbo(ap, *bp, flags);
 	retbp = al_create_sub_bitmap(ap->page, ap->x + 1, ap->y + 1, al_get_bitmap_width(*bp), al_get_bitmap_height(*bp));
 	ap->x += al_get_bitmap_width(*bp) + 2;
 	if(al_get_bitmap_height(*bp) + 2 > ap->line_height)
@@ -175,7 +189,7 @@ ALLEGRO_BITMAP * t3f_put_bitmap_on_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, i
 }
 
 /* fix for when you have exceeded the size of the sprite sheet */
-bool t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int type)
+bool t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int flags)
 {
 	ALLEGRO_BITMAP * retbp = NULL;
 
@@ -183,13 +197,13 @@ bool t3f_add_bitmap_to_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int type)
 	{
 		return false;
 	}
-	retbp = t3f_put_bitmap_on_atlas(ap, bp, type);
+	retbp = t3f_put_bitmap_on_atlas(ap, bp, flags);
 	if(retbp)
 	{
 		al_destroy_bitmap(*bp);
 		*bp = retbp;
 		ap->bitmap[ap->bitmaps] = bp;
-		ap->bitmap_type[ap->bitmaps] = type;
+		ap->bitmap_flags[ap->bitmaps] = flags;
 		ap->bitmaps++;
 	}
 
@@ -230,7 +244,7 @@ bool t3f_rebuild_atlases(void)
 		t3f_atlas[i]->line_height = 0;
 		for(j = 0; j < t3f_atlas[i]->bitmaps; j++)
 		{
-			bp = t3f_put_bitmap_on_atlas(t3f_atlas[i], t3f_atlas[i]->bitmap[j], t3f_atlas[i]->bitmap_type[j]);
+			bp = t3f_put_bitmap_on_atlas(t3f_atlas[i], t3f_atlas[i]->bitmap[j], t3f_atlas[i]->bitmap_flags[j]);
 			if(bp)
 			{
 				al_destroy_bitmap(*t3f_atlas[i]->bitmap[j]);

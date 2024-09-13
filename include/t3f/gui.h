@@ -23,7 +23,10 @@
 #define T3F_GUI_ELEMENT_ON_TOUCH 32 // active upon touch
 
 /* GUI flags */
-#define T3F_GUI_DISABLED          1 // GUI is disabled
+#define T3F_GUI_DISABLED          (1 << 0) // GUI is disabled
+#define T3F_GUI_NO_MOUSE          (1 << 1)
+#define T3F_GUI_NO_TOUCH          (1 << 2)
+#define T3F_GUI_USER_FLAG         (1 << 3)
 
 typedef struct
 {
@@ -55,6 +58,7 @@ typedef struct
 
 	int ox, oy;
 
+	float hover_y;
 	int hover_element;
   int font_margin_top;
   int font_margin_bottom;
@@ -66,9 +70,8 @@ typedef struct
 typedef struct
 {
 
-	float(*get_element_width)(T3F_GUI_ELEMENT * ep);
-	float(*get_element_height)(T3F_GUI_ELEMENT * ep);
-	void(*render_element)(T3F_GUI * pp, int i, bool hover);
+	void(*get_element_edges)(T3F_GUI * pp, int i, int * left, int * top, int * right, int * bottom);
+	void(*render_element)(T3F_GUI * pp, int i, bool hover, int flags);
 
 } T3F_GUI_DRIVER;
 
@@ -86,12 +89,13 @@ void t3f_set_gui_element_interaction_colors(T3F_GUI * pp, ALLEGRO_COLOR inactive
 int t3f_get_gui_width(T3F_GUI * pp);
 int t3f_get_gui_height(T3F_GUI * pp, float * top);
 
+bool t3f_select_hover_gui_element(T3F_GUI * pp, float x, float y);
 void t3f_select_previous_gui_element(T3F_GUI * pp);
 void t3f_select_next_gui_element(T3F_GUI * pp);
 void t3f_activate_selected_gui_element(T3F_GUI * pp, void * data);
 void t3f_reset_gui_input(T3F_GUI * pp);
-bool t3f_process_gui(T3F_GUI * pp, void * data);
-void t3f_render_gui(T3F_GUI * pp);
+bool t3f_process_gui(T3F_GUI * pp, int flags, void * data);
+void t3f_render_gui(T3F_GUI * pp, int flags);
 
 #ifdef __cplusplus
 	}

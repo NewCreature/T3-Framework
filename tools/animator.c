@@ -111,7 +111,7 @@ int menu_update_bitmap_delete_proc(ALLEGRO_MENU * menu, int item, void * data)
 	{
 		if(view == ANIMATOR_VIEW_BITMAPS)
 		{
-			if(animation->bitmaps->count)
+			if(animation->data->bitmaps->count)
 			{
 				al_set_menu_item_flags(menu, item, 0);
 				return 0;
@@ -128,7 +128,7 @@ int menu_update_bitmap_iter_proc(ALLEGRO_MENU * menu, int item, void * data)
 	{
 		if(view == ANIMATOR_VIEW_BITMAPS)
 		{
-			if(animation->bitmaps->count > 1)
+			if(animation->data->bitmaps->count > 1)
 			{
 				al_set_menu_item_flags(menu, item, 0);
 				return 0;
@@ -181,7 +181,7 @@ int menu_update_mode_frames_proc(ALLEGRO_MENU * menu, int item, void * data)
 
 int menu_update_frame_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
-	if(animation && animation->bitmaps->count)
+	if(animation && animation->data->bitmaps->count)
 	{
 		if(view == ANIMATOR_VIEW_FRAMES)
 		{
@@ -197,7 +197,7 @@ int menu_update_frames_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
 	if(animation)
 	{
-		if(view == ANIMATOR_VIEW_BITMAPS && animation->bitmaps->count)
+		if(view == ANIMATOR_VIEW_BITMAPS && animation->data->bitmaps->count)
 		{
 			al_set_menu_item_flags(menu, item, 0);
 			return 0;
@@ -209,11 +209,11 @@ int menu_update_frames_proc(ALLEGRO_MENU * menu, int item, void * data)
 
 int menu_update_frame_delete_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
-	if(animation && animation->bitmaps->count)
+	if(animation && animation->data->bitmaps->count)
 	{
 		if(view == ANIMATOR_VIEW_FRAMES)
 		{
-			if(animation->frames)
+			if(animation->data->frames)
 			{
 				al_set_menu_item_flags(menu, item, 0);
 				return 0;
@@ -226,11 +226,11 @@ int menu_update_frame_delete_proc(ALLEGRO_MENU * menu, int item, void * data)
 
 int menu_update_frame_tick_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
-	if(animation && animation->bitmaps->count)
+	if(animation && animation->data->bitmaps->count)
 	{
 		if(view == ANIMATOR_VIEW_FRAMES)
 		{
-			if(animation->frames && animation->frame[current_frame]->ticks > 1)
+			if(animation->data->frames && animation->data->frame[current_frame]->ticks > 1)
 			{
 				al_set_menu_item_flags(menu, item, 0);
 				return 0;
@@ -243,11 +243,11 @@ int menu_update_frame_tick_proc(ALLEGRO_MENU * menu, int item, void * data)
 
 int menu_update_frame_iter_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
-	if(animation && animation->bitmaps->count)
+	if(animation && animation->data->bitmaps->count)
 	{
 		if(view == ANIMATOR_VIEW_FRAMES)
 		{
-			if(animation->frames > 1)
+			if(animation->data->frames > 1)
 			{
 				al_set_menu_item_flags(menu, item, 0);
 				return 0;
@@ -281,7 +281,7 @@ int menu_proc_file_load(int i, void * data)
 			t3f_destroy_animation(animation);
 		}
 		strcpy(last_animation_filename, filename);
-		animation = t3f_load_animation(last_animation_filename);
+		animation = t3f_load_animation(last_animation_filename, 0, false);
 		update_config();
 		t3f_refresh_menus();
 	}
@@ -330,17 +330,17 @@ int menu_proc_view_frames(int i, void * data)
 
 int menu_proc_bitmap_add(int i, void * data)
 {
-	ALLEGRO_BITMAP * bp;
+	T3F_BITMAP * bp;
 	const char * fn;
 
 	fn = select_file(last_bitmap_filename, "Open Image", "*.*;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
 	if(fn)
 	{
-		bp = al_load_bitmap(fn);
+		bp = t3f_load_bitmap(fn, 0, false);
 		if(bp)
 		{
 			t3f_animation_add_bitmap(animation, bp);
-			current_bitmap = animation->bitmaps->count - 1;
+			current_bitmap = animation->data->bitmaps->count - 1;
 		}
 		strcpy(last_bitmap_filename, fn);
 		update_config();
@@ -351,12 +351,12 @@ int menu_proc_bitmap_add(int i, void * data)
 
 int menu_proc_bitmap_delete(int i, void * data)
 {
-	if(current_bitmap < animation->bitmaps->count)
+	if(current_bitmap < animation->data->bitmaps->count)
 	{
 		t3f_animation_delete_bitmap(animation, current_bitmap);
-		if(current_bitmap >= animation->bitmaps->count)
+		if(current_bitmap >= animation->data->bitmaps->count)
 		{
-			current_bitmap = animation->bitmaps->count - 1;
+			current_bitmap = animation->data->bitmaps->count - 1;
 		}
 		t3f_refresh_menus();
 	}
@@ -368,7 +368,7 @@ int menu_proc_bitmap_previous(int i, void * data)
 	current_bitmap--;
 	if(current_bitmap < 0)
 	{
-		current_bitmap = animation->bitmaps->count - 1;
+		current_bitmap = animation->data->bitmaps->count - 1;
 	}
 	return 0;
 }
@@ -376,7 +376,7 @@ int menu_proc_bitmap_previous(int i, void * data)
 int menu_proc_bitmap_next(int i, void * data)
 {
 	current_bitmap++;
-	if(current_bitmap >= animation->bitmaps->count)
+	if(current_bitmap >= animation->data->bitmaps->count)
 	{
 		current_bitmap = 0;
 	}
@@ -385,20 +385,20 @@ int menu_proc_bitmap_next(int i, void * data)
 
 int menu_proc_bitmap_load(int i, void * data)
 {
-	ALLEGRO_BITMAP * bp;
+	T3F_BITMAP * bp;
 	const char * fn;
 
 	fn = select_file(last_bitmap_filename, "Open Image", "*.*;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
 	if(fn)
 	{
-		bp = al_load_bitmap(fn);
+		bp = t3f_load_bitmap(fn, 0, false);
 		if(bp)
 		{
-			if(animation->bitmaps->bitmap[current_bitmap])
+			if(animation->data->bitmaps->bitmap[current_bitmap])
 			{
-				al_destroy_bitmap(animation->bitmaps->bitmap[current_bitmap]);
+				t3f_destroy_bitmap(animation->data->bitmaps->bitmap[current_bitmap]);
 			}
-			animation->bitmaps->bitmap[current_bitmap] = bp;
+			animation->data->bitmaps->bitmap[current_bitmap] = bp;
 		}
 		strcpy(last_bitmap_filename, fn);
 	}
@@ -412,7 +412,7 @@ int menu_proc_bitmap_save(int i, void * data)
 	fn = select_file(last_bitmap_filename, "Save Image", "*.*;*.pcx;*.png;*.tga;*.jpg", ALLEGRO_FILECHOOSER_SAVE);
 	if(fn)
 	{
-		al_save_bitmap(fn, animation->bitmaps->bitmap[current_bitmap]);
+		al_save_bitmap(fn, animation->data->bitmaps->bitmap[current_bitmap]->bitmap);
 		strcpy(last_bitmap_filename, fn);
 	}
 	return 0;
@@ -421,7 +421,7 @@ int menu_proc_bitmap_save(int i, void * data)
 int menu_proc_new_from_images(int index, void * data)
 {
 	ALLEGRO_FILECHOOSER * fc = NULL;
-	ALLEGRO_BITMAP * bp = NULL;
+	T3F_BITMAP * bp = NULL;
 	const char * fn = NULL;
 	int i;
 
@@ -442,13 +442,13 @@ int menu_proc_new_from_images(int index, void * data)
 			fn = al_get_native_file_dialog_path(fc, i);
 			if(fn)
 			{
-				bp = al_load_bitmap(fn);
+				bp = t3f_load_bitmap(fn, 0, false);
 				if(!bp)
 				{
 					goto fail;
 				}
 				t3f_animation_add_bitmap(animation, bp);
-				t3f_animation_add_frame(animation, i, 0, 0, 0, al_get_bitmap_width(animation->bitmaps->bitmap[i]), al_get_bitmap_height(animation->bitmaps->bitmap[i]), 0, 1, 0);
+				t3f_animation_add_frame(animation, i, 0, 0, 0, al_get_bitmap_width(animation->data->bitmaps->bitmap[i]->bitmap), al_get_bitmap_height(animation->data->bitmaps->bitmap[i]->bitmap), 0, 1, 0);
 			}
 		}
 	}
@@ -479,8 +479,8 @@ int menu_proc_new_from_images(int index, void * data)
 
 int menu_proc_frame_add(int i, void * data)
 {
-	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->bitmaps->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmaps->bitmap[current_bitmap]), 0, 1, 0);
-	current_frame = animation->frames - 1;
+	t3f_animation_add_frame(animation, current_bitmap, 0, 0, 0, al_get_bitmap_width(animation->data->bitmaps->bitmap[current_bitmap]->bitmap), al_get_bitmap_height(animation->data->bitmaps->bitmap[current_bitmap]->bitmap), 0, 1, 0);
+	current_frame = animation->data->frames - 1;
 	t3f_animation_build_frame_list(animation);
 	t3f_refresh_menus();
 	return 0;
@@ -488,12 +488,12 @@ int menu_proc_frame_add(int i, void * data)
 
 int menu_proc_frame_delete(int i, void * data)
 {
-	if(current_frame < animation->frames)
+	if(current_frame < animation->data->frames)
 	{
 		t3f_animation_delete_frame(animation, current_frame);
-		if(current_frame >= animation->frames)
+		if(current_frame >= animation->data->frames)
 		{
-			current_frame = animation->frames - 1;
+			current_frame = animation->data->frames - 1;
 		}
 		t3f_refresh_menus();
 	}
@@ -502,42 +502,42 @@ int menu_proc_frame_delete(int i, void * data)
 
 int menu_proc_frame_previous_bitmap(int i, void * data)
 {
-	animation->frame[current_frame]->bitmap--;
-	if(animation->frame[current_frame]->bitmap < 0)
+	animation->data->frame[current_frame]->bitmap--;
+	if(animation->data->frame[current_frame]->bitmap < 0)
 	{
-		animation->frame[current_frame]->bitmap = animation->bitmaps->count - 1;
+		animation->data->frame[current_frame]->bitmap = animation->data->bitmaps->count - 1;
 	}
 	return 0;
 }
 
 int menu_proc_frame_next_bitmap(int i, void * data)
 {
-	animation->frame[current_frame]->bitmap++;
-	if(animation->frame[current_frame]->bitmap >= animation->bitmaps->count)
+	animation->data->frame[current_frame]->bitmap++;
+	if(animation->data->frame[current_frame]->bitmap >= animation->data->bitmaps->count)
 	{
-		animation->frame[current_frame]->bitmap = 0;
+		animation->data->frame[current_frame]->bitmap = 0;
 	}
 	return 0;
 }
 
 int menu_proc_frame_double(int i, void * data)
 {
-	animation->frame[current_frame]->width *= 2.0;
-	animation->frame[current_frame]->height *= 2.0;
+	animation->data->frame[current_frame]->width *= 2.0;
+	animation->data->frame[current_frame]->height *= 2.0;
 	return 0;
 }
 
 int menu_proc_frame_half(int i, void * data)
 {
-	animation->frame[current_frame]->width /= 2.0;
-	animation->frame[current_frame]->height /= 2.0;
+	animation->data->frame[current_frame]->width /= 2.0;
+	animation->data->frame[current_frame]->height /= 2.0;
 	return 0;
 }
 
 int menu_proc_frame_reset(int i, void * data)
 {
-	animation->frame[current_frame]->width = al_get_bitmap_width(animation->bitmaps->bitmap[animation->frame[current_frame]->bitmap]);
-	animation->frame[current_frame]->height = al_get_bitmap_height(animation->bitmaps->bitmap[animation->frame[current_frame]->bitmap]);
+	animation->data->frame[current_frame]->width = al_get_bitmap_width(animation->data->bitmaps->bitmap[animation->data->frame[current_frame]->bitmap]->bitmap);
+	animation->data->frame[current_frame]->height = al_get_bitmap_height(animation->data->bitmaps->bitmap[animation->data->frame[current_frame]->bitmap]->bitmap);
 	return 0;
 }
 
@@ -545,15 +545,15 @@ int menu_proc_frame_lengthen(int index, void * data)
 {
 	int i;
 
-	if(t3f_key[ALLEGRO_KEY_LCTRL] || t3f_key[ALLEGRO_KEY_RCTRL] || t3f_key[ALLEGRO_KEY_COMMAND])
+	if(t3f_key_held(ALLEGRO_KEY_LCTRL) || t3f_key_held(ALLEGRO_KEY_RCTRL) || t3f_key_held(ALLEGRO_KEY_COMMAND))
 	{
-		animation->frame[current_frame]->ticks++;
+		animation->data->frame[current_frame]->ticks++;
 	}
 	else
 	{
-		for(i = 0; i < animation->frames; i++)
+		for(i = 0; i < animation->data->frames; i++)
 		{
-			animation->frame[i]->ticks++;
+			animation->data->frame[i]->ticks++;
 		}
 	}
 	t3f_animation_build_frame_list(animation);
@@ -564,15 +564,15 @@ int menu_proc_frame_shorten(int index, void * data)
 {
 	int i;
 
-	if(t3f_key[ALLEGRO_KEY_LCTRL] || t3f_key[ALLEGRO_KEY_RCTRL] || t3f_key[ALLEGRO_KEY_COMMAND])
+	if(t3f_key_held(ALLEGRO_KEY_LCTRL) || t3f_key_held(ALLEGRO_KEY_RCTRL) || t3f_key_held(ALLEGRO_KEY_COMMAND))
 	{
-		animation->frame[current_frame]->ticks--;
+		animation->data->frame[current_frame]->ticks--;
 	}
 	else
 	{
-		for(i = 0; i < animation->frames; i++)
+		for(i = 0; i < animation->data->frames; i++)
 		{
-			animation->frame[i]->ticks--;
+			animation->data->frame[i]->ticks--;
 		}
 	}
 	t3f_animation_build_frame_list(animation);
@@ -584,7 +584,7 @@ int menu_proc_frame_previous(int i, void * data)
 	current_frame--;
 	if(current_frame < 0)
 	{
-		current_frame = animation->frames - 1;
+		current_frame = animation->data->frames - 1;
 	}
 	return 0;
 }
@@ -592,7 +592,7 @@ int menu_proc_frame_previous(int i, void * data)
 int menu_proc_frame_next(int i, void * data)
 {
 	current_frame++;
-	if(current_frame >= animation->frames)
+	if(current_frame >= animation->data->frames)
 	{
 		current_frame = 0;
 	}
@@ -604,7 +604,7 @@ void global_logic(void)
 	const char * fn = NULL;
 	ALLEGRO_PATH * temp_path = NULL;
 
-	if(t3f_key[ALLEGRO_KEY_F3])
+	if(t3f_key_pressed(ALLEGRO_KEY_F3))
 	{
 		fn = select_file(last_animation_filename, "Open Animation", "ani", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
 		if(fn)
@@ -613,19 +613,19 @@ void global_logic(void)
 			{
 				t3f_destroy_animation(animation);
 			}
-			animation = t3f_load_animation(fn);
+			animation = t3f_load_animation(fn, 0, false);
 			strcpy(last_animation_filename, fn);
 		}
-		t3f_key[ALLEGRO_KEY_F3] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F3);
 	}
-	if(t3f_key[ALLEGRO_KEY_F4])
+	if(t3f_key_pressed(ALLEGRO_KEY_F4))
 	{
 		animation = t3f_create_animation();
-		t3f_key[ALLEGRO_KEY_F4] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F4);
 	}
 	if(animation)
 	{
-		if(t3f_key[ALLEGRO_KEY_F2])
+		if(t3f_key_pressed(ALLEGRO_KEY_F2))
 		{
 			fn = select_file(last_animation_filename, "Save Animation", "ani", ALLEGRO_FILECHOOSER_SAVE);
 			if(fn)
@@ -639,26 +639,26 @@ void global_logic(void)
 					al_destroy_path(temp_path);
 				}
 			}
-			t3f_key[ALLEGRO_KEY_F2] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_F2);
 		}
-		if(t3f_key[ALLEGRO_KEY_TAB])
+		if(t3f_key_pressed(ALLEGRO_KEY_TAB))
 		{
 			view++;
 			if(view > 1)
 			{
 				view = 0;
 			}
-			t3f_key[ALLEGRO_KEY_TAB] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_TAB);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_PLUS] && zoom < 10.0)
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_PLUS) && zoom < 10.0)
 		{
 			zoom += 1.0;
-			t3f_key[ALLEGRO_KEY_PAD_PLUS] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_PLUS);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_MINUS] && zoom > 1.0)
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_MINUS) && zoom > 1.0)
 		{
 			zoom -= 1.0;
-			t3f_key[ALLEGRO_KEY_PAD_MINUS] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_MINUS);
 		}
 	}
 }
@@ -687,138 +687,138 @@ void bitmap_logic(void)
 {
 	int i;
 
-	if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
+	if(t3f_key_pressed(ALLEGRO_KEY_INSERT) || t3f_key_pressed(ALLEGRO_KEY_I))
 	{
 		menu_proc_bitmap_add(0, NULL);
-		t3f_key[ALLEGRO_KEY_INSERT] = 0;
-		t3f_key[ALLEGRO_KEY_I] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_INSERT);
+		t3f_use_key_press(ALLEGRO_KEY_I);
 	}
-	if(t3f_key[ALLEGRO_KEY_DELETE])
+	if(t3f_key_pressed(ALLEGRO_KEY_DELETE))
 	{
 		menu_proc_bitmap_delete(0, NULL);
-		t3f_key[ALLEGRO_KEY_DELETE] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_DELETE);
 	}
-	if(t3f_key[ALLEGRO_KEY_ENTER])
+	if(t3f_key_pressed(ALLEGRO_KEY_ENTER))
 	{
 		menu_proc_bitmap_load(0, NULL);
-		t3f_key[ALLEGRO_KEY_ENTER] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_ENTER);
 	}
-	if(t3f_key[ALLEGRO_KEY_P])
+	if(t3f_key_pressed(ALLEGRO_KEY_P))
 	{
-		for(i = 0; i < animation->bitmaps->count; i++)
+		for(i = 0; i < animation->data->bitmaps->count; i++)
 		{
-			animation->bitmaps->bitmap[i] = pad_bitmap(animation->bitmaps->bitmap[i]);
+			animation->data->bitmaps->bitmap[i]->bitmap = pad_bitmap(animation->data->bitmaps->bitmap[i]->bitmap);
 		}
-		for(i = 0; i < animation->frames; i++)
+		for(i = 0; i < animation->data->frames; i++)
 		{
-			animation->frame[i]->x -= 1.0;
-			animation->frame[i]->y -= 1.0;
-			animation->frame[i]->width += 2.0;
-			animation->frame[i]->height += 2.0;
+			animation->data->frame[i]->x -= 1.0;
+			animation->data->frame[i]->y -= 1.0;
+			animation->data->frame[i]->width += 2.0;
+			animation->data->frame[i]->height += 2.0;
 		}
-		t3f_key[ALLEGRO_KEY_P] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_P);
 	}
-	if(animation->bitmaps > 0)
+	if(animation->data->bitmaps > 0)
 	{
-		if(t3f_key[ALLEGRO_KEY_LEFT])
+		if(t3f_key_pressed(ALLEGRO_KEY_LEFT))
 		{
 			menu_proc_bitmap_previous(0, NULL);
-			t3f_key[ALLEGRO_KEY_LEFT] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_LEFT);
 		}
-		if(t3f_key[ALLEGRO_KEY_RIGHT])
+		if(t3f_key_pressed(ALLEGRO_KEY_RIGHT))
 		{
 			menu_proc_bitmap_next(0, NULL);
-			t3f_key[ALLEGRO_KEY_RIGHT] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_RIGHT);
 		}
 	}
 }
 
 void frame_logic(void)
 {
-	if(t3f_key[ALLEGRO_KEY_INSERT] || t3f_key[ALLEGRO_KEY_I])
+	if(t3f_key_pressed(ALLEGRO_KEY_INSERT) || t3f_key_pressed(ALLEGRO_KEY_I))
 	{
 		menu_proc_frame_add(0, NULL);
-		t3f_key[ALLEGRO_KEY_INSERT] = 0;
-		t3f_key[ALLEGRO_KEY_I] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_INSERT);
+		t3f_use_key_press(ALLEGRO_KEY_I);
 	}
-	if(t3f_key[ALLEGRO_KEY_DELETE])
+	if(t3f_key_pressed(ALLEGRO_KEY_DELETE))
 	{
 		menu_proc_frame_delete(0, NULL);
-		t3f_key[ALLEGRO_KEY_DELETE] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_DELETE);
 	}
-	if(animation->frames > 0)
+	if(animation->data->frames > 0)
 	{
-		if(t3f_key[ALLEGRO_KEY_LEFT])
+		if(t3f_key_pressed(ALLEGRO_KEY_LEFT))
 		{
 			menu_proc_frame_previous(0, NULL);
-			t3f_key[ALLEGRO_KEY_LEFT] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_LEFT);
 		}
-		if(t3f_key[ALLEGRO_KEY_RIGHT])
+		if(t3f_key_pressed(ALLEGRO_KEY_RIGHT))
 		{
 			menu_proc_frame_next(0, NULL);
-			t3f_key[ALLEGRO_KEY_RIGHT] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_RIGHT);
 		}
-		if(t3f_key[ALLEGRO_KEY_UP])
+		if(t3f_key_pressed(ALLEGRO_KEY_UP))
 		{
 			menu_proc_frame_lengthen(0, NULL);
-			t3f_key[ALLEGRO_KEY_UP] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_UP);
 		}
-		if(t3f_key[ALLEGRO_KEY_DOWN])
+		if(t3f_key_pressed(ALLEGRO_KEY_DOWN))
 		{
-			if(animation->frame[current_frame]->ticks > 1)
+			if(animation->data->frame[current_frame]->ticks > 1)
 			{
 				menu_proc_frame_shorten(0, NULL);
 			}
-			t3f_key[ALLEGRO_KEY_DOWN] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_DOWN);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_ASTERISK])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_ASTERISK))
 		{
 			menu_proc_frame_double(0, NULL);
-			t3f_key[ALLEGRO_KEY_PAD_ASTERISK] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_ASTERISK);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_SLASH])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_SLASH))
 		{
 			menu_proc_frame_half(0, NULL);
-			t3f_key[ALLEGRO_KEY_PAD_SLASH] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_SLASH);
 		}
-		if(t3f_key[ALLEGRO_KEY_PAD_ENTER])
+		if(t3f_key_pressed(ALLEGRO_KEY_PAD_ENTER))
 		{
 			menu_proc_frame_reset(0, NULL);
-			t3f_key[ALLEGRO_KEY_PAD_ENTER] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PAD_ENTER);
 		}
-		if(t3f_key[ALLEGRO_KEY_PGUP])
+		if(t3f_key_pressed(ALLEGRO_KEY_PGUP))
 		{
 			menu_proc_frame_previous_bitmap(0, NULL);
-			t3f_key[ALLEGRO_KEY_PGUP] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PGUP);
 		}
-		if(t3f_key[ALLEGRO_KEY_PGDN])
+		if(t3f_key_pressed(ALLEGRO_KEY_PGDN))
 		{
 			menu_proc_frame_next_bitmap(0, NULL);
-			t3f_key[ALLEGRO_KEY_PGDN] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_PGDN);
 		}
-		if(t3f_key[ALLEGRO_KEY_H])
+		if(t3f_key_pressed(ALLEGRO_KEY_H))
 		{
-			animation->frame[current_frame]->x = (animation->frame[current_frame]->height - animation->frame[current_frame]->width) / 2;
-			t3f_key[ALLEGRO_KEY_H] = 0;
+			animation->data->frame[current_frame]->x = (animation->data->frame[current_frame]->height - animation->data->frame[current_frame]->width) / 2;
+			t3f_use_key_press(ALLEGRO_KEY_H);
 		}
-		if(t3f_key[ALLEGRO_KEY_F])
+		if(t3f_key_pressed(ALLEGRO_KEY_F))
 		{
-			animation->frame[current_frame]->flags = 0;
-			t3f_key[ALLEGRO_KEY_F] = 0;
+			animation->data->frame[current_frame]->flags = 0;
+			t3f_use_key_press(ALLEGRO_KEY_F);
 		}
 
-		if(t3f_mouse_button[0])
+		if(t3f_mouse_button_pressed(0))
 		{
 			if(!pegged)
 			{
-				pegx = t3f_mouse_x;
-				pegy = t3f_mouse_y;
+				pegx = t3f_get_mouse_x();
+				pegy = t3f_get_mouse_y();
 				pegged = true;
 			}
-			animation->frame[current_frame]->x += (t3f_mouse_x - pegx) / zoom;
-			animation->frame[current_frame]->y += (t3f_mouse_y - pegy) / zoom;
-			pegx = t3f_mouse_x;
-			pegy = t3f_mouse_y;
+			animation->data->frame[current_frame]->x += (t3f_get_mouse_x() - pegx) / zoom;
+			animation->data->frame[current_frame]->y += (t3f_get_mouse_y() - pegy) / zoom;
+			pegx = t3f_get_mouse_x();
+			pegy = t3f_get_mouse_y();
 		}
 		else
 		{
@@ -847,11 +847,11 @@ void logic(void * data)
 		}
 
 		/* toggle animation type */
-		if(t3f_key[ALLEGRO_KEY_O])
+		if(t3f_key_pressed(ALLEGRO_KEY_O))
 		{
-			animation->flags ^= T3F_ANIMATION_FLAG_ONCE;
+			animation->data->flags ^= T3F_ANIMATION_FLAG_ONCE;
 			t3f_animation_build_frame_list(animation);
-			t3f_key[ALLEGRO_KEY_O] = 0;
+			t3f_use_key_press(ALLEGRO_KEY_O);
 		}
 	}
 	tick++;
@@ -892,22 +892,22 @@ void help_render(void)
 void bitmap_render(void)
 {
 	al_draw_textf(font, t3f_color_white, 0, 360, 0, "bitmap[%d]", current_bitmap);
-	if(animation->bitmaps->count && current_bitmap < animation->bitmaps->count)
+	if(animation->data->bitmaps->count && current_bitmap < animation->data->bitmaps->count)
 	{
-		al_draw_scaled_bitmap(animation->bitmaps->bitmap[current_bitmap], 0, 0, al_get_bitmap_width(animation->bitmaps->bitmap[current_bitmap]), al_get_bitmap_height(animation->bitmaps->bitmap[current_bitmap]), 32, 32, (float)al_get_bitmap_width(animation->bitmaps->bitmap[current_bitmap]) * zoom, (float)al_get_bitmap_height(animation->bitmaps->bitmap[current_bitmap]) * zoom, 0);
+		al_draw_scaled_bitmap(animation->data->bitmaps->bitmap[current_bitmap]->bitmap, 0, 0, al_get_bitmap_width(animation->data->bitmaps->bitmap[current_bitmap]->bitmap), al_get_bitmap_height(animation->data->bitmaps->bitmap[current_bitmap]->bitmap), 32, 32, (float)al_get_bitmap_width(animation->data->bitmaps->bitmap[current_bitmap]->bitmap) * zoom, (float)al_get_bitmap_height(animation->data->bitmaps->bitmap[current_bitmap]->bitmap) * zoom, 0);
 	}
 }
 
 void frame_render(void)
 {
 	T3F_ANIMATION_FRAME * fp;
-	if(animation->frames > 0 && current_frame < animation->frames)
+	if(animation->data->frames > 0 && current_frame < animation->data->frames)
 	{
-		al_draw_textf(font, t3f_color_white, 0, 360, 0, "frame[%d].ticks = %d", current_frame, animation->frame[current_frame]->ticks);
+		al_draw_textf(font, t3f_color_white, 0, 360, 0, "frame[%d].ticks = %d", current_frame, animation->data->frame[current_frame]->ticks);
 		al_draw_line(32, 32, 64, 32, al_map_rgba_f(0.0, 1.0, 0.0, 0.5), 1.0);
 		al_draw_line(32, 32, 32, 64, al_map_rgba_f(0.0, 1.0, 0.0, 0.5), 1.0);
-		fp = animation->frame[current_frame];
-		t3f_draw_scaled_bitmap(animation->bitmaps->bitmap[fp->bitmap], t3f_color_white, 32 + fp->x * zoom, 32 + fp->y * zoom, fp->z, fp->width * zoom, fp->height * zoom, 0);
+		fp = animation->data->frame[current_frame];
+		t3f_draw_scaled_bitmap(animation->data->bitmaps->bitmap[fp->bitmap], t3f_color_white, 32 + fp->x * zoom, 32 + fp->y * zoom, fp->z, fp->width * zoom, fp->height * zoom, 0);
 	}
 	t3f_draw_scaled_animation(animation, t3f_color_white, tick, 320 + 32, 32, 0, zoom, 0);
 }
@@ -936,7 +936,7 @@ void render(void * data)
 	{
 		al_draw_textf(font, t3f_color_white, 0, 0, 0, "No animation loaded");
 	}
-	if(t3f_key[ALLEGRO_KEY_F1])
+	if(t3f_key_held(ALLEGRO_KEY_F1))
 	{
 		help_render();
 	}
@@ -1033,7 +1033,7 @@ bool initialize(void)
 	}
 	if(animation_fn)
 	{
-		animation = t3f_load_animation(animation_fn);
+		animation = t3f_load_animation(animation_fn, 0, false);
 		if(animation)
 		{
 			strcpy(last_animation_filename, animation_fn);

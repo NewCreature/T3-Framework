@@ -6,7 +6,7 @@
 #include "intro.h"
 #include "game.h"
 
-ALLEGRO_BITMAP * dot_bitmap[DOT_MAX_BITMAPS] = {NULL};
+T3F_BITMAP * dot_bitmap[DOT_MAX_BITMAPS] = {NULL};
 ALLEGRO_SAMPLE * dot_sample[DOT_MAX_SAMPLES] = {NULL};
 ALLEGRO_FONT * dot_font = NULL;
 T3F_ATLAS * dot_atlas = NULL;
@@ -70,55 +70,55 @@ bool dot_initialize(int argc, char * argv[])
 	}
 
 	/* load images */
-	dot_bitmap[DOT_BITMAP_BALL_RED] = al_load_bitmap("data/graphics/ball_red.png");
+	dot_bitmap[DOT_BITMAP_BALL_RED] = t3f_load_bitmap("data/graphics/ball_red.png", T3F_BITMAP_FLAG_PADDED, false);
 	if(!dot_bitmap[DOT_BITMAP_BALL_RED])
 	{
 		printf("Failed to load image %d!\n", DOT_BITMAP_BALL_RED);
 		return false;
 	}
-	dot_bitmap[DOT_BITMAP_BALL_GREEN] = al_load_bitmap("data/graphics/ball_green.png");
+	dot_bitmap[DOT_BITMAP_BALL_GREEN] = t3f_load_bitmap("data/graphics/ball_green.png", T3F_BITMAP_FLAG_PADDED, false);
 	if(!dot_bitmap[DOT_BITMAP_BALL_GREEN])
 	{
 		printf("Failed to load image %d!\n", DOT_BITMAP_BALL_GREEN);
 		return false;
 	}
-	dot_bitmap[DOT_BITMAP_BALL_BLUE] = al_load_bitmap("data/graphics/ball_blue.png");
+	dot_bitmap[DOT_BITMAP_BALL_BLUE] = t3f_load_bitmap("data/graphics/ball_blue.png", T3F_BITMAP_FLAG_PADDED, false);
 	if(!dot_bitmap[DOT_BITMAP_BALL_BLUE])
 	{
 		printf("Failed to load image %d!\n", DOT_BITMAP_BALL_BLUE);
 		return false;
 	}
-	dot_bitmap[DOT_BITMAP_BALL_PURPLE] = al_load_bitmap("data/graphics/ball_purple.png");
+	dot_bitmap[DOT_BITMAP_BALL_PURPLE] = t3f_load_bitmap("data/graphics/ball_purple.png", T3F_BITMAP_FLAG_PADDED, false);
 	if(!dot_bitmap[DOT_BITMAP_BALL_PURPLE])
 	{
 		printf("Failed to load image %d!\n", DOT_BITMAP_BALL_PURPLE);
 		return false;
 	}
-	dot_bitmap[DOT_BITMAP_BALL_YELLOW] = al_load_bitmap("data/graphics/ball_yellow.png");
+	dot_bitmap[DOT_BITMAP_BALL_YELLOW] = t3f_load_bitmap("data/graphics/ball_yellow.png", T3F_BITMAP_FLAG_PADDED, false);
 	if(!dot_bitmap[DOT_BITMAP_BALL_YELLOW])
 	{
 		printf("Failed to load image %d!\n", DOT_BITMAP_BALL_YELLOW);
 		return false;
 	}
-	dot_bitmap[DOT_BITMAP_BALL_ORANGE] = al_load_bitmap("data/graphics/ball_orange.png");
+	dot_bitmap[DOT_BITMAP_BALL_ORANGE] = t3f_load_bitmap("data/graphics/ball_orange.png", T3F_BITMAP_FLAG_PADDED, false);
 	if(!dot_bitmap[DOT_BITMAP_BALL_ORANGE])
 	{
 		printf("Failed to load image %d!\n", DOT_BITMAP_BALL_ORANGE);
 		return false;
 	}
-	dot_bitmap[DOT_BITMAP_BALL_BLACK] = al_load_bitmap("data/graphics/ball_black.png");
+	dot_bitmap[DOT_BITMAP_BALL_BLACK] = t3f_load_bitmap("data/graphics/ball_black.png", T3F_BITMAP_FLAG_PADDED, false);
 	if(!dot_bitmap[DOT_BITMAP_BALL_BLACK])
 	{
 		printf("Failed to load image %d!\n", DOT_BITMAP_BALL_BLACK);
 		return false;
 	}
-	dot_bitmap[DOT_BITMAP_BALL_EYES] = al_load_bitmap("data/graphics/ball_eyes.png");
+	dot_bitmap[DOT_BITMAP_BALL_EYES] = t3f_load_bitmap("data/graphics/ball_eyes.png", T3F_BITMAP_FLAG_PADDED, false);
 	if(!dot_bitmap[DOT_BITMAP_BALL_EYES])
 	{
 		printf("Failed to load image %d!\n", DOT_BITMAP_BALL_EYES);
 		return false;
 	}
-	dot_bitmap[DOT_BITMAP_HUD] = al_load_bitmap("data/graphics/hud.png");
+	dot_bitmap[DOT_BITMAP_HUD] = t3f_load_bitmap("data/graphics/hud.png", T3F_BITMAP_FLAG_PADDED, false);
 	if(!dot_bitmap[DOT_BITMAP_HUD])
 	{
 		printf("Failed to load image %d!\n", DOT_BITMAP_HUD);
@@ -166,7 +166,7 @@ bool dot_initialize(int argc, char * argv[])
 		{
 			if(dot_bitmap[i])
 			{
-				t3f_add_bitmap_to_atlas(dot_atlas, &dot_bitmap[i], T3F_ATLAS_SPRITE);
+				t3f_add_bitmap_to_atlas(dot_atlas, &dot_bitmap[i]->bitmap, T3F_ATLAS_SPRITE);
 			}
 		}
 	}

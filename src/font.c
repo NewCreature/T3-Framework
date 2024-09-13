@@ -3,14 +3,28 @@
 #include "draw.h"
 #include "file_utils.h"
 
+static const char * _get_config_value_fallback(ALLEGRO_CONFIG * cp, const char * section, const char * fallback_section, const char * key)
+{
+	const char * val;
+
+	val = al_get_config_value(cp, section, key);
+	if(!val)
+	{
+		val = al_get_config_value(cp, fallback_section, key);
+	}
+	return val;
+}
+
 /* include font engines */
 #include "font_allegro.inc"
 #include "font_t3f.inc"
+#include "font_none.inc"
 
 static T3F_FONT_ENGINE font_engine[] =
 {
 	{
 		font_engine_load_font_f_allegro,
+		NULL,
 		font_engine_destroy_font_allegro,
 
 		font_engine_get_text_width_allegro,
@@ -24,6 +38,7 @@ static T3F_FONT_ENGINE font_engine[] =
 	},
 	{
 		font_engine_load_font_f_t3f,
+		_t3f_font_engine_t3f_update,
 		font_engine_destroy_font_t3f,
 
 		font_engine_get_text_width_t3f,
@@ -36,7 +51,18 @@ static T3F_FONT_ENGINE font_engine[] =
 		font_engine_draw_textf_t3f
 	},
 	{
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,NULL, NULL
+		font_engine_load_font_f_none,
+		NULL,
+		font_engine_destroy_font_none,
+
+		font_engine_get_text_width_none,
+		font_engine_get_font_height_none,
+		font_engine_draw_glyph_none,
+		font_engine_get_glyph_width_none,
+		font_engine_get_glyph_dimensions_none,
+		font_engine_get_glyph_advance_none,
+		font_engine_draw_text_none,
+		font_engine_draw_textf_none
 	}
 };
 
@@ -55,7 +81,6 @@ void t3f_create_text_line_data(T3F_TEXT_LINE_DATA * lp, T3F_FONT * fp, float w, 
 {
 	char current_line[256];
 	int current_line_pos = 0;
-	int current_line_start_pos = 0;
 	int last_space = -1;
 	int i;
 	float wi = w;
@@ -85,7 +110,6 @@ void t3f_create_text_line_data(T3F_TEXT_LINE_DATA * lp, T3F_FONT * fp, float w, 
 		{
 			current_line[current_line_pos] = '\0';
 			strcpy(lp->line[lp->lines].text, current_line);
-			current_line_start_pos += i + 1;
 			lp->lines++;
 			strcpy(lp->line[lp->lines].text, "");
 			current_line_pos = 0;
@@ -98,7 +122,6 @@ void t3f_create_text_line_data(T3F_TEXT_LINE_DATA * lp, T3F_FONT * fp, float w, 
 		{
 			current_line[last_space] = '\0';
 			strcpy(lp->line[lp->lines].text, current_line);
-			current_line_start_pos += last_space + 1;
 			while(text[i] != ' ' && i >= 0)
 			{
 				i--;
@@ -130,8 +153,12 @@ void t3f_draw_text_lines(T3F_TEXT_LINE_DATA * lines, ALLEGRO_COLOR color, float 
 
 void t3f_draw_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * text)
 {
+	t3f_draw_scaled_multiline_text(fp, color, x, y, z, 1.0, w, tab, flags, text);
+}
+
+void t3f_draw_scaled_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float scale, float w, float tab, int flags, const char * text)
+{
 	T3F_TEXT_LINE_DATA line_data;
-	float pos = x;
 	bool held;
 
 	if(strlen(text) < 1)
@@ -142,14 +169,6 @@ void t3f_draw_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float 
 	if(!held)
 	{
 		al_hold_bitmap_drawing(true);
-	}
-	if(flags & T3F_FONT_ALIGN_CENTER)
-	{
-		pos -= t3f_get_text_width(fp, text) / 2.0;
-	}
-	else if(flags & T3F_FONT_ALIGN_RIGHT)
-	{
-		pos -= t3f_get_text_width(fp, text);
 	}
 	if(w > 0.0)
 	{
@@ -162,7 +181,7 @@ void t3f_draw_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float 
 	}
 	else
 	{
-		fp->engine->draw_text(fp->font, color, x, y, z, flags, text);
+		fp->engine->draw_text(fp->font, color, x, y, z, scale, flags, text);
 		if(!held)
 		{
 			al_hold_bitmap_drawing(false);
@@ -192,6 +211,11 @@ void t3f_draw_text(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, float z
 	t3f_draw_multiline_text(vf, color, x, y, z, 0, 0, flags, text);
 }
 
+void t3f_draw_scaled_text(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, float z, float scale, int flags, const char * text)
+{
+	t3f_draw_scaled_multiline_text(vf, color, x, y, z, scale, 0, 0, flags, text);
+}
+
 void t3f_draw_textf(T3F_FONT * vf, ALLEGRO_COLOR color, float x, float y, float z, int flags, const char * format, ...)
 {
 	char buf[1024] = {0};
@@ -216,52 +240,40 @@ int t3f_get_glyph_advance(T3F_FONT * vf, int cp1, int cp2)
 
 static int detect_font_type(const char * fn)
 {
-	const char * extension;
-
-	extension = t3f_get_path_extension(fn);
-	if(!strcmp(extension, ".ini"))
+	if(strstr(fn, ".ini"))
 	{
 		return T3F_FONT_TYPE_T3F;
 	}
 	return T3F_FONT_TYPE_ALLEGRO;
 }
 
-T3F_FONT * t3f_load_font_with_engine_f(T3F_FONT_ENGINE * engine, const char * fn, ALLEGRO_FILE * fp, int option, int flags)
+void * t3f_load_font_data_with_engine_f(T3F_FONT_ENGINE * engine, const char * fn, ALLEGRO_FILE * fp, int option, int flags)
 {
-	T3F_FONT * font;
+	void * font_data;
 
-	font = malloc(sizeof(T3F_FONT));
-	if(!font)
-	{
-		goto fail;
-	}
-	memset(font, 0, sizeof(T3F_FONT));
-
-	font->engine = engine;
-//	font->font = al_load_font(fn, option, flags);
-	font->font = font->engine->load(fn, fp, option, flags);
-	if(!font->font)
+	font_data = engine->load(fn, fp, option, flags);
+	if(!font_data)
 	{
 		goto fail;
 	}
 
-	return font;
+	return font_data;
 
 	fail:
 	{
-		t3f_destroy_font(font);
+		engine->destroy(font_data);
 	}
 	return NULL;
 }
 
-T3F_FONT * t3f_load_font_with_engine(T3F_FONT_ENGINE * engine, const char * fn, int option, int flags)
+void * t3f_load_font_data_with_engine(T3F_FONT_ENGINE * engine, const char * fn, int option, int flags)
 {
 	ALLEGRO_FILE * fp;
-	T3F_FONT * font = NULL;
+	void * font_data = NULL;
 	const char * extension = t3f_get_path_extension(fn);
 	bool is_ttf = false;
 
-	if(!strcasecmp(extension, ".ttf"))
+	if(!strcasecmp(extension, ".ttf") && engine != &(font_engine[T3F_FONT_TYPE_NONE]))
 	{
 		is_ttf = true;
 	}
@@ -271,13 +283,13 @@ T3F_FONT * t3f_load_font_with_engine(T3F_FONT_ENGINE * engine, const char * fn, 
 	{
 		goto fail;
 	}
-	font = t3f_load_font_with_engine_f(engine, fn, fp, option, flags);
+	font_data = t3f_load_font_data_with_engine_f(engine, fn, fp, option, flags);
 	if(!is_ttf)
 	{
 		al_fclose(fp);
 	}
 
-	return font;
+	return font_data;
 
 	fail:
 	{
@@ -288,66 +300,190 @@ T3F_FONT * t3f_load_font_with_engine(T3F_FONT_ENGINE * engine, const char * fn, 
 				al_fclose(fp);
 			}
 		}
-		t3f_destroy_font(font);
+		engine->destroy(font_data);
 	}
 	return NULL;
 }
 
-T3F_FONT * t3f_load_font_f(const char * fn, ALLEGRO_FILE * fp, int type, int option, int flags)
+void * t3f_load_font_data_f(const char * fn, ALLEGRO_FILE * fp, int type, int option, int flags)
+{
+	return NULL;
+}
+
+void * t3f_load_font_data(const char * fn, int type, int option, int flags)
 {
 	if(type == T3F_FONT_TYPE_AUTO)
 	{
 		type = detect_font_type(fn);
 	}
-	return t3f_load_font_with_engine_f(&font_engine[type], fn, fp, option, flags);
+	return t3f_load_font_data_with_engine_f(&font_engine[type], fn, NULL, option, flags);
 }
 
-T3F_FONT * t3f_load_font(const char * fn, int type, int option, int flags)
+typedef struct
 {
-	ALLEGRO_FILE * fp;
-	T3F_FONT * font = NULL;
-	const char * extension = t3f_get_path_extension(fn);
-	bool is_ttf = false;
 
-	if(!strcasecmp(extension, ".ttf"))
+	char * fn;
+	int type;
+	int size;
+	void ** font_data;
+
+} T3F_FONT_LOADER_DATA;
+
+static void _t3f_destroy_font_loader_data(T3F_FONT_LOADER_DATA * dp)
+{
+	if(dp)
 	{
-		is_ttf = true;
+		if(dp->fn)
+		{
+			free(dp->fn);
+		}
+		free(dp);
 	}
+}
 
-	fp = al_fopen(fn, "rb");
-	if(!fp)
+static T3F_FONT_LOADER_DATA * _t3f_get_font_loader_data(const char * fn, int type, int size, void ** font_data)
+{
+	T3F_FONT_LOADER_DATA * dp;
+
+	dp = malloc(sizeof(T3F_FONT_LOADER_DATA));
+	if(!dp)
 	{
 		goto fail;
 	}
-	font = t3f_load_font_f(fn, fp, type, option, flags);
-	if(!is_ttf)
+	memset(dp, 0, sizeof(T3F_FONT_LOADER_DATA));
+	dp->fn = strdup(fn);
+	dp->type = type;
+	dp->size = size;
+	dp->font_data = font_data;
+
+	return dp;
+
+	fail:
 	{
-		al_fclose(fp);
+		_t3f_destroy_font_loader_data(dp);
+		return NULL;
+	}
+}
+
+static void * _t3f_really_load_font(void * arg)
+{
+	T3F_FONT_LOADER_DATA * font_loader = (T3F_FONT_LOADER_DATA *)arg;
+	void * font_data = NULL;
+
+	if(arg)
+	{
+		switch(font_loader->type)
+		{
+			case T3F_FONT_TYPE_ALLEGRO:
+			{
+				font_data = t3f_load_resource(font_loader->font_data, t3f_font_allegro_resource_handler_proc, font_loader->fn, font_loader->size, 0, 0);
+				break;
+			}
+			case T3F_FONT_TYPE_T3F:
+			{
+				font_data = t3f_load_resource(font_loader->font_data, t3f_font_t3f_resource_handler_proc, font_loader->fn, font_loader->size, 0, 0);
+				break;
+			}
+		}
+		_t3f_destroy_font_loader_data(font_loader);
+	}
+	else
+	{
+		font_data = t3f_load_font_data(NULL, T3F_FONT_TYPE_NONE, 0, 0);
+	}
+
+	return font_data;
+}
+
+T3F_FONT * t3f_load_font(const char * fn, int type, int option, int flags, bool threaded)
+{
+	T3F_FONT * font = NULL;
+	T3F_FONT_LOADER_DATA * font_loader = NULL;
+
+	font = malloc(sizeof(T3F_FONT));
+	if(!font)
+	{
+		goto fail;
+	}
+	memset(font, 0, sizeof(T3F_FONT));
+	font->type = detect_font_type(fn); // need to select engine after loading
+	font->engine = &font_engine[T3F_FONT_TYPE_NONE];
+
+	font_loader = _t3f_get_font_loader_data(fn, font->type, option, &font->font);
+	if(!font_loader)
+	{
+		goto fail;
+	}
+
+	font->object_loader = t3f_create_object_loader();
+	if(!font->object_loader)
+	{
+		goto fail;
+	}
+
+	font->font = t3f_load_object(font->object_loader, _t3f_really_load_font, NULL, font_loader, threaded);
+	if(font->font)
+	{
+		font->engine = &font_engine[font->type];
 	}
 
 	return font;
 
 	fail:
 	{
-		if(fp)
+		t3f_destroy_font(font);
+		if(font_loader)
 		{
-			al_fclose(fp);
-		}
-		if(font)
-		{
-			t3f_destroy_font(font);
+			_t3f_destroy_font_loader_data(font_loader);
 		}
 	}
 	return NULL;
+}
+
+bool t3f_update_font(T3F_FONT * fp)
+{
+	if(t3f_object_ready(fp->object_loader))
+	{
+		fp->font = t3f_fetch_object(fp->object_loader);
+		if(fp->font)
+		{
+			if(font_engine[fp->type].update)
+			{
+				font_engine[fp->type].update(fp);
+			}
+			fp->engine = &font_engine[fp->type];
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void t3f_destroy_font_data(void * data, int type)
+{
+	if(data)
+	{
+		font_engine[type].destroy(data);
+	}
 }
 
 void t3f_destroy_font(T3F_FONT * fp)
 {
 	if(fp)
 	{
+		if(fp->object_loader)
+		{
+			t3f_destroy_object_loader(fp->object_loader);
+		}
 		if(fp->font)
 		{
-			fp->engine->destroy(fp->font);
+			if(!t3f_destroy_resource(fp->font))
+			{
+				fp->engine->destroy(fp->font);
+			}
 		}
 		free(fp);
 	}

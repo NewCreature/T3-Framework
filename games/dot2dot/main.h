@@ -24,7 +24,7 @@
 #define DOT_STATE_INTRO        0
 #define DOT_STATE_GAME         1
 
-extern ALLEGRO_BITMAP * dot_bitmap[DOT_MAX_BITMAPS];
+extern T3F_BITMAP * dot_bitmap[DOT_MAX_BITMAPS];
 extern ALLEGRO_SAMPLE * dot_sample[DOT_MAX_SAMPLES];
 extern ALLEGRO_FONT * dot_font;
 extern T3F_ATLAS * dot_atlas;

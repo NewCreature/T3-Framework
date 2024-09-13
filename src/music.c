@@ -54,13 +54,9 @@ static const char * t3f_get_music_extension(const char * fn)
 static void * t3f_play_music_thread(ALLEGRO_THREAD * thread, void * arg)
 {
 	const char * ext = NULL;
-	ALLEGRO_PATH * path = NULL;
-	int loop_points = 0;
 	float loop_start = -1;
 	float loop_end = -1;
 	bool loop_disabled = false;
-	const char * val = NULL;
-	ALLEGRO_CONFIG * config = NULL;
 
 	ALLEGRO_DEBUG("music thread start\n");
 	t3f_music_gain = 1.0;
@@ -81,50 +77,7 @@ static void * t3f_play_music_thread(ALLEGRO_THREAD * thread, void * arg)
 
 	ALLEGRO_DEBUG("configuring music\n");
 	/* look for loop data */
-	path = al_create_path(t3f_music_thread_fn);
-	if(path)
-	{
-		al_set_path_extension(path, ".ini");
-		config = al_load_config_file(al_path_cstr(path, '/'));
-		if(config)
-		{
-			val = al_get_config_value(config, "loop", "disabled");
-			if(val && !strcasecmp(val, "true"))
-			{
-				loop_disabled = true;
-			}
-			if(!loop_disabled)
-			{
-				val = al_get_config_value(config, "loop", "start");
-				if(val)
-				{
-					loop_start = atof(val);
-					loop_points++;
-				}
-				val = al_get_config_value(config, "loop", "end");
-				if(val)
-				{
-					loop_end = atof(val);
-					loop_points++;
-				}
-			}
-			val = al_get_config_value(config, "settings", "gain");
-			if(val)
-			{
-				t3f_music_gain = atof(val);
-				if(t3f_music_gain < 0.0)
-				{
-					t3f_music_gain = 0;
-				}
-				if(t3f_music_gain > 10.0)
-				{
-					t3f_music_gain = 10.0;
-				}
-			}
-			al_destroy_config(config);
-		}
-		al_destroy_path(path);
-	}
+	_t3f_get_sample_settings(t3f_music_thread_fn, &loop_start, &loop_end, &loop_disabled, &t3f_music_gain);
 	if(t3f_music_looping_disabled)
 	{
 		loop_disabled = true;
@@ -136,7 +89,7 @@ static void * t3f_play_music_thread(ALLEGRO_THREAD * thread, void * arg)
 	}
 	else
 	{
-		if(loop_points != 2)
+		if(loop_end <= loop_start)
 		{
 			/* loop entire song unless audio is MOD music */
 			ext = t3f_get_music_extension(t3f_music_thread_fn);

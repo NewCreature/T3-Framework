@@ -11,7 +11,7 @@ typedef struct
 
 } OBJECT;
 
-ALLEGRO_BITMAP * bitmap[8] = {NULL};
+T3F_BITMAP * bitmap[8] = {NULL};
 T3F_ATLAS * atlas = NULL;
 T3F_ANIMATION * animation = NULL;
 OBJECT object[1024];
@@ -20,7 +20,7 @@ void logic(void * data)
 {
 	int i;
 
-	if(t3f_key[ALLEGRO_KEY_ESCAPE])
+	if(t3f_key_held(ALLEGRO_KEY_ESCAPE))
 	{
 		t3f_exit();
 	}
@@ -69,7 +69,7 @@ int main(int argc, char * argv[])
 	for(i = 0; i < 8; i++)
 	{
 		sprintf(fn, "data/%d.png", i);
-		bitmap[i] = al_load_bitmap(fn);
+		bitmap[i] = t3f_load_bitmap(fn, 0, false);
 		if(!bitmap[i])
 		{
 			return 1;
@@ -84,7 +84,7 @@ int main(int argc, char * argv[])
 	for(i = 0; i < 8; i++)
 	{
 		t3f_animation_add_bitmap(animation, bitmap[i]);
-		t3f_animation_add_frame(animation, i, 0, 0, 0, al_get_bitmap_width(bitmap[i]), al_get_bitmap_height(bitmap[i]), 0, 10, 0);
+		t3f_animation_add_frame(animation, i, 0, 0, 0, al_get_bitmap_width(bitmap[i]->bitmap), al_get_bitmap_height(bitmap[i]->bitmap), 0, 10, 0);
 	}
 
 	atlas = t3f_create_atlas(512, 512);

@@ -20,7 +20,7 @@ void logic(void * data)
 {
 	int i;
 
-	if(t3f_key[ALLEGRO_KEY_ESCAPE])
+	if(t3f_key_held(ALLEGRO_KEY_ESCAPE))
 	{
 		t3f_exit();
 	}
