@@ -360,7 +360,7 @@ void draw_game(GAME * gp, THEME * tp)
 	            	}
 	            	else
 	            	{
-	                	al_draw_bitmap(tp->block[(int)gp->board.data[i][j]], j * 16 + gp->x, i * 16 + gp->y, 0);
+	                	al_draw_bitmap(tp->block[(int)gp->board.data[i][j]]->bitmap, j * 16 + gp->x, i * 16 + gp->y, 0);
                 	}
             	}
         	}
@@ -374,7 +374,7 @@ void draw_game(GAME * gp, THEME * tp)
 	            	}
 	            	else
 	            	{
-	                	al_draw_bitmap(tp->block[(int)gp->board.data[i][j]], j * 16 + gp->x, i * 16 + gp->y, 0);
+	                	al_draw_bitmap(tp->block[(int)gp->board.data[i][j]]->bitmap, j * 16 + gp->x, i * 16 + gp->y, 0);
             		}
 	            }
         	}
@@ -392,7 +392,7 @@ void draw_game(GAME * gp, THEME * tp)
             	{
 	                if(gp->pill.data[i][j])
                 	{
-	                   	al_draw_tinted_bitmap(tp->block[(int)gp->pill.data[i][j]], al_map_rgba_f(1.0, 1.0, 1.0, 0.5), (gp->pill.x + j) * 16 + gp->x, (get_aid_pos(gp) + i) * 16 + gp->y, 0);
+	                   	al_draw_tinted_bitmap(tp->block[(int)gp->pill.data[i][j]]->bitmap, al_map_rgba_f(1.0, 1.0, 1.0, 0.5), (gp->pill.x + j) * 16 + gp->x, (get_aid_pos(gp) + i) * 16 + gp->y, 0);
                 	}
             	}
         	}
@@ -403,7 +403,7 @@ void draw_game(GAME * gp, THEME * tp)
             {
                 if(gp->pill.data[i][j])
                 {
-                   	al_draw_bitmap(tp->block[(int)gp->pill.data[i][j]], (gp->pill.x + j) * 16 + gp->x, (gp->pill.y + i) * 16 + gp->y + 1, 0);
+                   	al_draw_bitmap(tp->block[(int)gp->pill.data[i][j]]->bitmap, (gp->pill.x + j) * 16 + gp->x, (gp->pill.y + i) * 16 + gp->y + 1, 0);
                 }
             }
         }
@@ -412,7 +412,7 @@ void draw_game(GAME * gp, THEME * tp)
     /* draw preview */
 	if(gp->level <= 20)
 	{
-		al_draw_scaled_rotated_bitmap(tp->block[(int)gp->next_pill.data[1][0]], 16, 8, 408 + 16 * 2, 168 + 8 * 2, 2, 2, gp->preview_angle, 0);
-		al_draw_scaled_rotated_bitmap(tp->block[(int)gp->next_pill.data[1][1]], 0, 8, 408 + 16 * 2, 168 + 8 * 2, 2, 2, gp->preview_angle, 0);
+		al_draw_scaled_rotated_bitmap(tp->block[(int)gp->next_pill.data[1][0]]->bitmap, 16, 8, 408 + 16 * 2, 168 + 8 * 2, 2, 2, gp->preview_angle, 0);
+		al_draw_scaled_rotated_bitmap(tp->block[(int)gp->next_pill.data[1][1]]->bitmap, 0, 8, 408 + 16 * 2, 168 + 8 * 2, 2, 2, gp->preview_angle, 0);
 	}
 }

@@ -101,7 +101,7 @@ static int font_engine_get_glyph_advance_allegro(const void * font, int codepoin
 	return al_get_glyph_advance(font, codepoint1, codepoint2);
 }
 
-static void font_engine_draw_text_allegro(const void * font, ALLEGRO_COLOR color, float x, float y, float z, int flags, char const * text)
+static void font_engine_draw_text_allegro(const void * font, ALLEGRO_COLOR color, float x, float y, float z, float scale, int flags, char const * text)
 {
 	int aflags = 0;
 	if(flags & T3F_FONT_ALIGN_CENTER)
@@ -124,5 +124,5 @@ static void font_engine_draw_textf_allegro(const void * font, ALLEGRO_COLOR colo
 	vsnprintf(buf, 1024, format, vap);
 	va_end(vap);
 
-	font_engine_draw_text_allegro(font, color, x, y, 0, flags, buf);
+	font_engine_draw_text_allegro(font, color, x, y, 0, 1.0, flags, buf);
 }

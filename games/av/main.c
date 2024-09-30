@@ -16,11 +16,11 @@ void av_logic(void * data)
 		// comments in IGame.h for details on the format of the input
 		// parameters and the requirements for the output.
 		// ...
-		keys[0] = t3f_key[ALLEGRO_KEY_LEFT];
-		keys[1] = t3f_key[ALLEGRO_KEY_RIGHT];
-		keys[3] = t3f_key[ALLEGRO_KEY_DOWN];
-		keys[4] = t3f_key[ALLEGRO_KEY_Z];
-		keys[5] = t3f_key[ALLEGRO_KEY_X];
+		keys[0] = t3f_key_held(ALLEGRO_KEY_LEFT);
+		keys[1] = t3f_key_held(ALLEGRO_KEY_RIGHT);
+		keys[3] = t3f_key_held(ALLEGRO_KEY_DOWN);
+		keys[4] = t3f_key_held(ALLEGRO_KEY_Z);
+		keys[5] = t3f_key_held(ALLEGRO_KEY_X);
 		read_controller(&av_game.controller, keys);
 		if(!do_game(&av_game))
 		{
@@ -87,7 +87,7 @@ void av_render(void * data)
 	al_hold_bitmap_drawing(true);
 	
 	/* draw the background */
-	al_draw_bitmap(av_theme.backdrop, 0, 0, 0);
+	t3f_draw_bitmap(av_theme.backdrop, t3f_color_white, 0, 0, 0, 0);
 	
 	/* draw the game board */
 	if(!paused && av_game.state != GAME_STATE_LEVEL)
@@ -146,16 +146,16 @@ ALLEGRO_FONT * av_load_font(const char * fn)
 	return fp;
 }
 
-ALLEGRO_BITMAP * av_load_bitmap(const char * fn)
+T3F_BITMAP * av_load_bitmap(const char * fn)
 {
-	ALLEGRO_BITMAP * bp;
+	T3F_BITMAP * bp;
 	
-	bp = al_load_bitmap(fn);
+	bp = t3f_load_bitmap(fn, 0, false);
 	if(!bp)
 	{
 		return NULL;
 	}
-	al_convert_mask_to_alpha(bp, al_map_rgb(255, 0, 255));
+	al_convert_mask_to_alpha(bp->bitmap, al_map_rgb(255, 0, 255));
 	return bp;
 }
 
@@ -175,7 +175,7 @@ bool av_initialize(void)
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
 	
 	/* load the board tile images */
-	av_theme.block[0] = al_create_bitmap(8, 8);
+	av_theme.block[0] = t3f_create_bitmap(8, 8, -1, -1, 0);
 	av_theme.block[1] = av_load_bitmap("data/graphics/pill_red4.pcx");
 	av_theme.block[2] = av_load_bitmap("data/graphics/pill_red0.pcx");
 	av_theme.block[3] = av_load_bitmap("data/graphics/pill_red2.pcx");
@@ -203,9 +203,9 @@ bool av_initialize(void)
 	}
 	
 	/* load virus animations */
-	av_theme.virus[0] = t3f_load_animation("data/graphics/virus_red.ani");
-	av_theme.virus[1] = t3f_load_animation("data/graphics/virus_yellow.ani");
-	av_theme.virus[2] = t3f_load_animation("data/graphics/virus_blue.ani");
+	av_theme.virus[0] = t3f_load_animation("data/graphics/virus_red.ani", 0, false);
+	av_theme.virus[1] = t3f_load_animation("data/graphics/virus_yellow.ani", 0, false);
+	av_theme.virus[2] = t3f_load_animation("data/graphics/virus_blue.ani", 0, false);
 	
 	/* make sure they all loaded */
 	for(i = 0; i < 3; i++)
@@ -218,7 +218,7 @@ bool av_initialize(void)
 	}
 	
 	/* load background image */
-	av_theme.backdrop = al_load_bitmap("data/graphics/bg.pcx");
+	av_theme.backdrop = t3f_load_bitmap("data/graphics/bg.pcx", 0, false);
 	if(!av_theme.backdrop)
 	{
 		printf("Failed to load backdrop.\n");
@@ -260,7 +260,7 @@ bool av_initialize(void)
 	
 	/* clear block 0 */
 	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP);
-	al_set_target_bitmap(av_theme.block[0]);
+	al_set_target_bitmap(av_theme.block[0]->bitmap);
 	al_clear_to_color(t3f_color_black);
 	al_restore_state(&old_state);
 	
@@ -270,7 +270,7 @@ bool av_initialize(void)
 	{
 		for(i = 0; i < 16; i++)
 		{
-			t3f_add_bitmap_to_atlas(av_atlas, &av_theme.block[i], T3F_ATLAS_SPRITE);
+			t3f_add_bitmap_to_atlas(av_atlas, &av_theme.block[i]->bitmap, T3F_ATLAS_SPRITE);
 		}
 		for(i = 0; i < 3; i++)
 		{

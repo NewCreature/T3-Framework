@@ -21,7 +21,7 @@ else
 	@cp -a template/android "$(DIR)"
 	@cp -a template/windows "$(DIR)"
 	@cp -a template/macos "$(DIR)"
-	@cp -a template/iphone "$(DIR)"
+	@cp -a template/ios "$(DIR)"
 	@cp -a template/icons "$(DIR)"
 	@cp -a template/packages "$(DIR)"
 	@cp -a template/misc "$(DIR)"
@@ -46,7 +46,7 @@ else
 	@cp -a template/linux "$(DIR)"
 	@cp -a template/windows "$(DIR)"
 	@cp -a template/macos "$(DIR)"
-	@cp -a template/iphone "$(DIR)"
+	@cp -a template/ios "$(DIR)"
 	@cp -a template/packages "$(DIR)"
 	@cp -a template/misc "$(DIR)"
 	@cp -a template/scripts "$(DIR)"
@@ -71,7 +71,7 @@ else
 	@cp -a "$(DIR)/macos/." template/macos/
 	@rm -rf template/macos/Info.plist
 	@rm -rf template/macos/entitlements.plist
-	@cp -a "$(DIR)/iphone/." template/iphone/
+	@cp -a "$(DIR)/ios/." template/ios/
 	@cp -a "$(DIR)/misc/." template/misc/
 	@cp -a "$(DIR)/scripts/." template/scripts/
 endif

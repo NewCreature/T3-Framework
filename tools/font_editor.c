@@ -9,7 +9,7 @@ float scale = 8.0;
 
 void vfe_logic(void * data)
 {
-	if(t3f_key[ALLEGRO_KEY_F2] && vector_font)
+	if(t3f_key_pressed(ALLEGRO_KEY_F2) && vector_font)
 	{
 		ALLEGRO_FILECHOOSER * file_save_dialog = NULL;
 		ALLEGRO_PATH * save_path = NULL;
@@ -31,9 +31,9 @@ void vfe_logic(void * data)
 			al_destroy_native_file_dialog(file_save_dialog);
 			al_start_timer(t3f_timer);
 		}
-		t3f_key[ALLEGRO_KEY_F2] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F2);
 	}
-	if(t3f_key[ALLEGRO_KEY_F3])
+	if(t3f_key_pressed(ALLEGRO_KEY_F3))
 	{
 		ALLEGRO_FILECHOOSER * file_load_dialog = NULL;
 		const char * rp = NULL;
@@ -55,18 +55,18 @@ void vfe_logic(void * data)
 			al_destroy_native_file_dialog(file_load_dialog);
 			al_start_timer(t3f_timer);
 		}
-		t3f_key[ALLEGRO_KEY_F3] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F3);
 	}
-	if(t3f_key[ALLEGRO_KEY_F4])
+	if(t3f_key_pressed(ALLEGRO_KEY_F4))
 	{
 		if(vector_font)
 		{
 			t3f_destroy_vector_font(vector_font);
 		}
 		vector_font = t3f_create_vector_font();
-		t3f_key[ALLEGRO_KEY_F4] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F4);
 	}
-	if(t3f_key[ALLEGRO_KEY_F5])
+	if(t3f_key_pressed(ALLEGRO_KEY_F5))
 	{
 		ALLEGRO_FILECHOOSER * file_load_dialog = NULL;
 		const char * rp = NULL;
@@ -93,37 +93,37 @@ void vfe_logic(void * data)
 			al_destroy_native_file_dialog(file_load_dialog);
 			al_start_timer(t3f_timer);
 		}
-		t3f_key[ALLEGRO_KEY_F5] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F5);
 	}
-	if(t3f_key[ALLEGRO_KEY_RIGHT] && character < T3F_VECTOR_FONT_MAX_CHARACTERS - 1)
+	if(t3f_key_pressed(ALLEGRO_KEY_RIGHT) && character < T3F_VECTOR_FONT_MAX_CHARACTERS - 1)
 	{
 		character++;
-		t3f_key[ALLEGRO_KEY_RIGHT] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_RIGHT);
 	}
-	if(t3f_key[ALLEGRO_KEY_LEFT] && character > 0)
+	if(t3f_key_pressed(ALLEGRO_KEY_LEFT) && character > 0)
 	{
 		character--;
-		t3f_key[ALLEGRO_KEY_LEFT] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_LEFT);
 	}
 	
 	if(vector_font)
 	{
 		if(vector_font->character[character])
 		{
-			if(t3f_key[ALLEGRO_KEY_MINUS])
+			if(t3f_key_pressed(ALLEGRO_KEY_MINUS))
 			{
 				vector_font->character[character]->width -= 1.0;
-				t3f_key[ALLEGRO_KEY_MINUS] = 0;
+				t3f_use_key_press(ALLEGRO_KEY_MINUS);
 			}
-			if(t3f_key[ALLEGRO_KEY_EQUALS])
+			if(t3f_key_pressed(ALLEGRO_KEY_EQUALS))
 			{
 				vector_font->character[character]->width += 1.0;
-				t3f_key[ALLEGRO_KEY_EQUALS] = 0;
+				t3f_use_key_press(ALLEGRO_KEY_EQUALS);
 			}
-			if(t3f_key[ALLEGRO_KEY_DELETE])
+			if(t3f_key_pressed(ALLEGRO_KEY_DELETE))
 			{
 				t3f_remove_vector_character(vector_font, character);
-				t3f_key[ALLEGRO_KEY_DELETE] = 0;
+				t3f_use_key_press(ALLEGRO_KEY_DELETE);
 			}
 		}
 	}

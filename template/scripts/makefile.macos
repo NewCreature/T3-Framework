@@ -27,6 +27,7 @@ T3F_PLATFORM_LIBRARIES =\
 	-framework OpenGL\
 	-framework OpenAL\
 	-framework Cocoa\
+	-framework CoreAudio\
 	-framework CoreVideo\
 	$(MACOS_CONFIG_PLATFORM_LIBS)\
 	$(MACOS_CONFIG_DEPEND_LIBS)\

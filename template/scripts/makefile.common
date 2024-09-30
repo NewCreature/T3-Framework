@@ -10,10 +10,6 @@ include makefile.defines
 include makefile.default_config
 include makefile.config
 
-DEMO_DIR = ../../$(APP_NAME)_demo
-DEMO_DATA = $(DEMO_DIR)/bin/data
-#DEMO_DELETE =
-
 T3F_OBJECTS = $(T3F_CORE_OBJECTS) $(T3F_PLATFORM_OBJECTS)
 
 APP_SOURCE_FILES = $(T3F_OBJECTS:.o=.c)
@@ -120,28 +116,45 @@ binary_package_common: clean binary_package_temp
 	@echo "Build archive..."
 	$(shell cd ../temp; tar -czf $(APP_PACKAGE_DIR)/$(APP_BINARY_PACKAGE_FILENAME) $(APP_PACKAGE_NAME); cd ..; rm -rf temp)
 
-#make a copy of the source tree with non-demo data deleted
-demo_copy:
-	mkdir $(DEMO_DIR)
-	cp -a -R -L ../* $(DEMO_DIR)
+#make a copy of the source tree with non-repackaged data deleted
+repackage_copy:
+ifndef APP_REPACKAGE_DIR
+	@echo Usage: make repackage APP_REPACKAGE_DIR=path
+	@test
+else
+	rm -rf $(APP_REPACKAGE_DIR)
+	mkdir $(APP_REPACKAGE_DIR)
+	cp -a -R -L ../* $(APP_REPACKAGE_DIR)
+endif
 
-demo_clean:
-	rm -rf $(DEMO_DIR)/workspace
-	rm -rf $(DEMO_DELETE)
+repackage_clean:
+	rm -rf $(APP_REPACKAGE_DIR)/workspace
+	rm -rf $(APP_REPACKAGE_DIR)/alt
+ifdef APP_REPACKAGE_DELETE
+	rm -rf $(APP_REPACKAGE_DELETE)
+endif
 
-demo_edit:
-	$(SED_COMMAND) 's|= $(APP_NAME)|= $(APP_NAME)-demo|' $(DEMO_DIR)/src/makefile.defines
-	$(SED_COMMAND) 's|$(subst $(SPACE),\$(SPACE),$(APP_TITLE))|$(subst $(SPACE),\$(SPACE),$(APP_TITLE))\\$(SPACE)Demo|' $(DEMO_DIR)/src/makefile.defines
-	$(SED_COMMAND) 's|$(APP_ID)|$(APP_ID)demo|' $(DEMO_DIR)/src/makefile.defines
-	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_NAME)-demo|' $(DEMO_DIR)/docs/changelog
+repackage_fetch_docs:
+ifdef APP_REPACKAGE_DOCS
+	cp $(APP_REPACKAGE_DOCS) $(APP_REPACKAGE_DIR)/docs
+else
+	@test 0
+endif
 
-demo_edit_gp:
-	$(SED_COMMAND) 's|CFLAGS = |CFLAGS = -DT3F_ANDROID_GP |' $(DEMO_DIR)/src/makefile.android_helper
-	mv $(DEMO_DIR) $(DEMO_DIR)_gp
+repackage_fetch_alternate_source:
+ifdef APP_REPACKAGE_SRC
+	cp $(APP_REPACKAGE_SRC)
+else
+	@test 0
+endif
 
-demo: clean demo_copy demo_clean demo_edit
+repackage_edit:
+	$(SED_COMMAND) 's|= $(APP_NAME)|= $(APP_REPACKAGE_NAME)|' $(APP_REPACKAGE_DIR)/src/makefile.defines
+	$(SED_COMMAND) 's|TITLE = $(APP_TITLE)|TITLE = $(APP_REPACKAGE_TITLE)|' $(APP_REPACKAGE_DIR)/src/makefile.defines
+	$(SED_COMMAND) 's|= $(APP_ANDROID_PACKAGE)|= $(APP_REPACKAGE_PACKAGE)|' $(APP_REPACKAGE_DIR)/src/makefile.defines
+	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_REPACKAGE_NAME)|' $(APP_REPACKAGE_DIR)/docs/changelog
 
-demo_gp: demo demo_edit_gp
+repackage_root: clean clean_packages repackage_copy repackage_clean repackage_edit repackage_fetch_alternate_source repackage_fetch_docs
 
 ../tools/makeicon$(EXE_SUFFIX): ../tools/makeicon.o
 	$(CC) $(LFLAGS) ../tools/makeicon.o $(T3F_LIBRARIES) -o ../tools/makeicon

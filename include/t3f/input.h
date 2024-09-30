@@ -18,11 +18,11 @@
 
 #define T3F_INPUT_HANDLER_TYPE_GENERIC               0
 #define T3F_INPUT_HANDLER_TYPE_GAMEPAD               1
+#define T3F_INPUT_HANDLER_TYPE_MOUSE                 2
 
 /* device types */
 #define T3F_INPUT_HANDLER_DEVICE_TYPE_KEYBOARD       0
 #define T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE          1
-#define T3F_INPUT_HANDLER_DEVICE_TYPE_TOUCH          2
 #define T3F_INPUT_HANDLER_DEVICE_TYPE_JOYSTICK       3
 
 #define T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON        0
@@ -49,6 +49,27 @@
 #define T3F_GAMEPAD_R3                              17
 #define T3F_GAMEPAD_SELECT                          18
 #define T3F_GAMEPAD_START                           19
+
+#define T3F_MOUSE_X                                  0
+#define T3F_MOUSE_Y                                  1
+#define T3F_MOUSE_Z                                  2
+#define T3F_MOUSE_W                                  3
+#define T3F_MOUSE_BUTTON_1                           4
+#define T3F_MOUSE_BUTTON_2                           5
+#define T3F_MOUSE_BUTTON_3                           6
+#define T3F_MOUSE_BUTTON_4                           7
+#define T3F_MOUSE_BUTTON_5                           8
+#define T3F_MOUSE_BUTTON_6                           9
+#define T3F_MOUSE_BUTTON_7                          10
+#define T3F_MOUSE_BUTTON_8                          11
+#define T3F_MOUSE_BUTTON_9                          12
+#define T3F_MOUSE_BUTTON_10                         13
+#define T3F_MOUSE_BUTTON_11                         14
+#define T3F_MOUSE_BUTTON_12                         15
+#define T3F_MOUSE_BUTTON_13                         16
+#define T3F_MOUSE_BUTTON_14                         17
+#define T3F_MOUSE_BUTTON_15                         18
+#define T3F_MOUSE_BUTTON_16                         19
 
 /* define an input element */
 typedef struct
@@ -96,8 +117,10 @@ void t3f_destroy_input_handler(T3F_INPUT_HANDLER * input_handler);
 bool t3f_add_input_handler_element(T3F_INPUT_HANDLER * input_handler, int type);
 void t3f_bind_input_handler_element(T3F_INPUT_HANDLER * input_handler, int element, int device_type, int device_number, int device_element);
 bool t3f_map_input_for_xbox_controller(T3F_INPUT_HANDLER * input_handler, int joystick);
+bool t3f_map_input_for_mouse(T3F_INPUT_HANDLER * input_handler);
 
 void t3f_update_input_handler_state(T3F_INPUT_HANDLER * input_handler);
+void t3f_clear_input_handler_state(T3F_INPUT_HANDLER * input_handler);
 
 void _t3f_input_handle_joystick_event(ALLEGRO_EVENT * event);
 

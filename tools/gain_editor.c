@@ -43,11 +43,11 @@ void ge_logic(void * data)
 	ALLEGRO_CONFIG * config = NULL;
 	const char * val;
 	
-	if(t3f_key[ALLEGRO_KEY_ESCAPE])
+	if(t3f_key_pressed(ALLEGRO_KEY_ESCAPE))
 	{
 		t3f_exit();
 	}
-	if(t3f_key[ALLEGRO_KEY_F3])
+	if(t3f_key_pressed(ALLEGRO_KEY_F3))
 	{
 		ge_file_selector = al_create_native_file_dialog(ge_filename, "Select music file", "*.*;*.ogg", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
 		if(ge_file_selector)
@@ -80,16 +80,16 @@ void ge_logic(void * data)
 				}
 			}
 		}
-		t3f_key[ALLEGRO_KEY_F3] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_F3);
 	}
-	if(t3f_key[ALLEGRO_KEY_UP])
+	if(t3f_key_pressed(ALLEGRO_KEY_UP))
 	{
 		ge_gain += 0.05;
 		al_set_audio_stream_gain(t3f_stream, ge_gain);
 		ge_save_gain();
-		t3f_key[ALLEGRO_KEY_UP] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_UP);
 	}
-	if(t3f_key[ALLEGRO_KEY_DOWN])
+	if(t3f_key_pressed(ALLEGRO_KEY_DOWN))
 	{
 		ge_gain -= 0.05;
 		al_set_audio_stream_gain(t3f_stream, ge_gain);
@@ -98,7 +98,7 @@ void ge_logic(void * data)
 			ge_gain = 0.0;
 		}
 		ge_save_gain();
-		t3f_key[ALLEGRO_KEY_DOWN] = 0;
+		t3f_use_key_press(ALLEGRO_KEY_DOWN);
 	}
 	if(t3f_stream)
 	{

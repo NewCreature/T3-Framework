@@ -1,5 +1,7 @@
 #include "t3f.h"
 #include "input.h"
+#include "mouse.h"
+#include "keyboard.h"
 
 static bool _t3f_input_initialized = false;
 ALLEGRO_JOYSTICK_STATE _input_state_fudging_helper[T3F_MAX_JOYSTICKS];
@@ -47,6 +49,11 @@ T3F_INPUT_HANDLER * t3f_create_input_handler(int type)
 {
   T3F_INPUT_HANDLER * input_handler = NULL;
 
+  if(!_t3f_input_initialized)
+  {
+    return NULL;
+  }
+
   input_handler = malloc(sizeof(T3F_INPUT_HANDLER));
   if(!input_handler)
   {
@@ -79,6 +86,30 @@ T3F_INPUT_HANDLER * t3f_create_input_handler(int type)
       t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // R3
       t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Select
       t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Start
+      break;
+    }
+    case T3F_INPUT_HANDLER_TYPE_MOUSE:
+    {
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_ABSOLUTE_AXIS); // X-Axis
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_ABSOLUTE_AXIS); // Y-Axis
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_ABSOLUTE_AXIS); // Z-Axis
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_ABSOLUTE_AXIS); // W-Axis
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
+      t3f_add_input_handler_element(input_handler, T3F_INPUT_HANDLER_ELEMENT_TYPE_BUTTON); // Button
       break;
     }
   }
@@ -329,11 +360,11 @@ bool t3f_map_input_for_xbox_controller(T3F_INPUT_HANDLER * input_handler, int jo
 
     /* Start */
     input_handler->element[T3F_GAMEPAD_START].device_number = joystick;
-    input_handler->element[T3F_GAMEPAD_START].device_element = 14;
+    input_handler->element[T3F_GAMEPAD_START].device_element = 15;
 
     /* Select */
     input_handler->element[T3F_GAMEPAD_SELECT].device_number = joystick;
-    input_handler->element[T3F_GAMEPAD_SELECT].device_element = 15;
+    input_handler->element[T3F_GAMEPAD_SELECT].device_element = 14;
 
     return true;
 
@@ -635,6 +666,31 @@ bool t3f_map_input_for_xbox_controller(T3F_INPUT_HANDLER * input_handler, int jo
 
 }
 
+bool t3f_map_input_for_mouse(T3F_INPUT_HANDLER * input_handler)
+{
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_X, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 0);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_Y, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 1);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_Z, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 2);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_W, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 3);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_1, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 4);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_2, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 5);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_3, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 6);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_4, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 7);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_5, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 8);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_6, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 9);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_7, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 10);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_8, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 11);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_9, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 12);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_10, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 13);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_11, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 14);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_12, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 15);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_13, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 16);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_14, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 17);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_15, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 18);
+  t3f_bind_input_handler_element(input_handler, T3F_MOUSE_BUTTON_16, T3F_INPUT_HANDLER_DEVICE_TYPE_MOUSE, 0, 19);
+  return true;
+}
+
 static void update_input_device(int device)
 {
   #ifdef ALLEGRO_MACOSX
@@ -676,7 +732,7 @@ static void update_input_device(int device)
 
 static void update_input_handler_element_state_keyboard(T3F_INPUT_HANDLER_ELEMENT * element)
 {
-  if(t3f_key[element->device_element])
+  if(t3f_key_held(element->device_element))
   {
     element->held = true;
     element->released = false;
@@ -710,31 +766,31 @@ static void update_input_handler_element_state_mouse(T3F_INPUT_HANDLER_ELEMENT *
 
   switch(element->device_element)
   {
-    case 0:
+    case T3F_MOUSE_X:
     {
-      element->val = t3f_mouse_x;
+      element->val = t3f_get_mouse_x();
       break;
     }
-    case 1:
+    case T3F_MOUSE_Y:
     {
-      element->val = t3f_mouse_y;
+      element->val = t3f_get_mouse_y();
       break;
     }
-    case 2:
+    case T3F_MOUSE_Z:
     {
-      element->val = t3f_mouse_z;
+      element->val = t3f_get_mouse_z();
       break;
     }
-    case 3: // placeholder for mouse_w
+    case T3F_MOUSE_W: // placeholder for mouse_w
     {
       element->val = 0;
     }
     default:
     {
-      button = element->device_element - 4;
+      button = element->device_element - T3F_MOUSE_BUTTON_1;
       if(button >= 0)
       {
-        if(t3f_mouse_button[button])
+        if(t3f_mouse_button_held(button))
         {
           element->held = true;
           element->released = false;
@@ -764,10 +820,6 @@ static void update_input_handler_element_state_mouse(T3F_INPUT_HANDLER_ELEMENT *
       break;
     }
   }
-}
-
-static void update_input_handler_element_state_touch(T3F_INPUT_HANDLER_ELEMENT * element)
-{
 }
 
 static void update_input_handler_element_joystick_cache(T3F_INPUT_HANDLER_ELEMENT * element)
@@ -899,11 +951,6 @@ static void update_input_handler_element_state(T3F_INPUT_HANDLER_ELEMENT * eleme
       update_input_handler_element_state_mouse(element);
       break;
     }
-    case T3F_INPUT_HANDLER_DEVICE_TYPE_TOUCH:
-    {
-      update_input_handler_element_state_touch(element);
-      break;
-    }
     case T3F_INPUT_HANDLER_DEVICE_TYPE_JOYSTICK:
     {
       update_input_handler_element_state_joystick(element);
@@ -919,6 +966,18 @@ void t3f_update_input_handler_state(T3F_INPUT_HANDLER * input_handler)
   for(i = 0; i < input_handler->elements; i++)
   {
     update_input_handler_element_state(&input_handler->element[i]);
+  }
+}
+
+void t3f_clear_input_handler_state(T3F_INPUT_HANDLER * input_handler)
+{
+  int i;
+
+  for(i = 0; i < input_handler->elements; i++)
+  {
+    input_handler->element[i].held = false;
+    input_handler->element[i].pressed = false;
+    input_handler->element[i].released = false;
   }
 }
 

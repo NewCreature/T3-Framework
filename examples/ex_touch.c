@@ -13,9 +13,9 @@ void render(void * data)
 	al_clear_to_color(al_map_rgba_f(0.0, 0.0, 0.0, 1.0));
 	for(i = 0; i < T3F_MAX_TOUCHES; i++)
 	{
-		if(t3f_touch[i].active)
+		if(t3f_touch_active(i))
 		{
-			al_draw_bitmap(bitmap, t3f_touch[i].x - al_get_bitmap_width(bitmap) / 2, t3f_touch[i].y - al_get_bitmap_height(bitmap) / 2, 0);
+			al_draw_bitmap(bitmap, t3f_get_touch_x(i) - al_get_bitmap_width(bitmap) / 2, t3f_get_touch_y(i) - al_get_bitmap_height(bitmap) / 2, 0);
 		}
 	}
 }
