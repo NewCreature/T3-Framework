@@ -1,0 +1,10 @@
+Notes
+-----
+
+ADB over WIFI
+-------------
+
+- Enable 'Wireless debugging' in 'Developer options'.
+- Select 'Pair device with pairing code' under 'Wireless debugging'.
+- Run command 'adb pair IP:PORT'.
+- Enter pairing code from step 2.
