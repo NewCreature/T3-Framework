@@ -44,6 +44,28 @@ sudo make install
 cd ..
 cd ..
 
+# OpenMPT
+#SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
+#if [ ! -d "openmpt" ];
+#then
+#  git clone https://github.com/OpenMPT/openmpt.git
+#fi
+#cd openmpt
+#git pull
+#make clean
+#CFLAGS="-arch i386 -mmacos-version-min=10.6 -isysroot $SDK_PATH" CXXFLAGS="-arch i386 -mmacos-version-min=10.6 -isysroot $SDK_PATH -std=c++11" make
+#mv bin/libopenmpt.a libopenmpt_i386.a
+#make clean
+#CFLAGS="-arch x86_64 -mmacos-version-min=10.6 -isysroot $SDK_PATH" CXXFLAGS="-arch x86_64 -mmacos-version-min=10.6 -isysroot $SDK_PATH" make
+#mv bin/libopenmpt.a libopenmpt_x86_64.a
+#SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
+#make clean
+#CFLAGS="-arch arm64 -mmacos-version-min=11.0 -isysroot $SDK_PATH" CXXFLAGS="-arch arm64 -mmacos-version-min=11.0 -isysroot $SDK_PATH" make
+#lipo -create lipopenmpt_i386.a libopenmpt_x86_64.a bin/libopenmpt.a -output bin/libopenmpt.a
+#sudo make install
+#sudo rm /usr/local/lib/libopenmpt.so
+#cd ..
+
 # OGG
 SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "ogg" ];
@@ -222,19 +244,18 @@ cd ..
 SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
 if [ ! -d "libpng" ];
 then
-  git clone git://git.code.sf.net/p/libpng/code
-  mv code libpng
+  git clone https://github.com/pnggroup/libpng.git
 fi
 cd libpng
 git pull
 remake_dir _build_i386
 cd _build_i386
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DPNG_TOOLS=OFF -DPNG_SHARED=OFF -DPNG_FRAMEWORK=OFF -DPNG_TESTS=OFF -DZLIB_ROOT=/usr/local
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DPNG_TOOLS=OFF -DPNG_SHARED=OFF -DPNG_FRAMEWORK=OFF -DPNG_TESTS=OFF -DZLIB_ROOT=/usr/local -DCMAKE_C_FLAGS=-D__i386__
 make
 cd ..
 remake_dir _build_x86_64
 cd _build_x86_64
-cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DPNG_TOOLS=OFF -DPNG_SHARED=OFF -DPNG_FRAMEWORK=OFF -DPNG_TESTS=OFF -DZLIB_ROOT=/usr/local
+cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DPNG_TOOLS=OFF -DPNG_SHARED=OFF -DPNG_FRAMEWORK=OFF -DPNG_TESTS=OFF -DZLIB_ROOT=/usr/local -DCMAKE_C_FLAGS=-D__x86_64__
 make
 cd ..
 SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
