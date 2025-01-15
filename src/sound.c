@@ -8,6 +8,7 @@ static ALLEGRO_SAMPLE * t3f_sample_queue[T3F_MAX_QUEUED_SAMPLES] = {NULL};
 static int t3f_queued_samples = 0;
 static ALLEGRO_SAMPLE_INSTANCE * t3f_queue_sample_instance = NULL;
 static ALLEGRO_AUDIO_STREAM * _t3f_sample_stream[T3F_MAX_SAMPLE_STREAMS] = {NULL};
+static int _t3f_sample_stream_slot = 0;
 ALLEGRO_SAMPLE_ID t3f_sample_id;
 
 void _t3f_clean_up_sound_data(void)
@@ -121,41 +122,40 @@ bool t3f_play_sample(ALLEGRO_SAMPLE * sp, float vol, float pan, float speed)
 ALLEGRO_AUDIO_STREAM * t3f_stream_sample(const char * fn, float vol, float pan, float speed)
 {
 	ALLEGRO_AUDIO_STREAM * ret = NULL;
-	float loop_start, loop_end, gain;
-	bool loop_disabled;
-	int i;
+	float loop_start = 0.0, loop_end = 0.0, gain = 1.0;
+	bool loop_disabled = false;
 
-	for(i = 0; i < T3F_MAX_SAMPLE_STREAMS; i++)
+	if(_t3f_sample_stream[_t3f_sample_stream_slot])
 	{
-		if(_t3f_sample_stream[i] && !al_get_audio_stream_playing(_t3f_sample_stream[i]))
+		al_destroy_audio_stream(_t3f_sample_stream[_t3f_sample_stream_slot]);
+		_t3f_sample_stream[_t3f_sample_stream_slot] = NULL;
+	}
+	_t3f_sample_stream[_t3f_sample_stream_slot] = al_load_audio_stream(fn, 4, 4096);
+	if(_t3f_sample_stream[_t3f_sample_stream_slot])
+	{
+		_t3f_get_sample_settings(fn, &loop_start, &loop_end, &loop_disabled, &gain);
+		if(loop_end <= loop_start)
 		{
-			al_destroy_audio_stream(_t3f_sample_stream[i]);
-			_t3f_sample_stream[i] = NULL;
+			loop_disabled = true;
 		}
-		if(!_t3f_sample_stream[i])
+		ret = _t3f_sample_stream[_t3f_sample_stream_slot];
+		if(loop_disabled)
 		{
-			_t3f_sample_stream[i] = al_load_audio_stream(fn, 4, 4096);
-			if(_t3f_sample_stream[i])
-			{
-				_t3f_get_sample_settings(fn, &loop_start, &loop_end, &loop_disabled, &gain);
-				if(loop_end <= loop_start)
-				{
-					loop_disabled = true;
-				}
-				ret = _t3f_sample_stream[i];
-				if(loop_disabled)
-				{
-					al_set_audio_stream_playmode(_t3f_sample_stream[i], ALLEGRO_PLAYMODE_ONCE);
-				}
-				else
-				{
-					al_set_audio_stream_loop_secs(_t3f_sample_stream[i], loop_start, loop_end);
-					al_set_audio_stream_playmode(_t3f_sample_stream[i], ALLEGRO_PLAYMODE_LOOP);
-				}
-				al_set_audio_stream_gain(_t3f_sample_stream[i], t3f_sound_volume * vol * gain);
-				al_attach_audio_stream_to_mixer(_t3f_sample_stream[i], al_get_default_mixer());
-			}
-			break;
+			al_set_audio_stream_playmode(_t3f_sample_stream[_t3f_sample_stream_slot], ALLEGRO_PLAYMODE_ONCE);
+		}
+		else
+		{
+			al_set_audio_stream_loop_secs(_t3f_sample_stream[_t3f_sample_stream_slot], loop_start, loop_end);
+			al_set_audio_stream_playmode(_t3f_sample_stream[_t3f_sample_stream_slot], ALLEGRO_PLAYMODE_LOOP);
+		}
+		al_set_audio_stream_pan(_t3f_sample_stream[_t3f_sample_stream_slot], pan);
+		al_set_audio_stream_gain(_t3f_sample_stream[_t3f_sample_stream_slot], t3f_sound_volume * vol * gain);
+		al_attach_audio_stream_to_mixer(_t3f_sample_stream[_t3f_sample_stream_slot], al_get_default_mixer());
+		al_set_audio_stream_playing(_t3f_sample_stream[_t3f_sample_stream_slot], true);
+		_t3f_sample_stream_slot++;
+		if(_t3f_sample_stream_slot >= T3F_MAX_SAMPLE_STREAMS)
+		{
+			_t3f_sample_stream_slot = 0;
 		}
 	}
 	return ret;
