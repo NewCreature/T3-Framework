@@ -46,6 +46,7 @@ static void allegro_get_element_edges(T3F_GUI * pp, int i, int * left, int * top
 			{
 				*bottom = pp->element[i].oy + t3f_get_font_line_height(*((T3F_FONT **)pp->element[i].resource));
 			}
+			break;
 		}
 		case T3F_GUI_ELEMENT_IMAGE:
 		{
@@ -66,6 +67,7 @@ static void allegro_get_element_edges(T3F_GUI * pp, int i, int * left, int * top
 				*bottom = pp->element[i].oy + al_get_bitmap_height(*((ALLEGRO_BITMAP **)pp->element[i].resource));
 			}
 		}
+		break;
 	}
 }
 
