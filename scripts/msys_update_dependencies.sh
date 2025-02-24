@@ -187,7 +187,7 @@ if [ $BUILD_OPUS -eq 1 ]; then
 fi
 
 # Opusfile
-if [ $BUILD_VORBIS -eq 1 ]; then
+if [ $BUILD_OPUSFILE -eq 1 ]; then
   echo "Updating Opusfile..."
   if [ ! -d "opusfile" ];
   then
