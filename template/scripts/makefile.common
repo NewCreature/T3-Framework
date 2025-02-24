@@ -125,6 +125,8 @@ else
 	rm -rf $(APP_REPACKAGE_DIR)
 	mkdir $(APP_REPACKAGE_DIR)
 	cp -a -R -L ../* $(APP_REPACKAGE_DIR)
+	touch -c $(APP_REPACKAGE_DIR)/macos/Info.plist
+	touch -c $(APP_REPACKAGE_DIR)/macos/entitlements.plist
 endif
 
 repackage_clean:
