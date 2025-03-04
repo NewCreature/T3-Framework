@@ -64,7 +64,7 @@ static int _t3f_get_touch_slot_by_id(int id)
 {
 	int i;
 
-	for(i = 0; i < T3F_MAX_TOUCHES; i++)
+	for(i = 2; i < T3F_MAX_TOUCHES; i++)
 	{
 		if(_t3f_touch_state[i].id == id)
 		{
