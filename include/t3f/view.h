@@ -22,12 +22,6 @@ typedef struct
 	float width;
 	float height;
 
-	/* adjusted offset of viewport (fot constraining aspect ratio) */
-	float adjusted_offset_x;
-	float adjusted_offset_y;
-	float adjusted_width;
-	float adjusted_height;
-
 	/* vanishing point */
 	float vp_x;
 	float vp_y;

@@ -1,4 +1,7 @@
 #include "t3f.h"
+#ifdef ALLEGRO_WINDOWS
+	#include <windows.h>
+#endif
 
 /* The code below is from a supposedly working implementation. We should derive
    our implementation from it and see if we can actually find our
@@ -240,17 +243,17 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 		char command[256] = {0};
 
 		#ifdef ALLEGRO_WINDOWS
-			snprintf(command, 256, "start %s", url);
+			ShellExecute(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
 		#else
 			#ifdef ALLEGRO_MACOSX
 				snprintf(command, 256, "open %s", url);
 			#else
 				snprintf(command, 256, "xdg-open %s", url);
 			#endif
+			al_stop_timer(t3f_timer);
+			(void) system(command);
+			al_start_timer(t3f_timer);
 		#endif
-		al_stop_timer(t3f_timer);
-		(void) system(command);
-		al_start_timer(t3f_timer);
 	}
 
 	char * t3f_run_url(const char * url)

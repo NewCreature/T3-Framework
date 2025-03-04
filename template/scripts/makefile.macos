@@ -123,6 +123,16 @@ mac_universal_bundle:
 	rm $(APP_EXE_NAME)-i386 $(APP_EXE_NAME)-x86_64 $(APP_EXE_NAME)-arm64
 	make mac_bundle
 
+# latest Steamworks SDK doesn't support i386
+mac_steam_bundle:
+	make clean
+	make mac_x86_64
+	make clean
+	make mac_arm64
+	lipo -create $(APP_EXE_NAME)-x86_64 $(APP_EXE_NAME)-arm64 -output $(APP_EXE_NAME)
+	rm $(APP_EXE_NAME)-x86_64 $(APP_EXE_NAME)-arm64
+	make mac_bundle
+
 mac_package: clean clean_packages mac_universal_bundle mac_sign_and_notarize_bundle
 	../tools/create-dmg/create-dmg --volname $(APP_TITLE) --volicon $(APP_PACKAGE_DIR)/$(APP_TITLE).app/Contents/Resources/$(APP_TITLE).icns --window-size 400 232 --icon-size 96 --icon "$(APP_TITLE)" 110 100 --app-drop-link 280 100 $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos.dmg $(APP_PACKAGE_DIR)/$(APP_TITLE).app
 
@@ -158,7 +168,7 @@ else
 	@echo Package not signed, missing credentials in 'makefile.config'.
 endif
 
-mac_steam_package: source_only_package steam_touch mac_universal_bundle steam_cleanup mac_sign_and_notarize_bundle
+mac_steam_package: source_only_package steam_touch mac_steam_bundle steam_cleanup mac_sign_and_notarize_bundle
 	ditto -c -k --keepParent $(APP_PACKAGE_DIR)/$(APP_TITLE).app $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-macos-steam.zip
 	cd $(APP_PACKAGE_DIR) && zip -9 $(APP_PACKAGE_NAME)-macos-steam.zip $(APP_PACKAGE_FILENAME)
 

@@ -572,7 +572,16 @@ static int t3f_set_new_gfx_mode(int w, int h, int flags)
 {
 	char val[128] = {0};
 	int ret = 1;
+	int new_flags = 0;
 
+	if(flags & T3F_USE_FULLSCREEN)
+	{
+		new_flags = ALLEGRO_FULLSCREEN_WINDOW;
+	}
+	if(flags & T3F_RESIZABLE)
+	{
+		new_flags = ALLEGRO_RESIZABLE;
+	}
 	if(flags & T3F_RESIZABLE)
 	{
 		if(!(t3f_flags & T3F_RESIZABLE))
@@ -633,6 +642,50 @@ static int t3f_set_new_gfx_mode(int w, int h, int flags)
 				}
 			}
 		}
+	}
+
+	/* destroy old display and create a new one if operation failed in some way */
+	if(ret != 1)
+	{
+		t3f_unload_atlases();
+		t3f_unload_resources();
+		al_destroy_display(t3f_display);
+		al_set_new_display_flags(new_flags);
+		t3f_display = al_create_display(w, h);
+		if(t3f_display)
+		{
+			t3f_reload_resources();
+			t3f_rebuild_atlases();
+			ret = 1;
+		}
+		if(flags & T3F_USE_FULLSCREEN)
+		{
+			t3f_flags |= T3F_USE_FULLSCREEN;
+		}
+		else
+		{
+			t3f_flags &= ~T3F_USE_FULLSCREEN;
+		}
+		if(flags & T3F_RESIZABLE)
+		{
+			t3f_flags |= T3F_RESIZABLE;
+		}
+		else
+		{
+			t3f_flags &= ~T3F_RESIZABLE;
+		}
+	}
+	else
+	{
+		#ifdef ALLEGRO_WINDOWS
+			if(!(t3f_flags & T3F_USE_OPENGL))
+			{
+				t3f_unload_atlases();
+				t3f_unload_resources();
+				t3f_reload_resources();
+				t3f_rebuild_atlases();
+			}
+		#endif
 	}
 
 	/* update settings if we successfully set the new mode */

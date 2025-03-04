@@ -24,7 +24,7 @@ bool t3f_init_steam_integration(T3F_ACHIEVEMENTS_LIST * achievements_list)
     SteamAPI_ManualDispatch_Init();
     _t3f_achievements_list = achievements_list;
     _t3f_steam_integration_enabled = true;
-    SteamAPI_ISteamUserStats_RequestCurrentStats(SteamUserStats());
+    SteamAPI_ISteamUserStats_RequestUserStats(SteamUserStats(), SteamAPI_ISteamUser_GetSteamID(SteamAPI_SteamUser()));
     val = al_get_config_value(t3f_config, "Setting", "Steam Notification Interval");
     if(val)
     {

@@ -80,6 +80,7 @@ static void _t3f_setup_view_transformation_letterbox_fill(T3F_VIEW * view, float
 {
 	float min_size;
 
+	/* constrain the view ratio */
 	if(view_ratio < view->aspect_min)
 	{
 		view_ratio = view->aspect_min;
@@ -88,29 +89,13 @@ static void _t3f_setup_view_transformation_letterbox_fill(T3F_VIEW * view, float
 	{
 		view_ratio = view->aspect_max;
 	}
-	/* need to adjust y */
-	if(view_ratio > view->aspect_max)
-	{
-		min_size = view->height / view->aspect_max;
-		view->scale_x = min_size / (float)view->virtual_width;
-		view->scale_y = view->scale_x;
-		view->left = 0.0;
-		view->top = -(view->height - min_size / virtual_display_ratio) / 2.0;
-		view->translate_x = view->offset_x + view->width / 2.0 - (view->width * view->scale_x) / 2.0;
-		view->translate_y = view->offset_y - view->top;
-	}
-	else
-	{
-		min_size = view->width / view->aspect_min;
-		view->scale_y = min_size / (float)view->virtual_height;
-		view->scale_x = view->scale_y;
-		view->left = -(view->width - min_size * virtual_display_ratio) / 2.0;
-		view->top = 0.0;
-		view->translate_x = view->offset_x - view->left;
-		view->translate_y = view->offset_y + view->height / 2.0 - (view->height * view->scale_y) / 2.0;
-	}
-	view->left /= view->scale_x;
-	view->top /= view->scale_y;
+	min_size = view->width;
+	view->scale_x = min_size / (float)view->virtual_width;
+	view->scale_y = view->scale_x;
+	view->left = 0.0;
+	view->top = 0.0;
+	view->translate_x = 0.0;
+	view->translate_y = (view->offset_y + view->height) / 2.0 - (view->virtual_height * view->scale_y) / 2.0;
 	view->bottom = view->virtual_height - view->top;
 	view->right = view->virtual_width - view->left;
 }
