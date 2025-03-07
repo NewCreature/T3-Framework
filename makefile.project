@@ -26,6 +26,7 @@ else
 	@cp -a template/packages "$(DIR)"
 	@cp -a template/misc "$(DIR)"
 	@cp -a template/scripts "$(DIR)"
+	@cp -a template/tools "$(DIR)"
 	@cp template/misc/blank_changes "$(DIR)/changes.txt"
 endif
 
@@ -50,6 +51,7 @@ else
 	@cp -a template/packages "$(DIR)"
 	@cp -a template/misc "$(DIR)"
 	@cp -a template/scripts "$(DIR)"
+	@cp -a template/tools "$(DIR)"
 endif
 
 import_updates:
@@ -74,4 +76,5 @@ else
 	@cp -a "$(DIR)/ios/." template/ios/
 	@cp -a "$(DIR)/misc/." template/misc/
 	@cp -a "$(DIR)/scripts/." template/scripts/
+	@cp -a "$(DIR)/tools/." template/tools/
 endif
