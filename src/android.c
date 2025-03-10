@@ -204,7 +204,7 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 		jbyteArray retB;
 		int retB_size;
 		const jbyte * ret;
-		char * real_ret;
+		char * real_ret = NULL;
 
 		retB = _jni_callObjectMethodV(
 			_al_android_get_jnienv(),
@@ -213,18 +213,26 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 			"(Ljava/lang/String;)[B",
 			urlS
 		);
-		retB_size = (*env)->GetArrayLength(env, retB);
-		ret = (*env)->GetByteArrayElements(env, retB, NULL);
-		real_ret = malloc(retB_size);
-		if(real_ret)
+		if(retB)
 		{
-			memcpy(real_ret, ret, retB_size);
+			retB_size = (*env)->GetArrayLength(env, retB);
+			ret = (*env)->GetByteArrayElements(env, retB, NULL);
+			real_ret = malloc(retB_size);
+			if(real_ret)
+			{
+				memcpy(real_ret, ret, retB_size);
+			}
+			(*env)->ReleaseStringUTFChars(env, retB, ret);
 		}
-		(*env)->ReleaseStringUTFChars(env, retB, ret);
 		return real_ret;
-}
+	}
 
-#else
+	void _t3f_reset_android_bg_color(void)
+	{
+		_jni_callVoidMethodV(_al_android_get_jnienv(), _al_android_activity_object(), "ResetBackgroundColor", "()V");
+	}
+
+	#else
 
 	void t3f_android_support_helper(void)
 	{
@@ -235,6 +243,10 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 	}
 
 	void t3f_show_soft_keyboard(bool toggle)
+	{
+	}
+
+	void _t3f_reset_android_bg_color(void)
 	{
 	}
 

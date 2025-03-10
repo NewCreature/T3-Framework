@@ -526,6 +526,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	{
 		return 0;
 	}
+	_t3f_reset_android_bg_color();
 
 	return 1;
 }

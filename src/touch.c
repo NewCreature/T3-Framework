@@ -385,9 +385,9 @@ void t3f_clear_touch_state(void)
 {
 	int i;
 
-  memset(_t3f_touch_state, 0, sizeof(_T3F_TOUCH_STATE) * T3F_MAX_TOUCHES);
+	memset(_t3f_touch_state, 0, sizeof(_T3F_TOUCH_STATE) * T3F_MAX_TOUCHES);
 	for(i = 0; i < T3F_MAX_TOUCHES; i++)
 	{
-    _t3f_touch_state[i].id = -1;
+		_t3f_touch_state[i].id = -1;
 	}
 }
