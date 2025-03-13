@@ -14,6 +14,7 @@ typedef struct
 
   T3F_OBJECT_LOADER * object_loader;
   ALLEGRO_BITMAP * bitmap;
+  ALLEGRO_BITMAP * loading_bitmap;
   int flags;
 
   /* how big the bitmap should appear on screen */

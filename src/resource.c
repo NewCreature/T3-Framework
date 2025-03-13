@@ -366,6 +366,19 @@ bool t3f_destroy_resource(void * ptr)
 	return false;
 }
 
+void t3f_remap_resource(void ** original_ptr, void ** new_ptr)
+{
+	int i;
+
+	for(i = 0; i < _t3f_resources; i++)
+	{
+		if(_t3f_resource[i]->ptr == original_ptr)
+		{
+			_t3f_resource[i]->ptr = new_ptr;
+		}
+	}
+}
+
 void t3f_unload_resources(void)
 {
 	int i;

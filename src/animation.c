@@ -455,7 +455,7 @@ typedef struct
 static void * _t3f_load_actual_animation_data(void * arg)
 {
 	_T3F_ANIMATION_LOAD_INFO * load_info = (_T3F_ANIMATION_LOAD_INFO *)arg;
-	T3F_ANIMATION_DATA * ret;
+	T3F_ANIMATION_DATA * ret = NULL;
 
 	if(arg)
 	{
@@ -681,12 +681,18 @@ int t3f_save_animation(T3F_ANIMATION * ap, const char * fn)
 bool t3f_update_animation(T3F_ANIMATION * ap)
 {
 	int i;
+	T3F_ANIMATION_DATA * new_data;
 
 	if(t3f_object_ready(ap->object_loader))
 	{
-		ap->data = t3f_fetch_object(ap->object_loader);
-		if(ap->data)
+		new_data = t3f_fetch_object(ap->object_loader);
+		if(new_data)
 		{
+			if(new_data != ap->data)
+			{
+				_t3f_destroy_animation_data(ap->data);
+				ap->data = new_data;
+			}
 			_t3f_fix_animation_frames(ap);
 			for(i = 0; i < ap->data->bitmaps->count; i++)
 			{

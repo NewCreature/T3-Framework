@@ -547,7 +547,7 @@ T3F_BITMAP * t3f_load_bitmap(const char * fn, int flags, bool threaded)
 	}
 	memset(load_info, 0, sizeof(_T3F_BITMAP_LOAD_INFO));
 	load_info->flags = flags;
-	load_info->bitmap = &bp->bitmap;
+	load_info->bitmap = &bp->loading_bitmap;
 
 	loading_fn = strdup(fn);
 	if(!loading_fn)
@@ -728,11 +728,14 @@ int t3f_get_bitmap_height(T3F_BITMAP * bp)
 /* return false if object was ready but the fetched bitmap was NULL */
 bool t3f_update_bitmap(T3F_BITMAP * bp)
 {
+	ALLEGRO_BITMAP * new_bitmap;
+
 	if(t3f_object_ready(bp->object_loader))
 	{
-		bp->bitmap = t3f_fetch_object(bp->object_loader);
-		if(bp->bitmap)
+		new_bitmap = t3f_fetch_object(bp->object_loader);
+		if(new_bitmap)
 		{
+			bp->bitmap = new_bitmap;
 			al_convert_bitmap(bp->bitmap);
 			if(bp->flags & T3F_BITMAP_FLAG_PADDED)
 			{
@@ -743,6 +746,7 @@ bool t3f_update_bitmap(T3F_BITMAP * bp)
 				bp->adjust_top = bp->pad_top * bp->target_scale_y;
 				bp->adjust_bottom = bp->pad_bottom * bp->target_scale_y;
 			}
+			t3f_remap_resource(&bp->loading_bitmap, &bp->bitmap);
 			return true;
 		}
 		else

@@ -47,6 +47,8 @@ static void * load_thread_proc(ALLEGRO_THREAD * tp, void * data)
 {
 	T3F_OBJECT_LOADER * dp = (T3F_OBJECT_LOADER *)data;
 
+  al_set_fs_interface(dp->fs_interface);
+  al_set_new_file_interface(dp->file_interface);
   dp->loading_object = dp->ctor(dp->arg);
   dp->ready = true;
 
@@ -59,6 +61,8 @@ void * t3f_load_object(T3F_OBJECT_LOADER * dp, void * (*ctor)(void * data), void
   bool skip_thread = false;
 
   t3f_stop_object_loader(dp);
+  dp->fs_interface = al_get_fs_interface();
+  dp->file_interface = al_get_new_file_interface();
   dp->ctor = ctor;
   dp->dtor = dtor;
   dp->arg = arg;
