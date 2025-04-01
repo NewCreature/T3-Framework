@@ -746,7 +746,7 @@ bool t3f_update_bitmap(T3F_BITMAP * bp)
 				bp->adjust_top = bp->pad_top * bp->target_scale_y;
 				bp->adjust_bottom = bp->pad_bottom * bp->target_scale_y;
 			}
-			t3f_remap_resource(&bp->loading_bitmap, &bp->bitmap);
+			t3f_remap_resource((void **)&bp->loading_bitmap, (void **)&bp->bitmap);
 			return true;
 		}
 		else

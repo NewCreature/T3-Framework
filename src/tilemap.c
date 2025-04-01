@@ -221,7 +221,6 @@ bool t3f_atlas_tileset(T3F_TILESET * tsp)
 {
 	int tile_sheet_size = 1024; // may want to calculate this from the tile data for an optimization
 	int i;
-	bool fail = false;
 
 	tsp->atlas = t3f_create_atlas(tile_sheet_size, tile_sheet_size);
 	if(!tsp->atlas)
@@ -233,7 +232,6 @@ bool t3f_atlas_tileset(T3F_TILESET * tsp)
 		if(!t3f_add_animation_to_atlas(tsp->atlas, tsp->tile[i]->ap, T3F_ATLAS_TILE))
 		{
 			printf("sprite sheet failed\n");
-			fail = true;
 		}
 	}
 	return true;

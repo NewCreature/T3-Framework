@@ -100,53 +100,6 @@ static void t3f_actually_put_bitmap_on_atlas_fbo(T3F_ATLAS * ap, ALLEGRO_BITMAP 
 	al_draw_bitmap(bp, ap->x + 1, ap->y + 1, 0);
 }
 
-static void t3f_pixel_copy_bitmap(ALLEGRO_BITMAP * src, ALLEGRO_BITMAP * dest, int x, int y)
-{
-	int i, j;
-	ALLEGRO_STATE old_state;
-
-	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP);
-	al_lock_bitmap_region(dest, x, y, al_get_bitmap_width(src), al_get_bitmap_height(src), ALLEGRO_PIXEL_FORMAT_RGBA_8888, ALLEGRO_LOCK_WRITEONLY);
-	al_lock_bitmap(src, ALLEGRO_PIXEL_FORMAT_RGBA_8888, ALLEGRO_LOCK_READONLY);
-	al_set_target_bitmap(dest);
-	for(i = 0; i < al_get_bitmap_height(src); i++)
-	{
-		for(j = 0; j < al_get_bitmap_width(src); j++)
-		{
-			al_put_pixel(x + j, y + i, al_get_pixel(src, j, i));
-		}
-	}
-	al_unlock_bitmap(src);
-	al_unlock_bitmap(dest);
-	al_restore_state(&old_state);
-}
-
-static void t3f_actually_put_bitmap_on_atlas_pixel_copy(T3F_ATLAS * ap, ALLEGRO_BITMAP * bp, int type)
-{
-	switch(type)
-	{
-		case T3F_ATLAS_TILE:
-		{
-			/* need to extend edges of tiles so they don't have soft edges */
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x, ap->y);
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x + 2, ap->y);
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x, ap->y + 2);
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x + 2, ap->y + 2);
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x + 1, ap->y);
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x + 1, ap->y + 2);
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x, ap->y + 1);
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x + 2, ap->y + 1);
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x + 1, ap->y + 1);
-			break;
-		}
-		case T3F_ATLAS_SPRITE:
-		{
-			t3f_pixel_copy_bitmap(bp, ap->page, ap->x + 1, ap->y + 1);
-			break;
-		}
-	}
-}
-
 ALLEGRO_BITMAP * t3f_put_bitmap_on_atlas(T3F_ATLAS * ap, ALLEGRO_BITMAP ** bp, int flags)
 {
 	ALLEGRO_STATE old_state;

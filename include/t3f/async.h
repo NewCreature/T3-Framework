@@ -7,8 +7,8 @@ typedef struct
 {
 
   ALLEGRO_THREAD * loading_thread;
-  ALLEGRO_FS_INTERFACE * fs_interface;
-  ALLEGRO_FILE_INTERFACE * file_interface;
+  const ALLEGRO_FS_INTERFACE * fs_interface;
+  const ALLEGRO_FILE_INTERFACE * file_interface;
   void * (*ctor)(void * data);
   void (*dtor)(void * data);
   void * arg;

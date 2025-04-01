@@ -277,7 +277,6 @@ void * t3f_load_font_data_with_engine(T3F_FONT_ENGINE * engine, const char * fn,
 	{
 		is_ttf = true;
 	}
-
 	fp = al_fopen(fn, "rb");
 	if(!fp)
 	{

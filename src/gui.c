@@ -407,14 +407,13 @@ void t3f_set_gui_element_interaction_colors(T3F_GUI * pp, ALLEGRO_COLOR inactive
 
 static bool t3f_gui_check_hover_x(T3F_GUI * pp, int i, float x)
 {
-	int left, right, width;
+	int left, right;
 
 	if((pp->element[i].flags & T3F_GUI_ELEMENT_STATIC))
 	{
 		return false;
 	}
 	t3f_gui_current_driver->get_element_edges(pp, i, &left, NULL, &right, NULL);
-	width = right - left;
 	if(x >= pp->ox + left && x < pp->ox + right)
 	{
 		return true;
