@@ -24,6 +24,12 @@ typedef struct
 /* keyboard data */
 static _T3F_KEY_STATE * _t3f_key_state = NULL;
 static _T3F_KEY_BUFFER * _t3f_key_buffer = NULL;
+static bool _t3f_key_repeat_enabled = true;
+
+void t3f_set_key_repeat(bool onoff)
+{
+	_t3f_key_repeat_enabled = onoff;
+}
 
 static void _handle_key_press(int keycode)
 {
@@ -79,11 +85,14 @@ void _t3f_handle_keyboard_event(ALLEGRO_EVENT * event)
 		/* a character was entered */
 		case ALLEGRO_EVENT_KEY_CHAR:
 		{
-			if(event->keyboard.unichar != -1)
+			if(_t3f_key_repeat_enabled || !event->keyboard.repeat)
 			{
-				t3f_put_char(event->keyboard.unichar);
+				if(event->keyboard.unichar != -1)
+				{
+					t3f_put_char(event->keyboard.unichar);
+				}
 			}
-			if(event->keyboard.repeat)
+			if(event->keyboard.repeat && _t3f_key_repeat_enabled)
 			{
 				_handle_key_press(event->keyboard.keycode);
 			}

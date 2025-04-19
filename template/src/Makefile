@@ -141,3 +141,6 @@ help:
 	@echo "\nLinux-only targets:\n"
 	@echo "  install:             Install application onto the system."
 	@echo "  uninstall:           Uninstall appplication from the system.\n"
+
+show_details:
+	$(MAKE) -f ../scripts/makefile.$(SYSTEM) -I ../scripts show_details

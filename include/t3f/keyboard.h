@@ -10,6 +10,7 @@ bool _t3f_initialize_keyboard(void);
 void _t3f_uninitialize_keyboard(void);
 void _t3f_handle_keyboard_event(ALLEGRO_EVENT * event);
 
+void t3f_set_key_repeat(bool onoff);
 bool t3f_key_held(int key);
 bool t3f_key_pressed(int key);
 bool t3f_use_key_press(int key);

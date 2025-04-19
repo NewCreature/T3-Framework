@@ -31,6 +31,24 @@ reset_config:
 	rm makefile.config
 	make finish
 
+show_details:
+	@echo ""
+	@echo "APP_COMPANY:         $(APP_COMPANY)"
+	@echo "APP_NAME:            $(APP_NAME)"
+	@echo "APP_TITLE:           $(APP_TITLE)"
+	@echo "APP_DATA_DIR:        $(APP_DATA_DIR)"
+	@echo "APP_VERSION:         $(APP_VERSION)"
+	@echo "APP_RELEASE:         $(APP_RELEASE)"
+	@echo "APP_PUBLISHER:       $(APP_PUBLISHER)"
+	@echo "APP_COPYRIGHT:       $(APP_COPYRIGHT)"
+	@echo "APP_ANDROID_PACKAGE: $(APP_ANDROID_PACKAGE)"
+	@echo "APP_ORIENTATION:     $(APP_ORIENTATION)"
+	@echo "APP_URL:             $(APP_URL)"
+	@echo "APP_STEAM_ID:        $(APP_STEAM_ID)"
+	@echo "APP_OBJECTS:         $(APP_OBJECTS)"
+	@echo "APP_PACKAGE_DIR:     $(APP_PACKAGE_DIR)"
+	@echo ""
+
 $(APP_EXE_NAME) : prepare_platform $(T3F_OBJECTS) $(APP_OBJECTS)
 	$(CC) $(LFLAGS) $(CONFIG_LFLAGS) $(T3F_OBJECTS) $(APP_OBJECTS) $(APP_LIBS) $(T3F_LIBRARIES) $(DEPEND_LIBS) -o $(APP_EXE_NAME)
 	@echo Executable built!

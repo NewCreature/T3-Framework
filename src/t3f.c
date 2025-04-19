@@ -494,7 +494,7 @@ int t3f_initialize(const char * name, int w, int h, double fps, void (*logic_pro
 	if(!(t3f_flags & T3F_NO_DISPLAY))
 	{
 		/* create a default view */
-		t3f_default_view = t3f_create_view(0, 0, al_get_display_width(t3f_display), al_get_display_height(t3f_display), t3f_virtual_display_width / 2, t3f_virtual_display_height / 2, t3f_flags);
+		t3f_default_view = t3f_create_view(NULL, 0, 0, al_get_display_width(t3f_display), al_get_display_height(t3f_display), t3f_virtual_display_width / 2, t3f_virtual_display_height / 2, t3f_flags);
 		if(!t3f_default_view)
 		{
 			printf("Failed to create default view!\n");
