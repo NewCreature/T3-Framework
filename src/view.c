@@ -237,6 +237,7 @@ void t3f_select_view(T3F_VIEW * vp)
 			scale_x *= current_view->scale_x;
 			scale_y *= current_view->scale_y;
 			al_build_transform(&current_view->transform, translate_x, translate_y, scale_x, scale_y, 0.0);
+			current_view->need_update = false;
 			current_view = current_view->child;
 		}
 	}
@@ -323,31 +324,36 @@ void t3f_set_view_render_offset(float x, float y, float z)
 void t3f_select_input_view(T3F_VIEW * vp)
 {
 	T3F_VIEW * old_view = t3f_current_view;
+	T3F_VIEW * current_view;
+	T3F_VIEW * last_view = NULL;
 	float translate_x = 0.0;
 	float translate_y = 0.0;
 	float scale_x = 1.0;
 	float scale_y = 1.0;
+	bool regenerate_transformation = false;
 
-	if(vp->need_update)
+	current_view = vp;
+	while(current_view)
+	{
+		current_view->child = last_view;
+		last_view = current_view;
+		if(current_view->need_update)
+		{
+			t3f_get_view_transformation(current_view);
+			regenerate_transformation = true;
+		}
+		current_view = current_view->parent;
+	}
+
+	if(regenerate_transformation)
 	{
 		t3f_select_view(vp);
-		t3f_current_view = old_view;
+		t3f_select_view(old_view);
 	}
-
-	if(vp && vp != t3f_default_view)
-	{
-		translate_x = t3f_default_view->translate_x + vp->translate_x * t3f_default_view->scale_x;
-		translate_y = t3f_default_view->translate_y + vp->translate_y * t3f_default_view->scale_y;
-		scale_x = t3f_default_view->scale_x * vp->scale_x;
-		scale_y = t3f_default_view->scale_y * vp->scale_y;
-	}
-	else
-	{
-		translate_x = t3f_default_view->translate_x;
-		translate_y = t3f_default_view->translate_y;
-		scale_x = t3f_default_view->scale_x;
-		scale_y = t3f_default_view->scale_y;
-	}
+	al_transform_coordinates(&vp->transform, &translate_x, &translate_y);
+	al_transform_coordinates(&vp->transform, &scale_x, &scale_y);
+	scale_x -= translate_x;
+	scale_y -= translate_y;
 
 	/* get new mouse coordinates */
 	if(t3f_flags & T3F_USE_MOUSE)
