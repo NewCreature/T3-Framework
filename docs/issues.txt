@@ -1,6 +1,8 @@
 T3F Issues
 ----------
 
+[ ]Fix project creation/upgrade/pull system. Should include extras.
+
 [ ]Add input module.
 
    [ ]Should handle construction of generic input devices.
