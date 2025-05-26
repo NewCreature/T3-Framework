@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = $(COMMON_CFLAGS) -DT3F_COMPANY="\"t3-i\"" -DT3F_PNG
+CFLAGS = $(COMMON_CFLAGS) -DT3F_DEVELOPER_NAME="\"tcbedsoftware\"" -DT3F_APP_DATA_DIR="\"tcubedsoftware\"" -DT3F_PNG
 LFLAGS = $(COMMON_LFLAGS)
 LIBS = `pkg-config --libs --static allegro_image-static-5` `pkg-config --libs --static allegro_font-static-5` `pkg-config --libs --static allegro_ttf-static-5` `pkg-config --libs --static allegro_primitives-static-5` `pkg-config --libs --static allegro_audio-static-5` `pkg-config --libs --static allegro_acodec-static-5` `pkg-config --libs --static allegro_dialog-static-5` `pkg-config --libs --static allegro_memfile-static-5` `pkg-config --libs --static allegro_color-static-5` `pkg-config --libs --static allegro-static-5` -lm -lsharpyuv
 EXE_SUFFIX =
