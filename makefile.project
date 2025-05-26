@@ -3,12 +3,12 @@ ifndef DIR
 	@echo "Usage: make project DIR=location"
 else
 	@echo "Creating new project in '$(DIR)'..."
-	@mkdir "$(DIR)"
-	@mkdir "$(DIR)/bin"
-	@mkdir "$(DIR)/bin/data"
-	@mkdir "$(DIR)/src"
-	@mkdir "$(DIR)/src/t3f"
-	@mkdir "$(DIR)/docs"
+	@mkdir -p "$(DIR)"
+	@mkdir -p "$(DIR)/bin"
+	@mkdir -p "$(DIR)/bin/data"
+	@mkdir -p "$(DIR)/src/extra"
+	@mkdir -p "$(DIR)/src/t3f/extra"
+	@mkdir -p "$(DIR)/docs"
 	@cp include/t3f/*.h "$(DIR)/src/t3f"
 	@cp src/*.c "$(DIR)/src/t3f"
 	@cp src/*.cpp "$(DIR)/src/t3f"
@@ -38,10 +38,17 @@ else
 	@echo "Verifying '$(DIR)' is a valid project directory..."
 	@find "$(DIR)/src/makefile.defines" > /dev/null
 	@echo "Upgrading project in '$(DIR)'..."
+	@mkdir -p "$(DIR)/bin"
+	@mkdir -p "$(DIR)/bin/data"
+	@mkdir -p "$(DIR)/src/extra"
+	@mkdir -p "$(DIR)/src/t3f/extra"
+	@mkdir -p "$(DIR)/docs"
 	@cp include/t3f/*.h "$(DIR)/src/t3f"
+	@cp include/t3f/extra.*.h "$(DIR)/src/t3f/extra"
 	@cp src/*.c "$(DIR)/src/t3f"
 	@cp src/*.cpp "$(DIR)/src/t3f"
 	@cp src/*.inc "$(DIR)/src/t3f"
+	@cp src/extra/*.c "$(DIR)/src/t3f/extra"
 	@cp template/src/Makefile "$(DIR)/src"
 	@cp -a template/debian "$(DIR)"
 	@cp -a template/android "$(DIR)"
@@ -65,7 +72,9 @@ else
 	@cp "$(DIR)/src/t3f/"*.c src
 	@cp "$(DIR)/src/t3f/"*.cpp src
 	@cp "$(DIR)/src/t3f/"*.inc src
+	@cp "$(DIR)/src/t3f/extra/"*.c src/extra
 	@cp "$(DIR)/src/t3f/"*.h include/t3f
+	@cp "$(DIR)/src/t3f/extra/"*.h include/t3f/extra
 	@cp "$(DIR)/src/Makefile" template/src/Makefile
 	@cp -a "$(DIR)/debian/." template/debian/
 	@cp -a "$(DIR)/android/." template/android/
