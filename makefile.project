@@ -21,6 +21,7 @@ else
 	@cp -a template/android "$(DIR)"
 	@cp -a template/windows "$(DIR)"
 	@cp -a template/macos "$(DIR)"
+	@cp -a template/linux "$(DIR)"
 	@cp -a template/ios "$(DIR)"
 	@cp -a template/icons "$(DIR)"
 	@cp -a template/packages "$(DIR)"
