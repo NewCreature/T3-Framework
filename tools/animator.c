@@ -579,6 +579,25 @@ int menu_proc_frame_shorten(int index, void * data)
 	return 0;
 }
 
+int menu_proc_frame_set_loop_point(int index, void * data)
+{
+	int i;
+	int tick_count = 0;
+
+	for(i = 0; i < current_frame; i++)
+	{
+		tick_count += animation->data->frame[i]->ticks;
+	}
+	animation->data->loop_point = tick_count;
+	return 0;
+}
+
+int menu_proc_frame_toggle_once_flag(int index, void * data)
+{
+	animation->data->flags ^= T3F_ANIMATION_FLAG_ONCE;
+	return 0;
+}
+
 int menu_proc_frame_previous(int i, void * data)
 {
 	current_frame--;
@@ -650,15 +669,15 @@ void global_logic(void)
 			}
 			t3f_use_key_press(ALLEGRO_KEY_TAB);
 		}
-		if(t3f_key_pressed(ALLEGRO_KEY_PAD_PLUS) && zoom < 10.0)
+		if(t3f_key_pressed(ALLEGRO_KEY_EQUALS) && zoom < 10.0)
 		{
 			zoom += 1.0;
-			t3f_use_key_press(ALLEGRO_KEY_PAD_PLUS);
+			t3f_use_key_press(ALLEGRO_KEY_EQUALS);
 		}
-		if(t3f_key_pressed(ALLEGRO_KEY_PAD_MINUS) && zoom > 1.0)
+		if(t3f_key_pressed(ALLEGRO_KEY_MINUS) && zoom > 1.0)
 		{
 			zoom -= 1.0;
-			t3f_use_key_press(ALLEGRO_KEY_PAD_MINUS);
+			t3f_use_key_press(ALLEGRO_KEY_MINUS);
 		}
 	}
 }
@@ -849,7 +868,7 @@ void logic(void * data)
 		/* toggle animation type */
 		if(t3f_key_pressed(ALLEGRO_KEY_O))
 		{
-			animation->data->flags ^= T3F_ANIMATION_FLAG_ONCE;
+			menu_proc_frame_toggle_once_flag(0, NULL);
 			t3f_animation_build_frame_list(animation);
 			t3f_use_key_press(ALLEGRO_KEY_O);
 		}
@@ -1000,6 +1019,8 @@ bool setup_menus(void)
 	t3f_add_menu_item(frame_menu, NULL, 0, NULL, NULL, NULL);
 	t3f_add_menu_item(frame_menu, "&Lengthen", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_lengthen, menu_update_frame_delete_proc);
 	t3f_add_menu_item(frame_menu, "Shor&ten", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_shorten, menu_update_frame_tick_proc);
+	t3f_add_menu_item(frame_menu, "Set Loop Point", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_set_loop_point, menu_update_frame_tick_proc);
+	t3f_add_menu_item(frame_menu, "Toggle Once Flag", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_toggle_once_flag, menu_update_frame_tick_proc);
 	t3f_add_menu_item(frame_menu, NULL, 0, NULL, NULL, NULL);
 	t3f_add_menu_item(frame_menu, "Pr&evious", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_previous, menu_update_frame_iter_proc);
 	t3f_add_menu_item(frame_menu, "Ne&xt", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_frame_next, menu_update_frame_iter_proc);
@@ -1018,7 +1039,7 @@ bool setup_menus(void)
 
 bool initialize(void)
 {
-	if(!t3f_initialize("T3F Animator", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_MENU, NULL))
+	if(!t3f_initialize("T3F Animator", 640, 480, 60.0, logic, render, T3F_USE_KEYBOARD | T3F_USE_MOUSE | T3F_USE_MENU | T3F_FORCE_ASPECT | T3F_RESIZABLE, NULL))
 	{
 		printf("Failed to initialize T3F.\n");
 		return false;
@@ -1065,5 +1086,6 @@ int main(int argc, char * argv[])
 		return -1;
 	}
 	t3f_run();
+	t3f_finish();
 	return 0;
 }
