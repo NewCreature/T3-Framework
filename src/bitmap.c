@@ -520,8 +520,8 @@ T3F_BITMAP * t3f_load_bitmap(const char * fn, int flags, bool threaded)
 	ALLEGRO_CONFIG * cp = NULL;
 	const char * val;
 	T3F_BITMAP * bp;
-  char * loading_fn = NULL;
-  char * loading_section;
+	char * loading_fn = NULL;
+	char * loading_section;
 	char * base_fn;
 	_T3F_BITMAP_LOAD_INFO * load_info = NULL;
 

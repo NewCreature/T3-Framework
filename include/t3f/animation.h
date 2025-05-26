@@ -11,8 +11,7 @@
 #include "async.h"
 
 #define T3F_ANIMATION_MAX_BITMAPS  256
-#define T3F_ANIMATION_MAX_FRAMES  1024
-#define T3F_ANIMATION_REVISION       1 // change to 1 after we fix image loading to use memfiles
+#define T3F_ANIMATION_REVISION       2 // change to 1 after we fix image loading to use memfiles
 
 #define T3F_ANIMATION_FLAG_ONCE             1
 #define T3F_ANIMATION_FLAG_EXTERNAL_BITMAPS 2
@@ -42,13 +41,14 @@ typedef struct
 
 typedef struct
 {
-  T3F_ANIMATION_BITMAPS * bitmaps;
+	T3F_ANIMATION_BITMAPS * bitmaps;
 
-	T3F_ANIMATION_FRAME * frame[T3F_ANIMATION_MAX_FRAMES];
+	T3F_ANIMATION_FRAME ** frame;
 	int frames;
 
-	int frame_list[T3F_ANIMATION_MAX_FRAMES];
+	int * frame_list;
 	int frame_list_total;
+	int loop_point;
 
 	int flags;
 

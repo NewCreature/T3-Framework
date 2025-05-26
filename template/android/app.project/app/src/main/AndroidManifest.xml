@@ -9,6 +9,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.AppTheme"
         android:debuggable="false"
+        android:installLocation="auto"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
