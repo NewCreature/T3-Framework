@@ -44,7 +44,7 @@ else
 	@mkdir -p "$(DIR)/src/t3f/extra"
 	@mkdir -p "$(DIR)/docs"
 	@cp include/t3f/*.h "$(DIR)/src/t3f"
-	@cp include/t3f/extra.*.h "$(DIR)/src/t3f/extra"
+	@cp include/t3f/extra/*.h "$(DIR)/src/t3f/extra"
 	@cp src/*.c "$(DIR)/src/t3f"
 	@cp src/*.cpp "$(DIR)/src/t3f"
 	@cp src/*.inc "$(DIR)/src/t3f"
