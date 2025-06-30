@@ -11,6 +11,7 @@
 char filename[1024] = {0};
 char last_animation_filename[1024] = {0};
 char last_bitmap_filename[1024] = {0};
+char loaded_filename[1024] = {0};
 ALLEGRO_FONT * font = NULL;
 char * animation_fn = NULL;
 T3F_ANIMATION * animation = NULL;
@@ -81,6 +82,19 @@ char * select_file(const char * initial, const char * title, const char * types,
 int menu_update_proc(ALLEGRO_MENU * menu, int item, void * data)
 {
 	if(animation)
+	{
+		al_set_menu_item_flags(menu, item, 0);
+	}
+	else
+	{
+		al_set_menu_item_flags(menu, item, ALLEGRO_MENU_ITEM_DISABLED);
+	}
+	return 0;
+}
+
+int menu_update_save_proc(ALLEGRO_MENU * menu, int item, void * data)
+{
+	if(animation && strlen(loaded_filename))
 	{
 		al_set_menu_item_flags(menu, item, 0);
 	}
@@ -265,6 +279,7 @@ int menu_proc_file_new(int i, void * data)
 		t3f_destroy_animation(animation);
 	}
 	animation = t3f_create_animation();
+	strcpy(loaded_filename, "");
 	t3f_refresh_menus();
 	return 0;
 }
@@ -282,15 +297,17 @@ int menu_proc_file_load(int i, void * data)
 		}
 		strcpy(last_animation_filename, filename);
 		animation = t3f_load_animation(last_animation_filename, 0, false);
+		if(animation)
+		{
+			strcpy(loaded_filename, filename);
+		}
+		else
+		{
+			strcpy(loaded_filename, "");
+		}
 		update_config();
 		t3f_refresh_menus();
 	}
-	return 0;
-}
-
-int menu_proc_file_save(int i, void * data)
-{
-	t3f_save_animation(animation, last_animation_filename);
 	return 0;
 }
 
@@ -302,8 +319,22 @@ int menu_proc_file_save_as(int i, void * data)
 	if(filename)
 	{
 		strcpy(last_animation_filename, filename);
-		menu_proc_file_save(0, data);
+		strcpy(loaded_filename, filename);
+		t3f_save_animation(animation, loaded_filename);
 		update_config();
+	}
+	return 0;
+}
+
+int menu_proc_file_save(int i, void * data)
+{
+	if(strlen(loaded_filename))
+	{
+		t3f_save_animation(animation, loaded_filename);
+	}
+	else
+	{
+		menu_proc_file_save_as(i, data);
 	}
 	return 0;
 }
@@ -633,6 +664,14 @@ void global_logic(void)
 				t3f_destroy_animation(animation);
 			}
 			animation = t3f_load_animation(fn, 0, false);
+			if(animation)
+			{
+				strcpy(loaded_filename, filename);
+			}
+			else
+			{
+				strcpy(loaded_filename, "");
+			}
 			strcpy(last_animation_filename, fn);
 		}
 		t3f_use_key_press(ALLEGRO_KEY_F3);
@@ -973,7 +1012,7 @@ bool setup_menus(void)
 	t3f_add_menu_item(file_menu, "New from Images", 0, NULL, menu_proc_new_from_images, NULL);
 	t3f_add_menu_item(file_menu, "&Load", 0, NULL, menu_proc_file_load, NULL);
 	t3f_add_menu_item(file_menu, NULL, 0, NULL, NULL, NULL);
-	t3f_add_menu_item(file_menu, "&Save", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_file_save, menu_update_proc);
+	t3f_add_menu_item(file_menu, "&Save", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_file_save, menu_update_save_proc);
 	t3f_add_menu_item(file_menu, "Save &As", ALLEGRO_MENU_ITEM_DISABLED, NULL, menu_proc_file_save_as, menu_update_proc);
 	#ifndef ALLEGRO_MACOSX
 		t3f_add_menu_item(file_menu, NULL, 0, NULL, NULL, NULL);
@@ -1057,8 +1096,13 @@ bool initialize(void)
 		animation = t3f_load_animation(animation_fn, 0, false);
 		if(animation)
 		{
+			strcpy(loaded_filename, filename);
 			strcpy(last_animation_filename, animation_fn);
 			update_config();
+		}
+		else
+		{
+			strcpy(loaded_filename, "");
 		}
 	}
 	if(!setup_menus())
