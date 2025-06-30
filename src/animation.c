@@ -944,7 +944,7 @@ T3F_ANIMATION_FRAME * t3f_animation_get_frame(T3F_ANIMATION * ap, int tick)
 	else
 	{
 		loop_ticks = ap->data->frame_list_total - ap->data->loop_point;
-		if(tick > ap->data->frame_list_total)
+		if(tick >= ap->data->frame_list_total)
 		{
 			tick -= ap->data->loop_point;
 			tick = tick % loop_ticks + ap->data->loop_point;
