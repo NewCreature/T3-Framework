@@ -641,6 +641,35 @@ T3F_BITMAP * t3f_load_bitmap(const char * fn, int flags, bool threaded)
 	}
 }
 
+T3F_BITMAP * t3f_clone_bitmap(T3F_BITMAP * bp)
+{
+	T3F_BITMAP * new_bitmap;
+
+	new_bitmap = malloc(sizeof(T3F_BITMAP));
+	if(!new_bitmap)
+	{
+		goto fail;
+	}
+	memcpy(new_bitmap, bp, sizeof(T3F_BITMAP));
+	new_bitmap->object_loader = NULL;
+	new_bitmap->loading_bitmap = NULL;
+	new_bitmap->bitmap = NULL;
+	if(!t3f_clone_resource((void **)(&new_bitmap->bitmap), bp->bitmap))
+	{
+		goto fail;
+	}
+	return new_bitmap;
+
+	fail:
+	{
+		if(new_bitmap)
+		{
+			free(new_bitmap);
+		}
+		return NULL;
+	}
+}
+
 T3F_BITMAP * t3f_encapsulate_bitmap(ALLEGRO_BITMAP * bp)
 {
 	T3F_BITMAP * new_bp;

@@ -197,7 +197,7 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 		(*env)->DeleteLocalRef(env, urlS);
 	}
 
-	char * t3f_run_url(const char * url)
+	char * t3f_run_url(const char * url, const char ** post_data, const char * out_path, char ** out_data)
 	{
 		JNIEnv * env = _al_android_get_jnienv();
 		jstring urlS = (*env)->NewStringUTF(env, url);
@@ -268,7 +268,7 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 		#endif
 	}
 
-	char * t3f_run_url(const char * url)
+	char * t3f_run_url(const char * url, const char ** post_data, const char * out_path, char ** out_data)
 	{
 		return NULL;
 	}

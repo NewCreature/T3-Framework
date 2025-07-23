@@ -21,6 +21,7 @@ T3F_PLATFORM_LIBRARIES =\
 	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_color$(ALLEGRO_SUFFIX)-5`\
 	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_memfile$(ALLEGRO_SUFFIX)-5`\
 	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_dialog$(ALLEGRO_SUFFIX)-5`\
+	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_physfs$(ALLEGRO_SUFFIX)-5`\
 	`pkg-config $(PKG_CONFIG_OPTIONS) allegro_main$(ALLEGRO_SUFFIX)-5`\
 	-framework IOKit\
 	-framework AudioToolbox\

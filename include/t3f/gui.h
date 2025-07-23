@@ -5,22 +5,26 @@
    extern "C" {
 #endif
 
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_font.h>
+#include "t3f.h"
 
 #define T3F_GUI_MAX_ELEMENTS    128
 
 /* GUI element types */
 #define T3F_GUI_ELEMENT_TEXT      0 // text element
 #define T3F_GUI_ELEMENT_IMAGE     1 // image element
+#define T3F_GUI_ELEMENT_ANIMATION 2 // animation element
 
 /* GUI_element flags */
-#define T3F_GUI_ELEMENT_STATIC    1 // do not animate on hover
-#define T3F_GUI_ELEMENT_CENTRE    2 // element is centered
-#define T3F_GUI_ELEMENT_SHADOW    4 // element has shadow
-#define T3F_GUI_ELEMENT_AUTOHIDE  8 // element is hidden unless mouse pointer is close
-#define T3F_GUI_ELEMENT_COPY     16 // element maintains its own copy of the data
-#define T3F_GUI_ELEMENT_ON_TOUCH 32 // active upon touch
+#define T3F_GUI_ELEMENT_STATIC    (1 << 0) // do not animate on hover
+#define T3F_GUI_ELEMENT_CENTER_H  (1 << 1)
+#define T3F_GUI_ELEMENT_CENTER_V  (1 << 2)
+#define T3F_GUI_ELEMENT_SHADOW    (1 << 3) // element has shadow
+#define T3F_GUI_ELEMENT_AUTOHIDE  (1 << 4) // element is hidden unless mouse pointer is close
+#define T3F_GUI_ELEMENT_COPY      (1 << 5) // element maintains its own copy of the data
+#define T3F_GUI_ELEMENT_ON_TOUCH  (1 << 6) // active upon touch
+#define T3F_GUI_ELEMENT_OWN       (1 << 7)
+#define T3F_GUI_ELEMENT_CENTRE T3F_GUI_ELEMENT_CENTER_H
+#define T3F_GUI_ELEMENT_CENTER T3F_GUI_ELEMENT_CENTER_H
 
 /* GUI flags */
 #define T3F_GUI_DISABLED          (1 << 0) // GUI is disabled
@@ -34,13 +38,14 @@ typedef struct
 	int type;
 	const void * data;
   void * allocated_data;
-	void ** resource; // for bitmaps, fonts, etc.
+	void * resource; // for bitmaps, fonts, etc.
 	ALLEGRO_COLOR color;
   ALLEGRO_COLOR inactive_color;
   ALLEGRO_COLOR active_color;
 	int flags;
 	int (*proc)(void *, int, void *);
 	char * description;
+	int description_flags;
 
 	int ox, oy;
 	int d1, d2, d3, d4;
@@ -64,6 +69,7 @@ typedef struct
   int font_margin_bottom;
   int font_margin_left;
   int font_margin_right;
+	int tick;
 
 } T3F_GUI;
 
@@ -76,12 +82,14 @@ typedef struct
 } T3F_GUI_DRIVER;
 
 void t3f_set_gui_driver(T3F_GUI_DRIVER * dp);
+void t3f_set_gui_shadow_color(ALLEGRO_COLOR color);
 T3F_GUI * t3f_create_gui(int ox, int oy);
 void t3f_destroy_gui(T3F_GUI * pp);
 
-int t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(void *, int, void *), void ** bp, int ox, int oy, int flags);
-int t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(void *, int, void *), const char * text, void ** fp, int ox, int oy, ALLEGRO_COLOR color, int flags);
-int t3f_describe_last_gui_element(T3F_GUI * pp, char * text);
+T3F_GUI_ELEMENT * t3f_add_gui_image_element(T3F_GUI * pp, int (*proc)(void *, int, void *), T3F_BITMAP * bitmap, ALLEGRO_COLOR color, int ox, int oy, int flags);
+T3F_GUI_ELEMENT * t3f_add_gui_animation_element(T3F_GUI * pp, int (*proc)(void *, int, void *), T3F_ANIMATION * animation, ALLEGRO_COLOR color, int ox, int oy, int flags);
+T3F_GUI_ELEMENT * t3f_add_gui_text_element(T3F_GUI * pp, int (*proc)(void *, int, void *), T3F_FONT * font, ALLEGRO_COLOR color, const char * text, int ox, int oy, int flags);
+int t3f_describe_last_gui_element(T3F_GUI * pp, char * text, int flags);
 void t3f_center_gui(T3F_GUI * pp, float oy, float my);
 void t3f_set_gui_shadow(T3F_GUI * pp, float x, float y);
 void t3f_set_gui_hover_lift(T3F_GUI * pp, float x, float y);

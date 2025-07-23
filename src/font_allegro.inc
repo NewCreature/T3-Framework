@@ -24,7 +24,7 @@ static void convert_grey_to_alpha(ALLEGRO_BITMAP * bitmap)
 			al_unmap_rgba(pixel, &ir, &ig, &ib, &ia);
 			if(ir == 255 && ig == 0 && ib == 255)
 			{
-				pixel = al_map_rgba(0, 0, 0, 0);
+				pixel = al_map_rgba(255, 0, 255, 255);
 				al_put_pixel(x, y, pixel);
 			}
 			else if(ia > 0 && !(ir == 255 && ig == 255 && ib == 0))
@@ -44,11 +44,11 @@ static void * load_bitmap_font_f(ALLEGRO_FILE * fp, const char * extension)
 	ALLEGRO_BITMAP * bp;
 	ALLEGRO_FONT * font = NULL;
 	int ranges[] = {32, 126};
+	char buf[256];
 
 	bp = al_load_bitmap_f(fp, extension);
 	if(bp)
 	{
-		convert_grey_to_alpha(bp);
 		font = al_grab_font_from_bitmap(bp, 1, ranges);
 		al_destroy_bitmap(bp);
 	}
