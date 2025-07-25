@@ -279,7 +279,7 @@ if [ $BUILD_LIBICONV -eq 1 ]; then
     remake_dir libiconv
   fi
   cd libiconv
-  wget https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz
+  wget https://ftp.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz
   tar xzf libiconv-1.17.tar.gz
   cd libiconv-1.17
   ./configure --enable-static=yes --enable-shared=no
