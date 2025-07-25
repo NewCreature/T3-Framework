@@ -496,7 +496,7 @@ T3F_BITMAP * t3f_load_bitmap_f(ALLEGRO_FILE * fp, const char * fn, int flags)
 	bp->target_height = -1;
 	bp->flags = flags;
 
-	t3f_load_resource_f((void **)(&bp->bitmap), t3f_bitmap_resource_handler_proc, fp, fn, 0, 0);
+	t3f_load_resource_f((void **)(&bp->bitmap), t3f_bitmap_resource_handler_proc, fp, fn, (flags & T3F_BITMAP_FLAG_DIRECT_LOAD) ? 1 : 0, 0);
 	if(!bp->bitmap)
 	{
 		goto fail;

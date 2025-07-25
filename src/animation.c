@@ -283,7 +283,7 @@ static T3F_ANIMATION_DATA * _t3f_load_animation_data_f(ALLEGRO_FILE * fp, const 
 			ap->bitmaps->count = al_fread16le(fp);
 			for(i = 0; i < ap->bitmaps->count; i++)
 			{
-				ap->bitmaps->bitmap[i] = t3f_load_bitmap_f(fp, fn, flags);
+				ap->bitmaps->bitmap[i] = t3f_load_bitmap_f(fp, fn, flags | T3F_BITMAP_FLAG_DIRECT_LOAD);
 				if(!ap->bitmaps->bitmap[i])
 				{
 					goto fail;
