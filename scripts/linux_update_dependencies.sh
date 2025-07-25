@@ -51,7 +51,7 @@ function setup_fedora() {
   sudo dnf install libXcursor-devel
   sudo dnf install freeglut-devel
   sudo dnf install gtk3-devel
-  sudo dnf install pulseaudio-devel
+  sudo dnf install pulseaudio-libs-devel
   sudo dnf install alsa-lib-devel
 }
 
