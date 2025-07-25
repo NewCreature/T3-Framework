@@ -2,8 +2,8 @@
 
 THEME av_theme;
 GAME  av_game;
-ALLEGRO_FONT * av_font = NULL;
-ALLEGRO_FONT * av_font_small = NULL;
+T3F_FONT * av_font = NULL;
+T3F_FONT * av_font_small = NULL;
 bool paused = false;
 int keys[8] = {0};
 T3F_ATLAS * av_atlas = NULL;
@@ -36,29 +36,29 @@ void show_title(void)
 	al_draw_filled_rectangle(32, 32, 640 - 32 - 1, 480 - 32 - 1, al_map_rgba_f(0.0, 0.0, 0.0, 0.75));
 	al_draw_rectangle(32, 32, 640 - 32 - 1, 480 - 32 - 1, al_map_rgba_f(1.0, 1.0, 0.0, 1.0), 2.0);
 	al_hold_bitmap_drawing(true);
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "Controls");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "Controls");
 	y += 16;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "--------");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "--------");
 	y += 32;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "Left/Right: Move pill");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "Left/Right: Move pill");
 	y += 16;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "Z/X:        Rotate left/right");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "Z/X:        Rotate left/right");
 	y += 48;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "Objective");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "Objective");
 	y += 16;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "---------");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "---------");
 	y += 32;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "Stack the pills up to create");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "Stack the pills up to create");
 	y += 16;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "matches of 4 of the same color");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "matches of 4 of the same color");
 	y += 16;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "vertically or horizontally.");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "vertically or horizontally.");
 	y += 16;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "Eliminate all the viruses to");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "Eliminate all the viruses to");
 	y += 16;
-	al_draw_text(av_font, t3f_color_white, 48, y, 0, "move on to the next level.");
+	t3f_draw_text(av_font, t3f_color_white, 48, y, 0, 0, "move on to the next level.");
 	y += 144;
-	al_draw_text(av_font, al_map_rgb_f(0.0, 1.0, 0.0), 320, y, ALLEGRO_ALIGN_CENTRE, "Press ROTATE to begin.");
+	t3f_draw_text(av_font, al_map_rgb_f(0.0, 1.0, 0.0), 320, y, 0, T3F_FONT_ALIGN_CENTER, "Press ROTATE to begin.");
 	al_hold_bitmap_drawing(false);
 }
 
@@ -69,13 +69,13 @@ void show_game_over(void)
 	al_draw_filled_rectangle(128, 176, 640 - 128 - 1, 480 - 176 - 1, al_map_rgba_f(0.0, 0.0, 0.0, 0.75));
 	al_draw_rectangle(128, 176, 640 - 128 - 1, 480 - 176 - 1, al_map_rgba_f(1.0, 1.0, 0.0, 1.0), 2.0);
 	al_hold_bitmap_drawing(true);
-	al_draw_text(av_font, al_map_rgb_f(1.0, 0.0, 0.0), 320, y, ALLEGRO_ALIGN_CENTRE, "Game Over");
+	t3f_draw_text(av_font, al_map_rgb_f(1.0, 0.0, 0.0), 320, y, 0, T3F_FONT_ALIGN_CENTER, "Game Over");
 	y += 32;
-	al_draw_textf(av_font, t3f_color_white, 320, y, ALLEGRO_ALIGN_CENTRE, "Final Score: %d", av_game.score);
+	t3f_draw_textf(av_font, t3f_color_white, 320, y, 0, T3F_FONT_ALIGN_CENTER, "Final Score: %d", av_game.score);
 	y += 32;
-	al_draw_text(av_font, al_map_rgb_f(0.0, 1.0, 0.0), 320, y, ALLEGRO_ALIGN_CENTRE, "Press ROTATE to");
+	t3f_draw_text(av_font, al_map_rgb_f(0.0, 1.0, 0.0), 320, y, 0, T3F_FONT_ALIGN_CENTER, "Press ROTATE to");
 	y += 16;
-	al_draw_text(av_font, al_map_rgb_f(0.0, 1.0, 0.0), 320, y, ALLEGRO_ALIGN_CENTRE, "play again.");
+	t3f_draw_text(av_font, al_map_rgb_f(0.0, 1.0, 0.0), 320, y, 0, T3F_FONT_ALIGN_CENTER, "play again.");
 	al_hold_bitmap_drawing(false);
 }
 
@@ -96,23 +96,23 @@ void av_render(void * data)
 	}
 	
 	/* draw the game status */
-	al_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, ALLEGRO_ALIGN_CENTRE, "SCORE");
+	t3f_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, 0, T3F_FONT_ALIGN_CENTER, "SCORE");
 	y += 12;
-	al_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, ALLEGRO_ALIGN_CENTRE, "%d", av_game.score);
+	t3f_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, 0, T3F_FONT_ALIGN_CENTER, "%d", av_game.score);
 	y += 24;
-	al_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, ALLEGRO_ALIGN_CENTRE, "LEVEL");
+	t3f_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, 0, T3F_FONT_ALIGN_CENTER, "LEVEL");
 	y += 12;
-	al_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, ALLEGRO_ALIGN_CENTRE, "%d", av_game.level);
+	t3f_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, 0, T3F_FONT_ALIGN_CENTER, "%d", av_game.level);
 	y += 24;
-	al_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, ALLEGRO_ALIGN_CENTRE, "HIGH");
+	t3f_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, 0, T3F_FONT_ALIGN_CENTER, "HIGH");
 	y += 12;
-	al_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, ALLEGRO_ALIGN_CENTRE, "%d", av_game.high_score);
+	t3f_draw_textf(av_font_small, al_map_rgb(0, 0, 0), 440, y, 0, T3F_FONT_ALIGN_CENTER, "%d", av_game.high_score);
 	
 	/* draw end level text if we are finished */
 	if(av_game.state == GAME_STATE_LEVEL && (av_game.timer / 15) % 2 == 0)
 	{
-		al_draw_textf(av_font, al_map_rgb(0, 0, 0), 320 + 2, 232 + 2, ALLEGRO_ALIGN_CENTRE, "LEVEL COMPLETE");
-		al_draw_textf(av_font, al_map_rgb(255, 255, 255), 320, 232, ALLEGRO_ALIGN_CENTRE, "LEVEL COMPLETE");
+		t3f_draw_textf(av_font, al_map_rgb(0, 0, 0), 320 + 2, 232 + 2, 0, T3F_FONT_ALIGN_CENTER, "LEVEL COMPLETE");
+		t3f_draw_textf(av_font, al_map_rgb(255, 255, 255), 320, 232, 0, T3F_FONT_ALIGN_CENTER, "LEVEL COMPLETE");
 	}
 	
 	/* if you used al_hold_bitmap_drawing(true), you must call this if you want
@@ -245,13 +245,13 @@ bool av_initialize(void)
 	}
 	
 	/* load fonts */
-	av_font = al_load_font("data/fonts/kongtext.ttf", 16, 0);
+	av_font = t3f_load_font("data/fonts/kongtext.ttf", T3F_FONT_TYPE_AUTO, 16, 0, false);
 	if(!av_font)
 	{
 		printf("Failed to load game font.\n");
 		return false;
 	}
-	av_font_small = al_load_font("data/fonts/kongtext.ttf", 12, 0);
+	av_font_small = t3f_load_font("data/fonts/kongtext.ttf", T3F_FONT_TYPE_AUTO, 12, 0, false);
 	if(!av_font_small)
 	{
 		printf("Failed to load game font.\n");

@@ -6,8 +6,8 @@
 #include "paddle.h"
 
 /* program data (defines in "example.h") */
-ALLEGRO_BITMAP * paddle_bitmap[EXAMPLE_MAX_BITMAPS] = {NULL};
-ALLEGRO_FONT * paddle_font[EXAMPLE_MAX_FONTS] = {NULL};
+T3F_BITMAP * paddle_bitmap[EXAMPLE_MAX_BITMAPS] = {NULL};
+T3F_FONT * paddle_font[EXAMPLE_MAX_FONTS] = {NULL};
 ALLEGRO_SAMPLE * paddle_sample[EXAMPLE_MAX_SAMPLES] = {NULL};
 T3F_GUI * paddle_menu = NULL;
 T3F_RNG_STATE rng_state;
@@ -292,10 +292,10 @@ void paddle_render(void * data)
 		{
 
 			/* draw background */
-			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], 0.0, 0.0, 0);
+			t3f_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], t3f_color_white, 0.0, 0.0, 0, 0);
 
 			/* center logo */
-			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_LOGO], al_get_display_width(t3f_display) / 2 - al_get_bitmap_width(paddle_bitmap[EXAMPLE_BITMAP_LOGO]) / 2, 32.0, 0);
+			t3f_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_LOGO], t3f_color_white, al_get_display_width(t3f_display) / 2 - paddle_bitmap[EXAMPLE_BITMAP_LOGO]->target_width / 2, 32.0, 0, 0);
 
 			/* draw menu */
 			t3f_render_gui(paddle_menu, 0);
@@ -308,24 +308,24 @@ void paddle_render(void * data)
 			int i;
 
 			/* draw background */
-			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], 0.0, 0.0, 0);
+			t3f_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], t3f_color_white, 0.0, 0.0, 0, 0);
 
 			/* draw game objects */
 			for(i = 0; i < 2; i++)
 			{
 				if(paddle[i].active)
 				{
-					al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_PADDLE], paddle[i].x, paddle[i].y, 0);
+					t3f_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_PADDLE], t3f_color_white, paddle[i].x, paddle[i].y, 0, 0);
 				}
 				if(ball.active)
 				{
-					al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BALL], ball.x, ball.y, 0);
+					t3f_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BALL], t3f_color_white, ball.x, ball.y, 0, 0);
 				}
 			}
 
 			/* draw scores */
-			al_draw_textf(paddle_font[EXAMPLE_FONT_GAME], al_map_rgba(0, 0, 0, 255), 10.0, 0.0, 0, "Player 1: %d", score[0]);
-			al_draw_textf(paddle_font[EXAMPLE_FONT_GAME], al_map_rgba(0, 0, 0, 255), 540.0, 0.0, 0, "Player 2: %d", score[1]);
+			t3f_draw_textf(paddle_font[EXAMPLE_FONT_GAME], al_map_rgba(0, 0, 0, 255), 10.0, 0.0, 0, 0, "Player 1: %d", score[0]);
+			t3f_draw_textf(paddle_font[EXAMPLE_FONT_GAME], al_map_rgba(0, 0, 0, 255), 540.0, 0.0, 0, 0, "Player 2: %d", score[1]);
 
 			break;
 		}
@@ -334,14 +334,14 @@ void paddle_render(void * data)
 		{
 
 			/* draw background */
-			al_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], 0.0, 0.0, 0);
+			t3f_draw_bitmap(paddle_bitmap[EXAMPLE_BITMAP_BG], t3f_color_white, 0.0, 0.0, 0, 0);
 
 			/* draw results */
 			al_draw_filled_circle(640.0 * t3f_drand(&rng_state), 480.0 * t3f_drand(&rng_state), 10.0 + 32.0 * t3f_drand(&rng_state), al_map_rgba(0, 0, 192, 128));
 			al_draw_filled_rectangle(220.0, 192.0, 420.0, 280.0, al_map_rgba(0, 192, 0, 128));
 			al_draw_rectangle(220.0, 192.0, 420.0, 280.0, al_map_rgba(0, 0, 0, 255), 2.0);
-			al_draw_textf(paddle_font[EXAMPLE_FONT_MENU], al_map_rgba(0, 0, 0, 255), 320.0, 200.0, ALLEGRO_ALIGN_CENTRE, "Player %d Wins!", score[0] > score[1] ? 1 : 2);
-			al_draw_textf(paddle_font[EXAMPLE_FONT_GAME], al_map_rgba(0, 0, 0, 255), 320.0, 240.0, ALLEGRO_ALIGN_CENTRE, "Click to continue...");
+			t3f_draw_textf(paddle_font[EXAMPLE_FONT_MENU], al_map_rgba(0, 0, 0, 255), 320.0, 200.0, 0, ALLEGRO_ALIGN_CENTRE, "Player %d Wins!", score[0] > score[1] ? 1 : 2);
+			t3f_draw_textf(paddle_font[EXAMPLE_FONT_GAME], al_map_rgba(0, 0, 0, 255), 320.0, 240.0, 0, ALLEGRO_ALIGN_CENTRE, "Click to continue...");
 
 			break;
 		}
@@ -376,25 +376,25 @@ bool paddle_initialize(void)
 	}
 
 	/* load bitmaps */
-	paddle_bitmap[EXAMPLE_BITMAP_BG] = al_load_bitmap("data/graphics/bg.png");
+	paddle_bitmap[EXAMPLE_BITMAP_BG] = t3f_load_bitmap("data/graphics/bg.png", false, 0);
 	if(!paddle_bitmap[EXAMPLE_BITMAP_BG])
 	{
 		printf("Failed to load image!\n");
 		return false;
 	}
-	paddle_bitmap[EXAMPLE_BITMAP_LOGO] = al_load_bitmap("data/graphics/logo.png");
+	paddle_bitmap[EXAMPLE_BITMAP_LOGO] = t3f_load_bitmap("data/graphics/logo.png", false, 0);
 	if(!paddle_bitmap[EXAMPLE_BITMAP_LOGO])
 	{
 		printf("Failed to load image!\n");
 		return false;
 	}
-	paddle_bitmap[EXAMPLE_BITMAP_PADDLE] = al_load_bitmap("data/graphics/paddle.png");
+	paddle_bitmap[EXAMPLE_BITMAP_PADDLE] = t3f_load_bitmap("data/graphics/paddle.png", false, 0);
 	if(!paddle_bitmap[EXAMPLE_BITMAP_PADDLE])
 	{
 		printf("Failed to load image!\n");
 		return false;
 	}
-	paddle_bitmap[EXAMPLE_BITMAP_BALL] = al_load_bitmap("data/graphics/ball.png");
+	paddle_bitmap[EXAMPLE_BITMAP_BALL] = t3f_load_bitmap("data/graphics/ball.png", false, 0);
 	if(!paddle_bitmap[EXAMPLE_BITMAP_BALL])
 	{
 		printf("Failed to load image!\n");
@@ -402,13 +402,13 @@ bool paddle_initialize(void)
 	}
 
 	/* load fonts */
-	paddle_font[EXAMPLE_FONT_MENU] = al_load_bitmap_font("data/fonts/title_font.png");
+	paddle_font[EXAMPLE_FONT_MENU] = t3f_load_font("data/fonts/title_font.png", T3F_FONT_TYPE_AUTO, 0, 0, false);
 	if(!paddle_font[EXAMPLE_FONT_MENU])
 	{
 		printf("Failed to load font!\n");
 		return false;
 	}
-	paddle_font[EXAMPLE_FONT_GAME] = al_load_bitmap_font("data/fonts/game_font.png");
+	paddle_font[EXAMPLE_FONT_GAME] = t3f_load_font("data/fonts/game_font.png", T3F_FONT_TYPE_AUTO, 0, 0, false);
 	if(!paddle_font[EXAMPLE_FONT_GAME])
 	{
 		printf("Failed to load font!\n");
@@ -432,8 +432,8 @@ bool paddle_initialize(void)
 	/* create GUI */
 	t3f_set_gui_driver(NULL);
 	paddle_menu = t3f_create_gui(0, 0);
-	t3f_add_gui_text_element(paddle_menu, paddle_menu_play_proc, "Play", (void **)&paddle_font[EXAMPLE_FONT_MENU], 320, 240, t3f_color_black, T3F_GUI_ELEMENT_CENTRE);
-	t3f_add_gui_text_element(paddle_menu, paddle_menu_quit_proc, "Quit", (void **)&paddle_font[EXAMPLE_FONT_MENU], 320, 270, t3f_color_black, T3F_GUI_ELEMENT_CENTRE);
+	t3f_add_gui_text_element(paddle_menu, paddle_menu_play_proc, paddle_font[EXAMPLE_FONT_MENU], t3f_color_black, "Play", 320, 240, T3F_GUI_ELEMENT_CENTRE);
+	t3f_add_gui_text_element(paddle_menu, paddle_menu_quit_proc, paddle_font[EXAMPLE_FONT_MENU], t3f_color_black, "Quit", 320, 270, T3F_GUI_ELEMENT_CENTRE);
 
 	return true;
 }

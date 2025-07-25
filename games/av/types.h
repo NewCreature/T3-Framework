@@ -78,7 +78,7 @@ typedef struct
     PILL       next_pill;
     BOARD      board;
     CONTROLLER controller;
-	ALLEGRO_BITMAP *   preview;
+	T3F_BITMAP *   preview;
 	float      preview_angle;
 	float      preview_vangle;
     int        state;
