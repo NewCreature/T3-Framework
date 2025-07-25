@@ -4,6 +4,7 @@
 START_PATH=$(pwd)
 X86_SDK=MacOSX10.13.sdk
 ARM_SDK=MacOSX11.sdk
+BUILD_CMAKE=0
 BUILD_DUMB=1
 BUILD_OGG=1
 BUILD_VORBIS=1
@@ -19,6 +20,44 @@ BUILD_LIBWEBP=1
 BUILD_FREETYPE=1
 BUILD_PHYSFS=1
 BUILD_ALLEGRO=1
+OS_ID=unknown
+
+function detect_os() {
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS_ID=$ID
+    echo "Detected OS: $OS_ID."
+  else
+    OS_ID=unknown
+    echo "Could not detect OS."
+  fi
+}
+
+function setup_ubuntu() {
+  sudo apt install build-essential
+  sudo apt install make
+  sudo apt install cmake
+  sudo apt install git
+}
+
+function setup_fedora() {
+  sudo dnf install gcc
+  sudo dnf install g++
+  sudo dnf install make
+  sudo dnf install cmake
+  sudo dnf install git
+  sudo dnf install libX11-devel
+  sudo dnf install xorg-x11-server-devel
+  sudo dnf install libXcursor-devel
+  sudo dnf install freeglut-devel
+  sudo dnf install dkt3-devel
+  sudo dnf install pulseaudio-devel
+  sudo dnf install alsa-lib-devel
+}
+
+function setup_arch() {
+  echo "Arch"
+}
 
 function remake_dir() {
   rm -rf $1
@@ -48,9 +87,21 @@ if [ "$#" -le 0 ]; then
   exit 1
 fi
 
+detect_os
+if [[ "$OS_ID" == "ubuntu" ]]; then
+  setup_ubuntu
+elif [[ "$OS_ID" == "fedora" ]]; then
+  setup_fedora
+elif [[ "$OS_ID" == "arch" ]]; then
+  setup_arch
+fi
+
 # check arguments
 for arg in "$@";
 do
+  if [ $arg = --build-cmake ]; then
+    BUILD_CMAKE=1
+  fi
   if [ $arg = --dumb_only ]; then
     disable_all
     BUILD_DUMB=1
@@ -117,16 +168,18 @@ mkdir -p $1
 cd $1
 
 # CMake (most dependencies are built with it)
-#if [ ! -d "CMake" ];
-#then
-#  git clone https://github.com/Kitware/CMake.git
-#fi
-#cd CMake
-#git pull
-#./bootstrap -- -DCMAKE_USE_OPENSSL=OFF
-#make
-#sudo make install
-#cd ..
+if [ $BUILD_CMAKE -eq 1 ]; then
+  if [ ! -d "CMake" ];
+  then
+    git clone https://github.com/Kitware/CMake.git
+  fi
+  cd CMake
+  git pull
+  ./bootstrap -- -DCMAKE_USE_OPENSSL=OFF
+  make
+  sudo make install
+  cd ..
+fi
 
 # DUMB
 if [ $BUILD_DUMB -eq 1 ]; then
