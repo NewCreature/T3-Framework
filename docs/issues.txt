@@ -1,6 +1,9 @@
 T3F Issues
 ----------
 
+[ ]Cloning an atlased bitmap doesn't work. I think the resource manager's
+   reference is outdated once the bitmap is atlased.
+
 [ ]Fix project creation/upgrade/pull system. Should include extras.
 
 [ ]Add input module.
