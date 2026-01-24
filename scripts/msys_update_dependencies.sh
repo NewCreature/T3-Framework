@@ -125,7 +125,7 @@ if [ $BUILD_DUMB -eq 1 ]; then
   git pull
   remake_dir _build
   cd _build
-  cmake .. -DBUILD_ALLEGRO4=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=/mingw32 -G "Unix Makefiles"
+  cmake .. -DBUILD_ALLEGRO4=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=/mingw32 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -G "Unix Makefiles"
   make
   make install
   cd ..
