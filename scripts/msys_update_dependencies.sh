@@ -179,7 +179,7 @@ if [ $BUILD_OPUS -eq 1 ]; then
   git pull
   remake_dir _build
   cd _build
-  cmake .. -DCMAKE_INSTALL_PREFIX=/mingw32 -G "Unix Makefiles"
+  cmake .. -DCMAKE_INSTALL_PREFIX=/mingw32 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -G "Unix Makefiles"
   make
   make install
   cd ..
@@ -286,7 +286,7 @@ if [ $BUILD_LIBPNG -eq 1 ]; then
   git pull
   remake_dir _build
   cd _build
-  cmake .. -DPNG_EXECUTABLES=OFF -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DCMAKE_INSTALL_PREFIX=/mingw32 -G "Unix Makefiles"
+  cmake .. -DPNG_EXECUTABLES=OFF -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DZLIB_INCLUDE_DIR=/mingw32/include -DZLIB_LIBRARY_RELEASE=/mingw32/lib/libz.a -DCMAKE_INSTALL_PREFIX=/mingw32 -G "Unix Makefiles"
   make
   make install
   cd ..
