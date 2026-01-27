@@ -265,11 +265,11 @@ if [ $BUILD_ZLIB -eq 1 ]; then
   git pull
   remake_dir _build
   cd _build
-  cmake .. -DCMAKE_INSTALL_PREFIX=/mingw32 -G "Unix Makefiles"
+  cmake .. -DCMAKE_INSTALL_PREFIX=/mingw32 -DZLIB_BUILD_SHARED=OFF -G "Unix Makefiles"
   make
   make install
-  mv /mingw32/lib/libzlibstatic.a /mingw32/lib/libz.a
-  rm /mingw32/lib/libzlib.dll.a
+  mv /mingw32/lib/libzs.a /mingw32/lib/libz.a
+  rm /mingw32/lib/libz.dll.a
   cd ..
   cd ..
 fi
