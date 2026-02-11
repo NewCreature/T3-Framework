@@ -2,6 +2,7 @@
 #include "music.h"
 
 ALLEGRO_AUDIO_STREAM * t3f_stream = NULL;
+static ALLEGRO_AUDIO_STREAM * _t3f_stopping_stream = NULL;
 ALLEGRO_MUTEX * t3f_music_mutex = NULL;
 ALLEGRO_MUTEX * t3f_music_state_mutex = NULL;
 ALLEGRO_THREAD * t3f_music_thread = NULL;
@@ -51,6 +52,16 @@ static const char * t3f_get_music_extension(const char * fn)
 	return NULL;
 }
 
+static void _t3f_actually_stop_music(void)
+{
+	if(_t3f_stopping_stream)
+	{
+		al_destroy_audio_stream(_t3f_stopping_stream);
+		_t3f_stopping_stream = NULL;
+		t3f_set_music_state(T3F_MUSIC_STATE_OFF);
+	}
+}
+
 static void * t3f_play_music_thread(ALLEGRO_THREAD * thread, void * arg)
 {
 	const char * ext = NULL;
@@ -61,9 +72,9 @@ static void * t3f_play_music_thread(ALLEGRO_THREAD * thread, void * arg)
 	ALLEGRO_DEBUG("music thread start\n");
 	t3f_music_gain = 1.0;
 	al_lock_mutex(t3f_music_mutex);
-	if(t3f_stream)
+	if(_t3f_stopping_stream)
 	{
-		t3f_stop_music();
+		_t3f_actually_stop_music();
 	}
 	ALLEGRO_DEBUG("setting file interface\n");
 	al_set_new_file_interface(t3f_music_thread_file_interface);
@@ -144,7 +155,9 @@ static void * t3f_fade_music_thread(void * arg)
 		t3f_music_target_volume -= s;
 		if(t3f_music_target_volume <= 0.0)
 		{
-			t3f_stop_music();
+			_t3f_stopping_stream = t3f_stream;
+			t3f_stream = NULL;
+			_t3f_actually_stop_music();
 			done = true;
 		}
 	}
@@ -169,6 +182,11 @@ bool t3f_play_music(const char * fn)
 	{
 		t3f_music_mutex = al_create_mutex();
 	}
+	if(t3f_stream)
+	{
+		_t3f_stopping_stream = t3f_stream;
+		t3f_stream = NULL;
+	}
 	if(t3f_music_mutex)
 	{
 		strcpy(t3f_music_thread_fn, fn);
@@ -178,6 +196,10 @@ bool t3f_play_music(const char * fn)
 		if(t3f_music_thread)
 		{
 			al_start_thread(t3f_music_thread);
+		}
+		else
+		{
+			_t3f_actually_stop_music();
 		}
 //		al_run_detached_thread(t3f_play_music_thread, NULL);
 		return true;
@@ -191,11 +213,13 @@ bool t3f_play_music(const char * fn)
 
 void t3f_stop_music(void)
 {
-	if(t3f_stream)
+	if(t3f_music_mutex)
 	{
-		al_destroy_audio_stream(t3f_stream);
+		_t3f_stopping_stream = t3f_stream;
 		t3f_stream = NULL;
-		t3f_set_music_state(T3F_MUSIC_STATE_OFF);
+		al_lock_mutex(t3f_music_mutex);
+		_t3f_actually_stop_music();
+		al_unlock_mutex(t3f_music_mutex);
 	}
 }
 

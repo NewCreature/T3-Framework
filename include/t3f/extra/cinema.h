@@ -30,6 +30,8 @@
 #define T3F_CINEMA_EVENT_END          255
 
 #define T3F_CINEMA_FLAG_INTEGER_RENDERING (1 << 0)
+#define T3F_CINEMA_FLAG_CONSTRAIN_CAMERA  (1 << 1)
+#define T3F_CINEMA_FLAG_DEVELOPER_MODE    (1 << 2)
 
 #define T3F_CINEMA_EVENT_FLAG_BREAK (1 << 0)
 #define T3F_CINEMA_EVENT_FLAG_WAIT  (1 << 1)
@@ -167,6 +169,7 @@ typedef union
 typedef struct
 {
 	
+	unsigned long id;
 	unsigned long tick;
 	int type;
 	T3F_CINEMA_EVENT_DATA data;
@@ -194,6 +197,8 @@ typedef struct
 	
 	float x, y, z;
 	float vx, vy, vz;
+	float width, height;
+	float render_x, render_y;
 	
 } T3F_CINEMA_CAMERA;
 
@@ -201,6 +206,7 @@ typedef struct
 {
 
 	ALLEGRO_CONFIG * script;
+	char script_path[1024];
 	ALLEGRO_PATH * path;
 	T3F_ANIMATION * bitmap[T3F_CINEMA_MAX_BITMAPS];
 	float graphics_scale;
@@ -212,6 +218,8 @@ typedef struct
 	void (*view_callback)(void * data);
 	void (*view_logic_callback)(void * data);
 	void * view_callback_data;
+	bool (*event_callback)(T3F_CINEMA_EVENT * event, void * data);
+	void * event_callback_data;
 	T3F_VIEW * view;
 	
 	/* cinema playback data */
@@ -233,13 +241,14 @@ void t3f_destroy_cinema(T3F_CINEMA * cp);
 
 bool t3f_cinema_add_bitmap(T3F_CINEMA * cp, ALLEGRO_BITMAP * bp);
 void t3f_cinema_remove_bitmap(T3F_CINEMA * cp, int bitmap);
-bool t3f_cinema_add_event(T3F_CINEMA * cp, unsigned long tick, int type, T3F_CINEMA_EVENT_DATA data, int flags);
+bool t3f_cinema_add_event(T3F_CINEMA * cp, unsigned long id, unsigned long tick, int type, T3F_CINEMA_EVENT_DATA data, int flags);
 void t3f_cinema_remove_event(T3F_CINEMA * cp, int event);
 
 T3F_CINEMA * t3f_load_cinema(const char * fn);
 T3F_CINEMA * t3f_load_cinema_script(const char * fn, float graphics_scale, int flags);
 bool t3f_save_cinema(T3F_CINEMA * cp, const char * fn);
 void t3f_set_cinema_view_callbacks(T3F_CINEMA * cp, void (*logic_callback)(void * data), void (*render_callback)(void * data), void * data);
+void t3f_set_cinema_event_callback(T3F_CINEMA * cp, bool (*callback)(T3F_CINEMA_EVENT * event, void * data), void * data);
 
 bool t3f_process_cinema(T3F_CINEMA * cp);
 void t3f_render_cinema(T3F_CINEMA * cp);

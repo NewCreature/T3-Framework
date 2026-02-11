@@ -43,8 +43,10 @@ void t3f_enable_leaderboard_uploads(bool onoff);
 void t3f_store_leaderboard_score(const char * section, const char * mode, const char * option, int flags, int score, const char * extra);
 int t3f_retrieve_leaderboard_score(const char * section, const char * mode, const char * option);
 const char * t3f_retrieve_leaderboard_extra(const char * section, const char * mode, const char * option);
+const char * t3f_get_leaderboard_user_name(const char * section);
 void t3f_set_leaderboard_user_name(const char * section, const char * name);
 const char * t3f_get_leaderboard_user_key(const char * section);
+bool t3f_submit_leaderboard_user_name(const char * section);
 bool t3f_submit_leaderboard_score(const char * section, const char * mode, const char * option);
 
 /* high level functions */

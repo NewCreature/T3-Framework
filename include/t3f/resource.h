@@ -35,7 +35,7 @@ bool t3f_destroy_resource(void * ptr);
 void t3f_remap_resource(void ** original_ptr, void ** new_ptw);
 void t3f_unload_resources(void);
 void t3f_reload_resources(void);
-void * t3f_clone_resource(void ** dest, void * ptr);
+void * t3f_clone_resource(void ** dest, void ** original_ptr);
 void t3f_show_resources(void);
 
 #endif

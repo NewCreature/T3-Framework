@@ -413,7 +413,7 @@ void t3f_reload_resources(void)
 	al_unlock_mutex(_t3f_resource_mutex);
 }
 
-void * t3f_clone_resource(void ** dest, void * ptr)
+void * t3f_clone_resource(void ** dest, void ** original_ptr)
 {
 	int i;
 	const ALLEGRO_FILE_INTERFACE * old_fi;
@@ -421,7 +421,7 @@ void * t3f_clone_resource(void ** dest, void * ptr)
 	al_lock_mutex(_t3f_resource_mutex);
 	for(i = 0; i < _t3f_resources; i++)
 	{
-		if(*_t3f_resource[i]->ptr == ptr)
+		if(_t3f_resource[i]->ptr == original_ptr)
 		{
 			old_fi = al_get_new_file_interface();
 			al_set_new_file_interface(_t3f_resource[i]->fi);

@@ -239,9 +239,21 @@ void t3f_poll_sound_queue(void)
 	}
 }
 
-float t3f_get_sound_position(float earx, float eary, float soundx, float soundy)
+float t3f_get_sound_position(float earx, float eary, float soundx, float soundy, float range)
 {
-	return -cos(atan2(eary - soundy, earx - soundx));
+	float pos = soundx - earx;
+
+	if(pos < -range)
+	{
+		return -1.0;
+		pos = -range;
+	}
+	else if(pos > range)
+	{
+		return 1.0;
+		pos = range;
+	}
+	return pos / range;
 }
 
 float t3f_get_sound_gain(float earx, float eary, float soundx, float soundy, float scale)

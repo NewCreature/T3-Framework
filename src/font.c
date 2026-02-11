@@ -76,78 +76,161 @@ float t3f_get_font_line_height(T3F_FONT * fp)
 	return fp->engine->get_font_height(fp->font);
 }
 
-/* need to make this not rely on spaces, sometimes there might be long stretches with no space which need to be broken up 'mid-word' */
-void t3f_create_text_line_data(T3F_TEXT_LINE_DATA * lp, T3F_FONT * fp, float w, float tab, const char * text)
+bool t3f_init_text_lines(T3F_TEXT_LINES * text_lines)
 {
-	char current_line[256];
-	int current_line_pos = 0;
-	int last_space = -1;
+	memset(text_lines, 0, sizeof(T3F_TEXT_LINES));
+
+	return true;
+}
+
+static bool _add_text_line(T3F_TEXT_LINES * text_lines, const char * text, bool last)
+{
+	T3F_TEXT_LINE * text_line;
+
+	if(!text_lines->line)
+	{
+		text_lines->line = malloc(sizeof(T3F_TEXT_LINE));
+		if(!text_lines->line)
+		{
+			goto fail;
+		}
+		memset(text_lines->line, 0, sizeof(T3F_TEXT_LINE));
+	}
+	text_line = text_lines->line;
+	while(text_line->next_line)
+	{
+		text_line = text_line->next_line;
+	}
+
+	text_line->text = strdup(text);
+	if(!text_line->text)
+	{
+		goto fail;
+	}
+	if(!last)
+	{
+		text_line->next_line = malloc(sizeof(T3F_TEXT_LINE));
+		if(!text_line->next_line)
+		{
+			goto fail;
+		}
+		memset(text_line->next_line, 0, sizeof(T3F_TEXT_LINE));
+	}
+	return true;
+
+	fail:
+	{
+		return false;
+	}
+}
+
+/* need to make this not rely on spaces, sometimes there might be long stretches with no space which need to be broken up 'mid-word' */
+bool t3f_create_text_lines(T3F_TEXT_LINES * text_lines, T3F_FONT * fp, float w, float tab, const char * text)
+{
+	char * current_text = NULL;
+	int current_text_pos = 0;
+	int last_space = 0;
+	int line_spaces = 0;
 	int i;
 	float wi = w;
 
-	lp->font = fp;
-	lp->tab = tab;
-	lp->lines = 0;
-	strcpy(lp->line[lp->lines].text, "");
-	if(strlen(text) < 1)
+	i = strlen(text) + 1;
+	if(i <= 1)
 	{
-		return;
+		goto fail;
 	}
+	current_text = malloc(i);
+	if(!current_text)
+	{
+		goto fail;
+	}
+	memset(current_text, 0, i);
 
 	/* divide text into lines */
 	for(i = 0; i < (int)strlen(text); i++)
 	{
-		current_line[current_line_pos] = text[i];
-		current_line[current_line_pos + 1] = '\0';
-		if(text[i] == ' ')
+		if(text[i] != '\r' && text[i] != '\n')
 		{
-			last_space = current_line_pos;
+			current_text[current_text_pos] = text[i];
+			current_text[current_text_pos + 1] = '\0';
+			if(text[i] == ' ')
+			{
+				last_space = current_text_pos;
+				line_spaces++;
+			}
+			current_text_pos++;
 		}
-		current_line_pos++;
 
 		/* copy line since we encountered a manual new line */
 		if(text[i] == '\n')
 		{
-			current_line[current_line_pos] = '\0';
-			strcpy(lp->line[lp->lines].text, current_line);
-			lp->lines++;
-			strcpy(lp->line[lp->lines].text, "");
-			current_line_pos = 0;
-			current_line[current_line_pos] = '\0';
+			current_text[current_text_pos] = '\0';
+			_add_text_line(text_lines, current_text, false);
+			line_spaces = 0;
+			current_text_pos = 0;
+			current_text[current_text_pos] = '\0';
 			wi = w - tab;
 		}
 
 		/* copy this line to our list of lines because it is long enough */
-		else if(t3f_get_text_width(fp, current_line) > wi)
+		else if(t3f_get_text_width(fp, current_text) > wi && line_spaces > 0)
 		{
-			current_line[last_space] = '\0';
-			strcpy(lp->line[lp->lines].text, current_line);
+			current_text[last_space] = '\0';
+			_add_text_line(text_lines, current_text, false);
+			line_spaces = 0;
 			while(text[i] != ' ' && i >= 0)
 			{
 				i--;
 			}
-			lp->lines++;
-			strcpy(lp->line[lp->lines].text, "");
-			current_line_pos = 0;
-			current_line[current_line_pos] = '\0';
+			current_text_pos = 0;
+			current_text[current_text_pos] = '\0';
 			wi = w - tab;
 		}
 	}
-	strcpy(lp->line[lp->lines].text, current_line);
-	lp->lines++;
+	_add_text_line(text_lines, current_text, true);
+
+	return true;
+
+	fail:
+	{
+		t3f_free_text_lines(text_lines);
+		return false;
+	}
 }
 
-void t3f_draw_text_lines(T3F_TEXT_LINE_DATA * lines, ALLEGRO_COLOR color, float x, float y, float z)
+void t3f_free_text_lines(T3F_TEXT_LINES * text_lines)
 {
-	int i;
+	T3F_TEXT_LINE * current_line = text_lines->line;
+	T3F_TEXT_LINE * next_line;
+
+	while(current_line)
+	{
+		next_line = current_line->next_line;
+		if(current_line->text)
+		{
+			free(current_line->text);
+		}
+		free(current_line);
+		current_line = next_line;
+	}
+	t3f_init_text_lines(text_lines);
+}
+
+void t3f_draw_text_lines(T3F_TEXT_LINES * text_lines, T3F_FONT * font, ALLEGRO_COLOR color, float x, float y, float z, float tab)
+{
+	T3F_TEXT_LINE * current_line = text_lines->line;
 	float px = x;
 	float py = y;
 
-	for(i = 0; i < lines->lines; i++)
+	while(current_line)
 	{
-		t3f_draw_text(lines->font, color, px, py, z, 0, lines->line[i].text);
-		px = x + lines->tab;
-		py += t3f_get_font_line_height(lines->font);
+		if(current_line->text)
+		{
+			t3f_draw_text(font, color, px, py, z, 0, current_line->text);
+			px = x + tab;
+			py += t3f_get_font_line_height(font);
+		}
+		current_line = current_line->next_line;
 	}
 }
 
@@ -158,7 +241,7 @@ void t3f_draw_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float 
 
 void t3f_draw_scaled_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float scale, float w, float tab, int flags, const char * text)
 {
-	T3F_TEXT_LINE_DATA line_data;
+	T3F_TEXT_LINES text_lines;
 	bool held;
 
 	if(strlen(text) < 1)
@@ -172,8 +255,10 @@ void t3f_draw_scaled_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x,
 	}
 	if(w > 0.0)
 	{
-		t3f_create_text_line_data(&line_data, fp, w, tab, text);
-		t3f_draw_text_lines(&line_data, color, x, y, z);
+		t3f_init_text_lines(&text_lines);
+		t3f_create_text_lines(&text_lines, fp, w, tab, text);
+		t3f_draw_text_lines(&text_lines, fp, color, x, y, z, tab);
+		t3f_free_text_lines(&text_lines);
 		if(!held)
 		{
 			al_hold_bitmap_drawing(false);

@@ -25,7 +25,7 @@ bool t3f_queue_sample(ALLEGRO_SAMPLE * sp);
 void t3f_clear_sample_queue(void);
 ALLEGRO_SAMPLE * t3f_get_queue_sample(void);
 void t3f_poll_sound_queue(void);
-float t3f_get_sound_position(float earx, float eary, float soundx, float soundy);
+float t3f_get_sound_position(float earx, float eary, float soundx, float soundy, float range);
 float t3f_get_sound_gain(float earx, float eary, float soundx, float soundy, float scale);
 
 #ifdef __cplusplus

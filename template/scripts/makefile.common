@@ -24,6 +24,9 @@ APP_TEMP_DIR = ../temp/$(APP_PACKAGE_NAME)
 all : $(APP_EXE_NAME) $(T3F_PLATFORM_TARGET) $(APP_EXTRA_TARGET)
 	@echo All targets built!
 
+t3f/font.o : t3f/font.c t3f/font_allegro.inc t3f/font_t3f.inc
+	gcc $(CFLAGS) -c -o t3f/font.o t3f/font.c
+
 finish:
 	@\:
 
@@ -66,6 +69,9 @@ makefile.config:
 ../icons/windows_icon.ico: ../icons/16.png ../icons/24.png ../icons/32.png ../icons/48.png ../icons/256.png ../tools/makeicon$(EXE_SUFFIX)
 	../tools/makeicon$(EXE_SUFFIX) -o ../icons/windows_icon.ico ../icons/16.png ../icons/24.png ../icons/32.png ../icons/48.png ../icons/64.png ../icons/256.png
 
+../icons/linux_icons.zip:
+	zip -9 -j ../icons/linux_icons.zip ../icons/*.png
+
 release: ../changes.txt ../docs/changelog
 	mv ../docs/changelog ../changelog
 	cat ../changes.txt ../misc/spacer ../changelog > ../docs/changelog
@@ -77,7 +83,7 @@ release: ../changes.txt ../docs/changelog
 	$(SED_COMMAND) "s|BUILD_DATE|`date -u +"%a, %d %b %Y %T"`|" ../docs/changelog
 	$(SED_COMMAND) "s|REMOVE_THIS_EMPTY_LINE||" ../docs/changelog
 
-clean: steam_cleanup app_clean
+clean: app_clean
 	@$(PLATFORM_CLEAN)
 	@$(DEL_COMMAND) $(subst /,$(PATH_SEPARATOR),$(T3F_OBJECTS))
 	@$(DEL_COMMAND) $(subst /,$(PATH_SEPARATOR),$(APP_OBJECTS))
@@ -116,7 +122,7 @@ binary_package_temp: $(APP_EXE_NAME)
 	@echo "Copy app data..."
 	@rsync -avq --exclude=".*" --exclude="temp/" ../ ../temp/$(APP_PACKAGE_NAME)
 	@cp ../$(T3F_PLATFORM_NAME)/blobs/$(T3F_PLATFORM_ARCHITECTURE)/* ../temp/$(APP_PACKAGE_NAME)/bin
-	@rm -rf ../temp/$(APP_PACKAGE_NAME)/src ../temp/$(APP_PACKAGE_NAME)/android ../temp/$(APP_PACKAGE_NAME)/debian ../temp/$(APP_PACKAGE_NAME)/iphone ../temp/$(APP_PACKAGE_NAME)/linux ../temp/$(APP_PACKAGE_NAME)/macos ../temp/$(APP_PACKAGE_NAME)/misc ../temp/$(APP_PACKAGE_NAME)/scripts ../temp/$(APP_PACKAGE_NAME)/tools ../temp/$(APP_PACKAGE_NAME)/packages ../temp/$(APP_PACKAGE_NAME)/windows ../temp/$(APP_PACKAGE_NAME)/graphics_src ../temp/$(APP_PACKAGE_NAME)/changes.txt ../temp/$(APP_PACKAGE_NAME)/issues.txt $(APP_PACKAGE_EXCLUDE_FILES)
+	@rm -rf ../temp/$(APP_PACKAGE_NAME)/src ../temp/$(APP_PACKAGE_NAME)/android ../temp/$(APP_PACKAGE_NAME)/debian ../temp/$(APP_PACKAGE_NAME)/icons ../temp/$(APP_PACKAGE_NAME)/ios ../temp/$(APP_PACKAGE_NAME)/linux ../temp/$(APP_PACKAGE_NAME)/macos ../temp/$(APP_PACKAGE_NAME)/misc ../temp/$(APP_PACKAGE_NAME)/scripts ../temp/$(APP_PACKAGE_NAME)/tools ../temp/$(APP_PACKAGE_NAME)/packages ../temp/$(APP_PACKAGE_NAME)/windows ../temp/$(APP_PACKAGE_NAME)/graphics_src ../temp/$(APP_PACKAGE_NAME)/changes.txt ../temp/$(APP_PACKAGE_NAME)/issues.txt $(APP_PACKAGE_EXCLUDE_FILES)
 	@rm -f ../temp/$(APP_PACKAGE_NAME)/bin/binaries.here
 	@echo "Make install script..."
 	@cp ../misc/binary_install.sh ../temp/$(APP_PACKAGE_NAME)/install.sh
@@ -130,7 +136,7 @@ binary_package_temp: $(APP_EXE_NAME)
 	@$(SED_COMMAND) 's|T3F_APP_DIR|$(DEBIAN_DIR)|' ../temp/$(APP_PACKAGE_NAME)/uninstall.sh
 	@$(SED_COMMAND) 's|T3F_APP_CATEGORIES|$(DEBIAN_DESKTOP_CATEGORIES)|' ../temp/$(APP_PACKAGE_NAME)/uninstall.sh
 
-binary_package_common: clean binary_package_temp
+binary_package_common: clean steam_cleanup binary_package_temp
 	@echo "Build archive..."
 	$(shell cd ../temp; tar -czf $(APP_PACKAGE_DIR)/$(APP_BINARY_PACKAGE_FILENAME) $(APP_PACKAGE_NAME); cd ..; rm -rf temp)
 
@@ -154,16 +160,9 @@ ifdef APP_REPACKAGE_DELETE
 	rm -rf $(APP_REPACKAGE_DELETE)
 endif
 
-repackage_fetch_docs:
-ifdef APP_REPACKAGE_DOCS
-	cp $(APP_REPACKAGE_DOCS) $(APP_REPACKAGE_DIR)/docs
-else
-	@test 0
-endif
-
-repackage_fetch_alternate_source:
-ifdef APP_REPACKAGE_SRC
-	cp $(APP_REPACKAGE_SRC)
+repackage_fetch_alternate_files:
+ifdef APP_REPACKAGE_ROOT
+	cp -R $(APP_REPACKAGE_ROOT)/* $(APP_REPACKAGE_DIR)
 else
 	@test 0
 endif
@@ -174,7 +173,7 @@ repackage_edit:
 	$(SED_COMMAND) 's|= $(APP_ANDROID_PACKAGE)|= $(APP_REPACKAGE_PACKAGE)|' $(APP_REPACKAGE_DIR)/src/makefile.defines
 	$(SED_COMMAND) 's|$(APP_NAME)|$(APP_REPACKAGE_NAME)|' $(APP_REPACKAGE_DIR)/docs/changelog
 
-repackage_root: clean clean_packages repackage_copy repackage_clean repackage_edit repackage_fetch_alternate_source repackage_fetch_docs
+repackage_root: clean clean_packages repackage_copy repackage_fetch_alternate_files repackage_clean repackage_edit
 
 ../tools/makeicon$(EXE_SUFFIX): ../tools/makeicon.o
 	$(CC) $(LFLAGS) ../tools/makeicon.o $(T3F_LIBRARIES) -o ../tools/makeicon
@@ -193,13 +192,16 @@ steam_cleanup:
 	rm -rf ../bin/data/steam.dat
 
 steam_binary_package: $(APP_EXE_NAME)
-ifndef CONFIG_STEAMWORKS_SDK_PATH
-	@echo Please define 'CONFIG_STEAMWORKS_SDK_PATH' as the path to the root of the Steamworks SDK and 'CONFIG_STEAMWORKS_PLATFORM' as the name of the platform (osx or linux64) if you are not building for Windows.
-else
 	rm -f $(APP_PACKAGE_DIR)/$(APP_PACKAGE_NAME)-$(T3F_PLATFORM_NAME)-binaries.zip
 	cd ../bin && zip -9 $(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-$(T3F_PLATFORM_NAME)-binaries.zip * -x data\*; cd ../$(T3F_PLATFORM_NAME)/blobs/$(T3F_PLATFORM_ARCHITECTURE) && zip -9 -r ../../$(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-$(T3F_PLATFORM_NAME)-binaries.zip * -x binaries.here || true
+ifndef CONFIG_STEAMWORKS_SDK_PATH
+	@echo If your build links to Steam libraries, please define 'CONFIG_STEAMWORKS_SDK_PATH' as the path to the root of the Steamworks SDK. If you are not building for Windows, define 'CONFIG_STEAMWORKS_PLATFORM' as the name of the platform \(osx or linux64\).
+else
 	cd $(CONFIG_STEAMWORKS_SDK_PATH)/redistributable_bin/$(CONFIG_STEAMWORKS_PLATFORM) && zip -9 -r "$(PWD)/$(APP_PACKAGE_DIR)/$(APP_NAME)-$(APP_VERSION)-$(T3F_PLATFORM_NAME)-binaries.zip" *.dll *.so *.dylib || true
 endif
 
 steam_packages_common: data_package all steam_binary_package
 	@echo Successfully created Steam data and binary packages for the the current platform.
+
+steam_assets: ../icons/macos_icon.icns ../icons/windows_icon.ico ../icons/linux_icons.zip
+	@echo Successfully generated assets for Steam store page.

@@ -152,7 +152,7 @@ T3F_ANIMATION * t3f_clone_animation(T3F_ANIMATION * ap)
 	{
 		for(i = 0; i < ap->data->bitmaps->count; i++)
 		{
-			t3f_clone_resource((void **)&(clone->data->bitmaps->bitmap[i]), ap->data->bitmaps->bitmap[i]);
+			t3f_clone_resource((void **)&(clone->data->bitmaps->bitmap[i]), (void **)&ap->data->bitmaps->bitmap[i]);
 			if(!clone->data->bitmaps->bitmap[i])
 			{
 				printf("failed to clone bitmap\n");
@@ -958,30 +958,30 @@ static void handle_vh_flip(T3F_ANIMATION_FRAME * base_fp, T3F_ANIMATION_FRAME * 
 	bool vflip = false;
 	bool hflip = false;
 
-	if(fp->flags & ALLEGRO_FLIP_HORIZONTAL && !(flags & ALLEGRO_FLIP_HORIZONTAL))
+	if(fp->flags & T3F_DRAW_H_FLIP && !(flags & T3F_DRAW_H_FLIP))
 	{
 		hflip = true;
 	}
-	else if(flags & ALLEGRO_FLIP_HORIZONTAL && !(fp->flags & ALLEGRO_FLIP_HORIZONTAL))
+	else if(flags & T3F_DRAW_H_FLIP && !(fp->flags & T3F_DRAW_H_FLIP))
 	{
 		hflip = true;
 	}
-	if(fp->flags & ALLEGRO_FLIP_VERTICAL && !(flags & ALLEGRO_FLIP_VERTICAL))
+	if(fp->flags & T3F_DRAW_V_FLIP && !(flags & T3F_DRAW_V_FLIP))
 	{
 		vflip = true;
 	}
-	else if(flags & ALLEGRO_FLIP_VERTICAL && !(fp->flags & ALLEGRO_FLIP_VERTICAL))
+	else if(flags & T3F_DRAW_V_FLIP && !(fp->flags & T3F_DRAW_V_FLIP))
 	{
 		vflip = true;
 	}
 	if(hflip)
 	{
-		*dflags |= ALLEGRO_FLIP_HORIZONTAL;
+		*dflags |= T3F_DRAW_H_FLIP;
 		*fox = -((fp->x + fp->width) - (base_fp->x + base_fp->width)) - (fp->x - base_fp->x);
 	}
 	if(vflip)
 	{
-		*dflags |= ALLEGRO_FLIP_VERTICAL;
+		*dflags |= T3F_DRAW_V_FLIP;
 		*foy = -((fp->y + fp->height) - (base_fp->y + base_fp->height)) - (fp->y - base_fp->y);
 	}
 }
@@ -991,7 +991,7 @@ void t3f_draw_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tick, float
 	T3F_ANIMATION_FRAME * fp = t3f_animation_get_frame(ap, tick);
 	float fox = 0.0;
 	float foy = 0.0;
-	int dflags = 0;
+	int dflags = flags & ~(T3F_DRAW_H_FLIP | T3F_DRAW_V_FLIP);
 
 	if(fp)
 	{
@@ -1019,7 +1019,7 @@ void t3f_draw_rotated_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, int tic
 	T3F_ANIMATION_FRAME * fp = t3f_animation_get_frame(ap, tick);
 	float fox = 0.0;
 	float foy = 0.0;
-	int dflags = 0;
+	int dflags = flags & ~(T3F_DRAW_H_FLIP | T3F_DRAW_V_FLIP);
 	if(fp)
 	{
 		handle_vh_flip(ap->data->frame[0], fp, flags, &fox, &foy, &dflags);
@@ -1035,7 +1035,7 @@ void t3f_draw_rotated_scaled_animation(T3F_ANIMATION * ap, ALLEGRO_COLOR color, 
 	T3F_ANIMATION_FRAME * fp = t3f_animation_get_frame(ap, tick);
 	float fox = 0.0;
 	float foy = 0.0;
-	int dflags = 0;
+	int dflags = flags & ~(T3F_DRAW_H_FLIP | T3F_DRAW_V_FLIP);
 	if(fp)
 	{
 		handle_vh_flip(ap->data->frame[0], fp, flags, &fox, &foy, &dflags);

@@ -519,12 +519,16 @@ T3F_BITMAP * t3f_load_bitmap(const char * fn, int flags, bool threaded)
 {
 	ALLEGRO_CONFIG * cp = NULL;
 	const char * val;
-	T3F_BITMAP * bp;
+	T3F_BITMAP * bp = NULL;
 	char * loading_fn = NULL;
 	char * loading_section;
 	char * base_fn;
 	_T3F_BITMAP_LOAD_INFO * load_info = NULL;
 
+	if(!fn)
+	{
+		goto fail;
+	}
 	bp = malloc(sizeof(T3F_BITMAP));
 	if(!bp)
 	{
@@ -613,6 +617,10 @@ T3F_BITMAP * t3f_load_bitmap(const char * fn, int flags, bool threaded)
 		load_info = NULL;
 		goto fail;
 	}
+	else if(!threaded)
+	{
+		t3f_remap_resource((void **)&bp->loading_bitmap, (void **)&bp->bitmap);
+	}
 
 	_t3f_bitmap_setup_variables(bp);
 
@@ -654,7 +662,7 @@ T3F_BITMAP * t3f_clone_bitmap(T3F_BITMAP * bp)
 	new_bitmap->object_loader = NULL;
 	new_bitmap->loading_bitmap = NULL;
 	new_bitmap->bitmap = NULL;
-	if(!t3f_clone_resource((void **)(&new_bitmap->bitmap), bp->bitmap))
+	if(!t3f_clone_resource((void **)(&new_bitmap->bitmap), (void **)&bp->bitmap))
 	{
 		goto fail;
 	}
@@ -804,6 +812,15 @@ void t3f_draw_bitmap(T3F_BITMAP * bp, ALLEGRO_COLOR color, float x, float y, flo
 	/* clip sprites at z = 0 */
 	if(obj_z[0] > 0)
 	{
+		/* adjust screen position for integer snap */
+		if(flags & T3F_DRAW_INTEGER_SNAP)
+		{
+			obj_x[0] = (int)obj_x[0];
+			obj_y[0] = (int)obj_y[0];
+			obj_x[1] = (int)obj_x[1];
+			obj_y[1] = (int)obj_y[1];
+			flags &= ~T3F_DRAW_INTEGER_SNAP;
+		}
 		screen_w = obj_x[1] - obj_x[0];
 		screen_h = obj_y[1] - obj_y[0];
 		al_draw_tinted_scaled_bitmap(bp->bitmap, color, 0, 0, al_get_bitmap_width(bp->bitmap), al_get_bitmap_height(bp->bitmap), obj_x[0], obj_y[0], screen_w, screen_h, flags);
@@ -837,8 +854,29 @@ void t3f_draw_rotated_bitmap(T3F_BITMAP * bp, ALLEGRO_COLOR color, float cx, flo
 	/* clip sprites at z = 0 */
 	if(obj_z[0] > 0)
 	{
+		if(flags & T3F_DRAW_INTEGER_SNAP)
+		{
+			obj_x[0] = (int)obj_x[0];
+			obj_x[1] = (int)obj_x[1];
+			obj_y[0] = (int)obj_y[0];
+			obj_y[1] = (int)obj_y[1];
+			obj_cx = (int)obj_cx;
+			obj_cy = (int)obj_cy;
+			flags &= ~T3F_DRAW_INTEGER_SNAP;
+		}
 		screen_w = obj_x[1] - obj_x[0];
 		screen_h = obj_y[1] - obj_y[0];
+		if(flags & T3F_DRAW_INTEGER_SNAP)
+		{
+			if((int)screen_w & 1)
+			{
+				obj_cx += 0.5;
+			}
+			if((int)screen_h & 1)
+			{
+				obj_cy += 0.5;
+			}
+		}
 		rx = screen_w / bp->target_width;
 		ry = screen_h / bp->target_height;
 		al_draw_tinted_scaled_rotated_bitmap(bp->bitmap, color, (cx / bp->target_scale_x) + bp->pad_left, (cy / bp->target_scale_y) + bp->pad_top, obj_cx, obj_cy, rx * bp->target_scale_x, ry * bp->target_scale_y, angle, flags);
@@ -854,23 +892,42 @@ void t3f_draw_scaled_rotated_bitmap(T3F_BITMAP * bp, ALLEGRO_COLOR color, float 
 	/* upper left and bottom right points in 2d */
 	float screen_w, screen_h;
 
-	obj_x[0] = t3f_project_x(x - bp->adjust_left * scale_x, z);
-	obj_x[1] = t3f_project_x(x + bp->target_width * scale_x + bp->adjust_right * scale_x, z);
-	obj_y[0] = t3f_project_y(y - bp->adjust_top * scale_y, z);
-	obj_y[1] = t3f_project_y(y + bp->target_height * scale_y + bp->adjust_bottom * scale_y, z);
 	obj_z[0] = z + t3f_current_view->virtual_width;
-//	obj_z[1] = z + t3f_virtual_display_width;
-	obj_cx = t3f_project_x(x, z);
-	obj_cy = t3f_project_y(y, z);
 
 	/* clip sprites at z = 0 */
 	if(obj_z[0] > 0)
 	{
+		obj_x[0] = t3f_project_x(x - bp->adjust_left * scale_x, z);
+		obj_x[1] = t3f_project_x(x + bp->target_width * scale_x + bp->adjust_right * scale_x, z);
+		obj_y[0] = t3f_project_y(y - bp->adjust_top * scale_y, z);
+		obj_y[1] = t3f_project_y(y + bp->target_height * scale_y + bp->adjust_bottom * scale_y, z);
+		obj_cx = t3f_project_x(x, z);
+		obj_cy = t3f_project_y(y, z);
 		screen_w = obj_x[1] - obj_x[0];
 		screen_h = obj_y[1] - obj_y[0];
+		if(flags & T3F_DRAW_INTEGER_SNAP)
+		{
+			obj_x[0] = (int)obj_x[0];
+			obj_x[1] = (int)obj_x[1];
+			obj_y[0] = (int)obj_y[0];
+			obj_y[1] = (int)obj_y[1];
+			obj_cx = (int)obj_cx;
+			obj_cy = (int)obj_cy;
+			screen_w = roundf(screen_w);
+			screen_h = roundf(screen_h);
+			if((int)screen_w & 1)
+			{
+				obj_cx += 0.5;
+			}
+			if((int)screen_h & 1)
+			{
+				obj_cy += 0.5;
+			}
+			flags &= ~T3F_DRAW_INTEGER_SNAP;
+		}
 		rx = screen_w / bp->target_width;
 		ry = screen_h / bp->target_height;
-		al_draw_tinted_scaled_rotated_bitmap(bp->bitmap, color, (cx / bp->target_scale_x) + bp->pad_top, (cy / bp->target_scale_y) + bp->pad_top, obj_cx, obj_cy, rx * bp->target_scale_x, ry * bp->target_scale_y, angle, flags);
+		al_draw_tinted_scaled_rotated_bitmap(bp->bitmap, color, (cx / bp->target_scale_x) + bp->pad_left, (cy / bp->target_scale_y) + bp->pad_top, obj_cx, obj_cy, rx * bp->target_scale_x, ry * bp->target_scale_y, angle, flags);
 		al_hold_bitmap_drawing(false);
 	}
 }
@@ -884,20 +941,29 @@ void t3f_draw_scaled_bitmap(T3F_BITMAP * bp, ALLEGRO_COLOR color, float x, float
 	float screen_w, screen_h;
 	float scale_x, scale_y;
 
-	scale_x = _t3f_bitmap_get_scale(w, al_get_bitmap_width(bp->bitmap), bp->pad_left + bp->pad_right);
-	scale_y = _t3f_bitmap_get_scale(h, al_get_bitmap_height(bp->bitmap), bp->pad_top + bp->pad_bottom);
-	obj_x[0] = t3f_project_x(x - bp->pad_left * scale_x, z);
-	obj_x[1] = t3f_project_x(x + w + bp->pad_right * scale_x, z);
-	obj_y[0] = t3f_project_y(y - bp->pad_top * scale_y, z);
-	obj_y[1] = t3f_project_y(y + h + bp->pad_bottom * scale_y, z);
 	obj_z[0] = z + t3f_current_view->virtual_width;
-//	obj_z[1] = z + t3f_virtual_display_width;
 
 	/* clip sprites at z = 0 */
 	if(obj_z[0] > 0)
 	{
+		scale_x = _t3f_bitmap_get_scale(w, al_get_bitmap_width(bp->bitmap), bp->pad_left + bp->pad_right);
+		scale_y = _t3f_bitmap_get_scale(h, al_get_bitmap_height(bp->bitmap), bp->pad_top + bp->pad_bottom);
+		obj_x[0] = t3f_project_x(x - bp->pad_left * scale_x, z);
+		obj_x[1] = t3f_project_x(x + w + bp->pad_right * scale_x, z);
+		obj_y[0] = t3f_project_y(y - bp->pad_top * scale_y, z);
+		obj_y[1] = t3f_project_y(y + h + bp->pad_bottom * scale_y, z);
 		screen_w = obj_x[1] - obj_x[0];
 		screen_h = obj_y[1] - obj_y[0];
+		if(flags & T3F_DRAW_INTEGER_SNAP)
+		{
+			obj_x[0] = (int)obj_x[0];
+			obj_x[1] = (int)obj_x[1];
+			obj_y[0] = (int)obj_y[0];
+			obj_y[1] = (int)obj_y[1];
+			screen_w = roundf(screen_w);
+			screen_h = roundf(screen_h);
+			flags &= ~T3F_DRAW_INTEGER_SNAP;
+		}
 		al_draw_tinted_scaled_bitmap(bp->bitmap, color, 0, 0, al_get_bitmap_width(bp->bitmap), al_get_bitmap_height(bp->bitmap), obj_x[0], obj_y[0], screen_w, screen_h, flags);
 	}
 }
@@ -905,12 +971,41 @@ void t3f_draw_scaled_bitmap(T3F_BITMAP * bp, ALLEGRO_COLOR color, float x, float
 void t3f_draw_scaled_rotated_bitmap_region(T3F_BITMAP * bp, float sx, float sy, float sw, float sh, ALLEGRO_COLOR color, float cx, float cy, float x, float y, float z, float scale, float angle, int flags)
 {
 	float fsx, fsy, fsw, fsh;
+	float screen_w, screen_h;
+	float obj_x[2], obj_y[2], obj_z[2], obj_cx, obj_cy;
 
-	/* scale the region coordinates so we can pretend the bitmap is target_width/height */
-	fsx = sx / bp->target_scale_x + bp->pad_left;
-	fsy = sy / bp->target_scale_y + bp->pad_top;
-	fsw = sw / bp->target_scale_x;
-	fsh = sh / bp->target_scale_y;
+	obj_z[0] = z + t3f_current_view->virtual_width;
 
-	al_draw_tinted_scaled_rotated_bitmap_region(bp->bitmap, fsx, fsy, fsw, fsh, color, cx / bp->target_scale_x, cy / bp->target_scale_y, t3f_project_x(x, z), t3f_project_y(y, z), scale * bp->target_scale_x, scale * bp->target_scale_y, angle, flags);
+	if(obj_z[0] > 0)
+	{
+		/* scale the region coordinates so we can pretend the bitmap is target_width/height */
+		fsx = sx / bp->target_scale_x + bp->pad_left;
+		fsy = sy / bp->target_scale_y + bp->pad_top;
+		fsw = sw / bp->target_scale_x;
+		fsh = sh / bp->target_scale_y;
+
+		obj_cx = t3f_project_x(x, z);
+		obj_cy = t3f_project_y(y, z);
+		if(flags & T3F_DRAW_INTEGER_SNAP)
+		{
+			obj_x[0] = t3f_project_x(x - bp->adjust_left * scale, z);
+			obj_x[1] = t3f_project_x(x + bp->target_width * scale + bp->adjust_right * scale, z);
+			obj_y[0] = t3f_project_y(y - bp->adjust_top * scale, z);
+			obj_y[1] = t3f_project_y(y + bp->target_height * scale + bp->adjust_bottom * scale, z);
+			obj_cx = (int)obj_cx;
+			obj_cy = (int)obj_cy;
+			screen_w = roundf(obj_x[1] - obj_x[0]);
+			screen_h = roundf(obj_y[1] - obj_y[0]);
+			if((int)screen_w & 1)
+			{
+				obj_cx += 0.5;
+			}
+			if((int)screen_h & 1)
+			{
+				obj_cy += 0.5;
+			}
+			flags &= ~T3F_DRAW_INTEGER_SNAP;
+		}
+		al_draw_tinted_scaled_rotated_bitmap_region(bp->bitmap, fsx, fsy, fsw, fsh, color, (cx / bp->target_scale_x) + bp->pad_left, (cy / bp->target_scale_y) + bp->pad_top, obj_cx, obj_cy, scale * bp->target_scale_x, scale * bp->target_scale_y, angle, flags);
+	}
 }

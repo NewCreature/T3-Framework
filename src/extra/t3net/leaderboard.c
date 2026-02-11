@@ -67,51 +67,6 @@ static char * _t3f_get_new_leaderboard_user_key(const char * url, const char * u
 	}
 }
 
-static int _t3f_update_leaderboard_user_name(const char * url, const char * user_key, const char * user_name)
-{
-	T3NET_ARGUMENTS * args = NULL;
-	T3NET_DATA * data = NULL;
-
-	args = t3net_create_arguments();
-	if(!args)
-	{
-		goto fail;
-	}
-	if(user_name)
-	{
-		if(!t3net_add_argument(args, "user_key", user_key))
-		{
-			goto fail;
-		}
-		if(!t3net_add_argument(args, "user_name", user_name))
-		{
-			goto fail;
-		}
-	}
-	data = t3net_get_data(url, args, NULL);
-	if(!data)
-	{
-		goto fail;
-	}
-	t3net_destroy_arguments(args);
-	t3net_destroy_data(data);
-
-	return 1;
-
-	fail:
-	{
-		if(args)
-		{
-			t3net_destroy_arguments(args);
-		}
-		if(data)
-		{
-			t3net_destroy_data(data);
-		}
-		return 0;
-	}
-}
-
 static T3NET_DATA * _t3f_retrieve_leaderboard_data(const char * url, const char * game, const char * version, const char * mode, const char * option, int entries, int ascend)
 {
 	T3NET_ARGUMENTS * args = NULL;
@@ -581,6 +536,11 @@ const char * t3f_retrieve_leaderboard_extra(const char * section, const char * m
   return al_get_config_value(t3f_user_data, section, key_text);
 }
 
+const char * t3f_get_leaderboard_user_name(const char * section)
+{
+  return al_get_config_value(t3f_user_data, section, "user_naem");
+}
+
 void t3f_set_leaderboard_user_name(const char * section, const char * name)
 {
   const char * val;
@@ -631,6 +591,76 @@ const char * t3f_get_leaderboard_user_key(const char * section)
   {
     return NULL;
   }
+}
+
+bool t3f_submit_leaderboard_user_name(const char * section)
+{
+	T3NET_ARGUMENTS * args = NULL;
+	T3NET_DATA * data = NULL;
+  const char * user_key;
+  const char * user_name;
+  const char * url;
+  bool ret = false;
+  const char * error;
+
+  user_key = al_get_config_value(t3f_user_data, section, "user_key");
+  if(!user_key)
+  {
+    goto fail;
+  }
+  user_name = al_get_config_value(t3f_user_data, section, "user_name");
+  if(!user_name)
+  {
+    goto fail;
+  }
+  url = al_get_config_value(t3f_user_data, section, "user_name_url");
+  if(!url)
+  {
+    goto fail;
+  }
+	args = t3net_create_arguments();
+	if(!args)
+	{
+		goto fail;
+	}
+	if(user_name)
+	{
+		if(!t3net_add_argument(args, "user_key", user_key))
+		{
+			goto fail;
+		}
+		if(!t3net_add_argument(args, "user_name", user_name))
+		{
+			goto fail;
+		}
+	}
+	data = t3net_get_data(url, args, NULL);
+	if(!data)
+	{
+		goto fail;
+	}
+  error = t3net_get_error(data);
+  if(!error)
+  {
+    ret = true;
+  }
+	t3net_destroy_arguments(args);
+	t3net_destroy_data(data);
+
+	return ret;
+
+	fail:
+	{
+		if(args)
+		{
+			t3net_destroy_arguments(args);
+		}
+		if(data)
+		{
+			t3net_destroy_data(data);
+		}
+		return false;
+	}
 }
 
 bool t3f_submit_leaderboard_score(const char * section, const char * mode, const char * option)

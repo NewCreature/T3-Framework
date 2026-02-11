@@ -45,19 +45,17 @@ typedef struct
 typedef struct
 {
 
-	char text[256];
+	char * text;
+	void * next_line;
 
 } T3F_TEXT_LINE;
 
 typedef struct
 {
 
-	T3F_FONT * font;
-	T3F_TEXT_LINE line[64];
-	int lines;
-	float tab;
+	T3F_TEXT_LINE * line;
 
-} T3F_TEXT_LINE_DATA;
+} T3F_TEXT_LINES;
 
 /* used by the resource manager */
 void * t3f_load_font_data_with_engine_f(T3F_FONT_ENGINE * engine, const char * fn, ALLEGRO_FILE * fp, int option, int flags);
@@ -80,13 +78,16 @@ float t3f_get_font_line_height(T3F_FONT * fp);
 void t3f_draw_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, int flags, const char * text);
 void t3f_draw_scaled_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float scale, int flags, const char * text);
 void t3f_draw_textf(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, int flags, const char * format, ...);
-void t3f_draw_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * text);
-void t3f_draw_scaled_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float scale, float w, float tab, int flags, const char * text);
-void t3f_draw_multiline_textf(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * format, ...);
+
 void t3f_draw_glyph(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, int cp);
 int t3f_get_glyph_advance(T3F_FONT * fp, int cp1, int cp2);
 
-void t3f_create_text_line_data(T3F_TEXT_LINE_DATA * lp, T3F_FONT * fp, float w, float tab, const char * text);
-void t3f_draw_text_lines(T3F_TEXT_LINE_DATA * lines, ALLEGRO_COLOR color, float x, float y, float z);
+bool t3f_init_text_lines(T3F_TEXT_LINES * text_lines);
+bool t3f_create_text_lines(T3F_TEXT_LINES * text_lines, T3F_FONT * fp, float w, float tab, const char * text);
+void t3f_free_text_lines(T3F_TEXT_LINES * text_lines);
+void t3f_draw_text_lines(T3F_TEXT_LINES * lines, T3F_FONT * font, ALLEGRO_COLOR color, float x, float y, float z, float tab);
+void t3f_draw_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * text);
+void t3f_draw_scaled_multiline_text(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float scale, float w, float tab, int flags, const char * text);
+void t3f_draw_multiline_textf(T3F_FONT * fp, ALLEGRO_COLOR color, float x, float y, float z, float w, float tab, int flags, const char * format, ...);
 
 #endif

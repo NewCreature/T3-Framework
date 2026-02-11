@@ -42,6 +42,10 @@ void t3f_destroy_cinema(T3F_CINEMA * cp)
 		}
 		if(cp->script)
 		{
+			if(cp->flags & T3F_CINEMA_FLAG_DEVELOPER_MODE)
+			{
+				al_save_config_file(cp->script_path, cp->script);
+			}
 			al_destroy_config(cp->script);
 		}
 		al_free(cp);
@@ -57,11 +61,12 @@ void t3f_cinema_remove_bitmap(T3F_CINEMA * cp, int bitmap)
 {
 }
 
-bool t3f_cinema_add_event(T3F_CINEMA * cp, unsigned long tick, int type, T3F_CINEMA_EVENT_DATA data, int flags)
+bool t3f_cinema_add_event(T3F_CINEMA * cp, unsigned long id, unsigned long tick, int type, T3F_CINEMA_EVENT_DATA data, int flags)
 {
 	cp->event[cp->events] = al_malloc(sizeof(T3F_CINEMA_EVENT));
 	if(cp->event[cp->events])
 	{
+		cp->event[cp->events]->id = id;
 		cp->event[cp->events]->tick = tick;
 		cp->event[cp->events]->type = type;
 		cp->event[cp->events]->flags = flags;
@@ -87,6 +92,18 @@ void t3f_cinema_remove_event(T3F_CINEMA * cp, int event)
 T3F_CINEMA * t3f_load_cinema(const char * fn)
 {
 	return NULL;
+}
+
+static bool get_config_bool(ALLEGRO_CONFIG * cp, const char * section, const char * key)
+{
+	const char * val;
+
+	val = al_get_config_value(cp, section, key);
+	if(val)
+	{
+		return !strcasecmp(val, "true");
+	}
+	return 0;
 }
 
 static int get_config_integer(ALLEGRO_CONFIG * cp, const char * section, const char * key)
@@ -115,13 +132,15 @@ static bool get_config_float(ALLEGRO_CONFIG * cp, const char * section, const ch
 	return false;
 }
 
-static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number, unsigned long * current_tick)
+static void _t3f_load_cinema_event(T3F_CINEMA * cp, unsigned long id, const char * buf, int number, unsigned long * current_tick)
 {
 	T3F_CINEMA_EVENT_DATA event_data;
 	int b, e, t, scene;
 	float x, y, z, a, vx, vy, vz, va, s, is, jy, gy;
-	int etick = 0;
 	bool use_x, use_y, use_z;
+	float focus_x, focus_y;
+	bool use_focus_x, use_focus_y;
+	int etick = 0;
 	bool use_vx, use_vy, use_vz, use_va;
 	float cr, cg, cb, ca;
 	bool use_c;
@@ -131,6 +150,7 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 	const char * name;
 	const char * val;
 	int flags = 0;
+	bool focus = false;
 
 	/* determine if event is a break point */
 	val = al_get_config_value(cp->script, buf, "break_point");
@@ -157,6 +177,9 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 	b = get_config_integer(cp->script, buf, "bitmap");
 	t = get_config_integer(cp->script, buf, "type");
 	e = get_config_integer(cp->script, buf, "entity");
+	focus = get_config_bool(cp->script, buf, "focus");
+	use_focus_x = get_config_float(cp->script, buf, "focus_x", &focus_x);
+	use_focus_y = get_config_float(cp->script, buf, "focus_y", &focus_y);
 	etick = get_config_integer(cp->script, buf, "etick");
 	use_x = get_config_float(cp->script, buf, "x", &x);
 	use_y = get_config_float(cp->script, buf, "y", &y);
@@ -180,13 +203,13 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 	{
 		case T3F_CINEMA_EVENT_CLEAR:
 		{
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			break;
 		}
 		case T3F_CINEMA_EVENT_LOAD_SCENE:
 		{
 			event_data.load_scene.scene = scene;
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			break;
 		}
 		case T3F_CINEMA_EVENT_ADD_ENTITY:
@@ -222,7 +245,7 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 			{
 				event_data.add_entity.color = al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
 			}
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			break;
 		}
 		case T3F_CINEMA_EVENT_CHANGE_ENTITY:
@@ -230,19 +253,19 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 			event_data.change_entity.name = name;
 			event_data.change_entity.entity = e;
 			event_data.change_entity.bitmap = b;
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			break;
 		}
 		case T3F_CINEMA_EVENT_REMOVE_ENTITY:
 		{
 			event_data.remove_entity.name = name;
 			event_data.remove_entity.entity = e;
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			break;
 		}
 		case T3F_CINEMA_EVENT_MOVE_ENTITY:
 		{
-			event_data.remove_entity.name = name;
+			event_data.move_entity.name = name;
 			event_data.move_entity.entity = e;
 			event_data.move_entity.tick = *current_tick + target_tick;
 			event_data.move_entity.ux = use_x;
@@ -263,9 +286,26 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 			}
 
 			event_data.move_entity.a = a;
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			event_data.stop_entity.entity = e;
-			t3f_cinema_add_event(cp, *current_tick + target_tick, T3F_CINEMA_EVENT_STOP_ENTITY, event_data, 0);
+			t3f_cinema_add_event(cp, id, *current_tick + target_tick, T3F_CINEMA_EVENT_STOP_ENTITY, event_data, 0);
+			if(focus)
+			{
+				event_data.move_camera.tick = *current_tick + target_tick;
+				event_data.move_camera.x = x - t3f_current_view->virtual_width / 2;
+				if(use_focus_x)
+				{
+					event_data.move_camera.x += focus_x;
+				}
+				event_data.move_camera.y = y - t3f_current_view->virtual_height / 2;
+				if(use_focus_y)
+				{
+					event_data.move_camera.y += focus_y;
+				}
+				event_data.move_camera.z = z;
+				t3f_cinema_add_event(cp, id, *current_tick, T3F_CINEMA_EVENT_MOVE_CAMERA, event_data, flags);
+				t3f_cinema_add_event(cp, id, *current_tick + target_tick, T3F_CINEMA_EVENT_STOP_CAMERA, event_data, 0);
+			}
 			break;
 		}
 		case T3F_CINEMA_EVENT_ACCEL_ENTITY:
@@ -281,7 +321,7 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 			event_data.accel_entity.vy = vy;
 			event_data.accel_entity.vz = vz;
 			event_data.accel_entity.va = va;
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			break;
 		}
 		case T3F_CINEMA_EVENT_MOVE_CAMERA:
@@ -290,8 +330,8 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 			event_data.move_camera.x = x;
 			event_data.move_camera.y = y;
 			event_data.move_camera.z = z;
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
-			t3f_cinema_add_event(cp, *current_tick + target_tick, T3F_CINEMA_EVENT_STOP_CAMERA, event_data, 0);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick + target_tick, T3F_CINEMA_EVENT_STOP_CAMERA, event_data, 0);
 			break;
 		}
 		case T3F_CINEMA_EVENT_FADE_ENTITY:
@@ -300,8 +340,8 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 			event_data.fade_entity.entity = e;
 			event_data.fade_entity.tick = *current_tick + target_tick;
 			event_data.fade_entity.color = al_map_rgba_f(cr, cg, cb, ca);
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
-			t3f_cinema_add_event(cp, *current_tick + target_tick, T3F_CINEMA_EVENT_STOP_FADE, event_data, 0);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick + target_tick, T3F_CINEMA_EVENT_STOP_FADE, event_data, 0);
 			break;
 		}
 		case T3F_CINEMA_EVENT_COLOR_ENTITY:
@@ -309,14 +349,14 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 			event_data.color_entity.name = name;
 			event_data.color_entity.entity = e;
 			event_data.color_entity.color = al_map_rgba_f(cr, cg, cb, ca);
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			break;
 		}
 		case T3F_CINEMA_EVENT_PLAY_MUSIC:
 		{
 			event_data.play_music.filename = efn;
 			event_data.play_music.fade_ticks = s;
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			break;
 		}
 		case T3F_CINEMA_EVENT_PLAY_SOUND:
@@ -325,18 +365,18 @@ static void _t3f_load_cinema_event(T3F_CINEMA * cp, const char * buf, int number
 			{
 				event_data.play_sound.filename = efn;
 				event_data.play_sound.pan = s;
-				t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+				t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			}
 			break;
 		}
 		case T3F_CINEMA_EVENT_NONE:
 		{
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			break;
 		}
 		case T3F_CINEMA_EVENT_END:
 		{
-			t3f_cinema_add_event(cp, *current_tick, t, event_data, flags);
+			t3f_cinema_add_event(cp, id, *current_tick, t, event_data, flags);
 			cp->length = *current_tick;
 			break;
 		}
@@ -361,6 +401,7 @@ T3F_CINEMA * t3f_load_cinema_script(const char * fn, float graphics_scale, int f
 	{
 		goto fail;
 	}
+	strcpy(cp->script_path, fn);
 	cp->path = al_create_path(fn);
 	if(!cp->path)
 	{
@@ -370,6 +411,35 @@ T3F_CINEMA * t3f_load_cinema_script(const char * fn, float graphics_scale, int f
 	cp->flags = flags;
 	cp->entities = 0;
 
+	/* load settings */
+	val = al_get_config_value(cp->script, "Settings", "integer_rendering");
+	if(val && !strcasecmp(val, "true"))
+	{
+		cp->flags |= T3F_CINEMA_FLAG_INTEGER_RENDERING;
+	}
+	val = al_get_config_value(cp->script, "Settings", "constrain_camera");
+	if(val && !strcasecmp(val, "true"))
+	{
+		cp->flags |= T3F_CINEMA_FLAG_CONSTRAIN_CAMERA;
+	}
+	val = al_get_config_value(cp->script, "Settings", "developer_mode");
+	if(val && !strcasecmp(val, "true"))
+	{
+		cp->flags |= T3F_CINEMA_FLAG_DEVELOPER_MODE;
+	}
+	cp->camera.width = t3f_current_view->virtual_width;
+	cp->camera.height = t3f_current_view->virtual_height;
+	val = al_get_config_value(cp->script, "Settings", "camera_width");
+	if(val)
+	{
+		cp->camera.width = atoi(val);
+	}
+	val = al_get_config_value(cp->script, "Settings", "camera_height");
+	if(val)
+	{
+		cp->camera.height = atoi(val);
+	}
+
 	/* load events */
 	for(i = 0; i < T3F_CINEMA_MAX_SCRIPT_EVENTS; i++)
 	{
@@ -378,7 +448,7 @@ T3F_CINEMA * t3f_load_cinema_script(const char * fn, float graphics_scale, int f
 		val = al_get_config_value(cp->script, buf, "tick");
 		if(val)
 		{
-			_t3f_load_cinema_event(cp, buf, i, &current_tick);
+			_t3f_load_cinema_event(cp, i, buf, i, &current_tick);
 		}
 	}
 
@@ -417,6 +487,12 @@ void t3f_set_cinema_view_callbacks(T3F_CINEMA * cp, void (*logic_callback)(void 
 	cp->view_logic_callback = logic_callback;
 	cp->view_callback = render_callback;
 	cp->view_callback_data = data;
+}
+
+void t3f_set_cinema_event_callback(T3F_CINEMA * cp, bool (*callback)(T3F_CINEMA_EVENT * event, void * data), void * data)
+{
+	cp->event_callback = callback;
+	cp->event_callback_data = data;
 }
 
 static void t3f_cinema_remove_entity(T3F_CINEMA * cp, int entity)
@@ -467,6 +543,13 @@ void t3f_process_cinema_event(T3F_CINEMA * cp, int event)
 	char buf2[256] = {0};
 	char buf3[1024];
 
+	if(cp->event_callback && !cp->first_frame)
+	{
+		if(cp->event_callback(cp->event[event], cp->event_callback_data))
+		{
+			return;
+		}
+	}
 	switch(cp->event[event]->type)
 	{
 		case T3F_CINEMA_EVENT_CLEAR:
@@ -561,6 +644,14 @@ void t3f_process_cinema_event(T3F_CINEMA * cp, int event)
 		{
 			e = _get_entity_id(cp, cp->event[event]->data.move_entity.name, cp->event[event]->data.move_entity.entity);
 			t = cp->event[event]->data.move_entity.tick;
+			if(cp->flags & T3F_CINEMA_FLAG_DEVELOPER_MODE)
+			{
+				sprintf(buf, "event %lu", cp->event[event]->id);
+				sprintf(buf2, "%d", (int)cp->bitmap[cp->entity[e].bitmap]->data->frame[0]->width / 2);
+				al_set_config_value(cp->script, buf, "focus_x", buf2);
+				sprintf(buf2, "%d", (int)cp->bitmap[cp->entity[e].bitmap]->data->frame[0]->height / 2);
+				al_set_config_value(cp->script, buf, "focus_y", buf2);
+			}
 
 			/* if target tick is the current tick, move entity immediately */
 			if(t - cp->event[event]->tick <= 0)
@@ -628,20 +719,42 @@ void t3f_process_cinema_event(T3F_CINEMA * cp, int event)
 		}
 		case T3F_CINEMA_EVENT_MOVE_CAMERA:
 		{
+			int target_x, target_y;
 			t = cp->event[event]->data.move_camera.tick;
 
+			target_x = cp->event[event]->data.move_camera.x;
+			target_y = cp->event[event]->data.move_camera.y;
+			if(cp->flags & T3F_CINEMA_FLAG_CONSTRAIN_CAMERA)
+			{
+				if(target_x < 0)
+				{
+					target_x = 0;
+				}
+				else if(target_x + t3f_current_view->virtual_width > cp->camera.width)
+				{
+					target_x = cp->camera.width - t3f_current_view->virtual_width;
+				}
+				if(target_y < 0)
+				{
+					target_y = 0;
+				}
+				else if(target_y + t3f_current_view->virtual_height > cp->camera.height)
+				{
+					target_y = cp->camera.height - t3f_current_view->virtual_height;
+				}
+			}
 			/* if target tick is the current tick, move camera immediately */
 			if(t - cp->event[event]->tick <= 0)
 			{
-				cp->camera.x = cp->event[event]->data.move_camera.x;
-				cp->camera.y = cp->event[event]->data.move_camera.y;
+				cp->camera.x = target_x;
+				cp->camera.y = target_y;
 				cp->camera.z = cp->event[event]->data.move_camera.z;
 			}
 			else
 			{
-				d = (cp->event[event]->data.move_camera.x - cp->camera.x) / (float)(t - cp->event[event]->tick);
+				d = (target_x - cp->camera.x) / (float)(t - cp->event[event]->tick);
 				cp->camera.vx = d;
-				d = (cp->event[event]->data.move_camera.y - cp->camera.y) / (float)(t - cp->event[event]->tick);
+				d = (target_y - cp->camera.y) / (float)(t - cp->event[event]->tick);
 				cp->camera.vy = d;
 				d = (cp->event[event]->data.move_camera.z - cp->camera.z) / (float)(t - cp->event[event]->tick);
 				cp->camera.vz = d;
@@ -782,10 +895,13 @@ static bool _t3f_process_cinema_tick(T3F_CINEMA * cp)
 		}
 	}
 
-	if(_t3f_detect_cinema_wait(cp) && !cp->wait_skipped)
+	if(!(cp->flags & T3F_CINEMA_FLAG_DEVELOPER_MODE))
 	{
-		cp->state = T3F_CINEMA_STATE_WAIT;
-		return true;
+		if(_t3f_detect_cinema_wait(cp) && !cp->wait_skipped)
+		{
+			cp->state = T3F_CINEMA_STATE_WAIT;
+			return true;
+		}
 	}
 	cp->wait_skipped = false;
 	for(i = cp->scene_start_event; i < cp->events; i++)
@@ -837,8 +953,15 @@ static bool _t3f_process_cinema_tick(T3F_CINEMA * cp)
 	cp->camera.x += cp->camera.vx;
 	cp->camera.y += cp->camera.vy;
 	cp->camera.z += cp->camera.vz;
+	cp->camera.render_x = cp->camera.x;
+	cp->camera.render_y = cp->camera.y;
+	if(cp->flags & T3F_CINEMA_FLAG_INTEGER_RENDERING)
+	{
+		cp->camera.render_x = (int)cp->camera.render_x;
+		cp->camera.render_y = (int)cp->camera.render_y;
+	}
 
-	if(cp->tick >= cp->length)
+	if(cp->tick > cp->length)
 	{
 		ret = true;
 	}
@@ -869,9 +992,9 @@ void t3f_render_cinema(T3F_CINEMA * cp)
 	float w, h;
 
 	/* render entities */
+	t3f_set_clipping_rectangle(-cp->camera.render_x, -cp->camera.render_y, cp->camera.width, cp->camera.height);
 	for(i = 0; i < cp->entities; i++)
 	{
-
 		/* use the view callback in this case, we want to be able to render the
 		 * game into this view while the cinema is still running */
 		if(cp->entity[i].bitmap < 0)
@@ -893,9 +1016,10 @@ void t3f_render_cinema(T3F_CINEMA * cp)
 		{
 			cx = cp->bitmap[cp->entity[i].bitmap]->data->frame[0]->width / 2;
 			cy = cp->bitmap[cp->entity[i].bitmap]->data->frame[0]->height / 2;
-			t3f_draw_rotated_scaled_animation(cp->bitmap[cp->entity[i].bitmap], cp->entity[i].color, cp->entity[i].tick, cx, cy, cp->entity[i].x - cp->camera.x + cx * cp->entity[i].s, cp->entity[i].y - cp->camera.y + cy * cp->entity[i].s, cp->entity[i].z - cp->camera.z, cp->entity[i].a, cp->entity[i].s, 0);
+			t3f_draw_rotated_scaled_animation(cp->bitmap[cp->entity[i].bitmap], cp->entity[i].color, cp->entity[i].tick, cx, cy, cp->entity[i].x - cp->camera.render_x + cx * cp->entity[i].s, cp->entity[i].y - cp->camera.render_y + cy * cp->entity[i].s, cp->entity[i].z - cp->camera.z, cp->entity[i].a, cp->entity[i].s, (cp->flags & T3F_CINEMA_FLAG_INTEGER_RENDERING) ? T3F_DRAW_INTEGER_SNAP : 0);
 		}
 	}
+	t3f_set_clipping_rectangle(0, 0, 0, 0);
 }
 
 static int _t3f_cinema_click_count = 0;

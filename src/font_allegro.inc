@@ -1,50 +1,10 @@
 /* Allegro font engine */
 
-/* make "magic pink" transparent and grays different levels of alpha */
-static void convert_grey_to_alpha(ALLEGRO_BITMAP * bitmap)
-{
-	int x, y;
-	unsigned char ir, ig, ib, ia;
-	ALLEGRO_COLOR pixel;
-	ALLEGRO_STATE old_state;
-
-	if(!al_lock_bitmap(bitmap, al_get_bitmap_format(bitmap), 0))
-	{
-		return;
-	}
-
-	al_store_state(&old_state, ALLEGRO_STATE_TARGET_BITMAP);
-	al_set_target_bitmap(bitmap);
-
-	for(y = 0; y < al_get_bitmap_height(bitmap); y++)
-	{
-		for(x = 0; x < al_get_bitmap_width(bitmap); x++)
-		{
-			pixel = al_get_pixel(bitmap, x, y);
-			al_unmap_rgba(pixel, &ir, &ig, &ib, &ia);
-			if(ir == 255 && ig == 0 && ib == 255)
-			{
-				pixel = al_map_rgba(255, 0, 255, 255);
-				al_put_pixel(x, y, pixel);
-			}
-			else if(ia > 0 && !(ir == 255 && ig == 255 && ib == 0))
-			{
-				pixel = al_map_rgba(ir, ir, ir, ir);
-				al_put_pixel(x, y, pixel);
-			}
-		}
-	}
-
-	al_restore_state(&old_state);
-	al_unlock_bitmap(bitmap);
-}
-
 static void * load_bitmap_font_f(ALLEGRO_FILE * fp, const char * extension)
 {
 	ALLEGRO_BITMAP * bp;
 	ALLEGRO_FONT * font = NULL;
 	int ranges[] = {32, 126};
-	char buf[256];
 
 	bp = al_load_bitmap_f(fp, extension);
 	if(bp)

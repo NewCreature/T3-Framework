@@ -10,6 +10,7 @@
   static double _t3f_steam_store_time_interval = 7.0;
   static double _t3f_steam_store_time = -_t3f_steam_store_time_interval;
   static T3F_ACHIEVEMENTS_LIST * _t3f_achievements_list = NULL;
+  static bool _t3f_steam_overlay_active = false;
 #endif
 
 bool t3f_init_steam_integration(T3F_ACHIEVEMENTS_LIST * achievements_list)
@@ -51,6 +52,14 @@ void t3f_shutdown_steam_integration(void)
       _t3f_steam_integration_enabled = false;
     }
   #endif
+}
+
+bool t3f_steam_integration_enabled(void)
+{
+  #ifdef T3F_ENABLE_STEAM_INTEGRATION
+    return _t3f_steam_integration_enabled;
+  #endif
+  return false;
 }
 
 bool t3f_restart_through_steam(uint32_t app_id)
@@ -159,6 +168,11 @@ const char * t3f_get_steam_user_display_name(void)
             }
           }
         }
+        else if(callback.m_iCallback == GameOverlayActivated_t::k_iCallback)
+        {
+          uint8_t * overlay_state = (uint8_t *)callback.m_pubParam;
+          _t3f_steam_overlay_active = *overlay_state;
+        }
       }
       SteamAPI_ManualDispatch_FreeLastCallback( hSteamPipe );
     }
@@ -209,6 +223,15 @@ void t3f_reset_steam_stats(void)
 {
   #ifdef T3F_ENABLE_STEAM_INTEGRATION
     _t3f_steam_want_stats_reset = true;
+  #endif
+}
+
+bool t3f_steam_overlay_active(void)
+{
+  #ifdef T3F_ENABLE_STEAM_INTEGRATION
+    return _t3f_steam_overlay_active;
+  #else
+    return false;
   #endif
 }
 
