@@ -197,14 +197,14 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 		(*env)->DeleteLocalRef(env, urlS);
 	}
 
-	char * t3f_run_url(const char * url, const char ** post_data, const char * out_path, char ** out_data)
+	int t3f_run_url(const char * url, const char ** post_data, const char * out_path, char ** out_data)
 	{
 		JNIEnv * env = _al_android_get_jnienv();
 		jstring urlS = (*env)->NewStringUTF(env, url);
 		jbyteArray retB;
 		int retB_size;
 		const jbyte * ret;
-		char * real_ret = NULL;
+		int real_ret = 0;
 
 		retB = _jni_callObjectMethodV(
 			_al_android_get_jnienv(),
@@ -217,14 +217,15 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 		{
 			retB_size = (*env)->GetArrayLength(env, retB);
 			ret = (*env)->GetByteArrayElements(env, retB, NULL);
-			real_ret = malloc(retB_size);
-			if(real_ret)
+			*out_data = malloc(retB_size);
+			if(*out_data)
 			{
-				memcpy(real_ret, ret, retB_size);
+				memcpy(*out_data, ret, retB_size);
 			}
 			(*env)->ReleaseStringUTFChars(env, retB, ret);
+			return 1;
 		}
-		return real_ret;
+		return 0;
 	}
 
 	void _t3f_reset_android_bg_color(void)
@@ -268,9 +269,9 @@ JNI_FUNC(void, MainActivity, nativeOnEditComplete, (JNIEnv *env, jobject obj, js
 		#endif
 	}
 
-	char * t3f_run_url(const char * url, const char ** post_data, const char * out_path, char ** out_data)
+	int t3f_run_url(const char * url, const char ** post_data, const char * out_path, char ** out_data)
 	{
-		return NULL;
+		return 0;
 	}
 
 #endif

@@ -10,7 +10,7 @@ prepare_platform:
 build_android_apk: build_android $(ANDROID_PLATFORM_TARGET)
 ifdef ANDROID_SIGNING_SETTINGS
 	rm -f ../packages/$(APP_PACKAGE_NAME)-android-aligned.apk
-	$(ANDROID_SDK_ROOT)/build-tools/30.0.3/zipalign -v 4 ../packages/$(APP_PACKAGE_NAME)-android-unsigned.apk ../packages/$(APP_PACKAGE_NAME)-android-aligned.apk
+	$(ANDROID_SDK_ROOT)/build-tools/37.0.0-rc1/zipalign -v 4 ../packages/$(APP_PACKAGE_NAME)-android-unsigned.apk ../packages/$(APP_PACKAGE_NAME)-android-aligned.apk
 	rm ../packages/$(APP_PACKAGE_NAME)-android-unsigned.apk
 	$(ANDROID_SIGNING_TOOL) $(ANDROID_SIGNING_SETTINGS) ../packages/$(APP_PACKAGE_NAME)-android-aligned.apk
 	mv ../packages/$(APP_PACKAGE_NAME)-android-aligned.apk ../packages/$(APP_PACKAGE_NAME)-android.apk
@@ -94,11 +94,11 @@ copy_libs:
 
 create_native_libs:
 	make clean
-	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=armeabi-v7a ANDROID_COMPILER_TARGET=armv7-none-linux-androideabi19 ANDROID_C_ARCH="-march=armv7-a" CFLAGS_ARCH="-mfpu=vfpv3-d16 -mfloat-abi=softfp -mthumb" LFLAGS_ARCH=-"Wl,--fix-cortex-a8" create_native_lib
+	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=armeabi-v7a ANDROID_COMPILER_TARGET=armv7-none-linux-androideabi21 ANDROID_C_ARCH="-march=armv7-a" CFLAGS_ARCH="-mfpu=vfpv3-d16 -mfloat-abi=softfp -mthumb" LFLAGS_ARCH=-"Wl,--fix-cortex-a8" create_native_lib
 	make clean
 	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=arm64-v8a ANDROID_COMPILER_TARGET=aarch64-none-linux-android21 ANDROID_C_ARCH="" CFLAGS_ARCH="" LFLAGS_ARCH="" create_native_lib
 	make clean
-	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=x86 ANDROID_COMPILER_TARGET=i686-none-linux-android19 ANDROID_C_ARCH="" CFLAGS_ARCH="" LFLAGS_ARCH="" create_native_lib
+	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=x86 ANDROID_COMPILER_TARGET=i686-none-linux-android21 ANDROID_C_ARCH="" CFLAGS_ARCH="" LFLAGS_ARCH="" create_native_lib
 	make clean
 	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=x86_64 ANDROID_COMPILER_TARGET=x86_64-none-linux-android21 ANDROID_C_ARCH="" CFLAGS_ARCH="" LFLAGS_ARCH="" create_native_lib
 
@@ -108,14 +108,14 @@ create_android_temp:
 
 build_android: create_android_temp edit_project copy_resources copy_libs create_native_libs
 	@echo Building Android project
-	cd ../android_temp/app.project; export ANDROID_HOME=$(ANDROID_SDK_ROOT); export JAVA_HOME=$(ANDROID_JAVA_HOME); ./gradlew build
+	cd ../android_temp/app.project; export ANDROID_HOME=$(ANDROID_SDK_ROOT); export JAVA_HOME=$(ANDROID_JAVA_HOME); ./gradlew --stop; ./gradlew build; ./gradlew --stop
 	cp ../android_temp/app.project/app/build/outputs/apk/release/app-release-unsigned.apk ../packages/$(APP_PACKAGE_NAME)-android-unsigned.apk
 	rm -rf ../android_temp
 	@echo Unsigned APK generated.
 
 build_android_bundle: create_android_temp edit_project copy_resources copy_libs create_native_libs
 	@echo Building Android project
-	cd ../android_temp/app.project; export ANDROID_HOME=$(ANDROID_SDK_ROOT); export JAVA_HOME=$(ANDROID_JAVA_HOME); ./gradlew bundle
+	cd ../android_temp/app.project; export ANDROID_HOME=$(ANDROID_SDK_ROOT); export JAVA_HOME=$(ANDROID_JAVA_HOME); ./gradlew --stop; ./gradlew bundle; ./gradlew --stop
 	cp ../android_temp/app.project/app/build/outputs/bundle/release/app-release.aab ../packages/$(APP_PACKAGE_NAME)-android-unsigned.aab
 	rm -rf ../android_temp
 	@echo Unsigned AAB generated.
