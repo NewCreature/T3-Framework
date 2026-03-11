@@ -15,6 +15,7 @@ BUILD_LIBWEBP=1
 BUILD_FREETYPE=1
 BUILD_PHYSFS=1
 BUILD_ALLEGRO=1
+BUILD_MINIZIP=0
 
 function remake_dir()
 {
@@ -37,6 +38,7 @@ function disable_all() {
   BUILD_FREETYPE=0
   BUILD_PHYSFS=0
   BUILD_ALLEGRO=0
+  BUILD_MINIZIP=0
 }
 
 # handle updating all dependencies for a single architecture
@@ -292,6 +294,24 @@ function update_dependencies_for()
     cd ..
   fi
 
+  # minizip
+  if [ $BUILD_MINIZIP -eq 1 ]; then
+    echo "Updating minizip..."
+    if [ ! -d "minizip" ];
+    then
+      git clone https://github.com/domoticz/minizip.git
+    fi
+    cd minizip
+    git pull
+    remake_dir _build_android_$2
+    cd _build_android_$2
+    cmake .. $CMAKE_SETTINGS -DCMAKE_C_FLAGS="-include stdio.h" -DZLIB_INCLUDE_DIR=$INSTALL_PREFIX/include -DZLIB_LIBRARY_RELEASE=$INSTALL_PREFIX/lib/libz.a
+    make
+    cp -a ../minizip $INSTALL_PREFIX/include
+    cp libminizip.a $INSTALL_PREFIX/lib
+    cd ..
+    cd ..
+  fi
 }
 
 if [ "$#" -le 0 ]; then
@@ -366,6 +386,10 @@ do
   if [ $arg = --allegro_only ]; then
     disable_all
     BUILD_ALLEGRO=1
+  fi
+  if [ $arg = --minizip_only ]; then
+    disable_all
+    BUILD_MINIZIP=1
   fi
 done
 
