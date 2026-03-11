@@ -19,6 +19,7 @@ BUILD_LIBWEBP=1
 BUILD_FREETYPE=1
 BUILD_PHYSFS=1
 BUILD_ALLEGRO=1
+BUILD_MINIZIP=1
 
 function merge_libs() {
   lipo -create $1/$3 $2/$3 -output $1/$3
@@ -45,6 +46,7 @@ function disable_all() {
   BUILD_FREETYPE=0
   BUILD_PHYSFS=0
   BUILD_ALLEGRO=0
+  BUILD_MINIZIP=0
 }
 
 if [ "$#" -le 0 ]; then
@@ -114,6 +116,10 @@ do
   if [ $arg = --allegro_only ]; then
     disable_all
     BUILD_ALLEGRO=1
+  fi
+  if [ $arg = --minizip_only ]; then
+    disable_all
+    BUILD_MINIZIP=1
   fi
 done
 
@@ -542,6 +548,33 @@ if [ $BUILD_ALLEGRO -eq 1 ]; then
   merge_libs lib ../_build_x86/lib liballegro_primitives-static.a
   merge_libs lib ../_build_x86/lib liballegro_ttf-static.a
   sudo make install
+  cd ..
+  cd ..
+fi
+
+# minizip
+if [ $BUILD_MINIZIP -eq 1 ]; then
+  echo "Updating minizip..."
+  SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$X86_SDK
+  if [ ! -d "minizip" ];
+  then
+    git clone https://github.com/domoticz/minizip.git
+  fi
+  cd minizip
+  git pull
+  remake_dir _build_x86
+  cd _build_x86
+  cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a
+  make
+  cd ..
+  SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
+  remake_dir _build_arm
+  cd _build_arm
+  cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a
+  make
+  merge_libs ./ ../_build_x86 libminizip.a
+  sudo cp -a ../minizip /usr/local/include
+  sudo cp libminizip.a /usr/local/lib
   cd ..
   cd ..
 fi
