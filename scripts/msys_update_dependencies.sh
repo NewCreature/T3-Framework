@@ -17,6 +17,7 @@ BUILD_LIBWEBP=1
 BUILD_FREETYPE=1
 BUILD_PHYSFS=1
 BUILD_ALLEGRO=1
+BUILD_MINIZIP=0
 
 function remake_dir() {
   rm -rf $1
@@ -39,6 +40,7 @@ function disable_all() {
   BUILD_FREETYPE=0
   BUILD_PHYSFS=0
   BUILD_ALLEGRO=0
+  BUILD_MINIZIP=0
 }
 
 if [ "$#" -le 0 ]; then
@@ -108,6 +110,10 @@ do
   if [ $arg = --allegro_only ]; then
     disable_all
     BUILD_ALLEGRO=1
+  fi
+  if [ $arg = --minizip_only ]; then
+    disable_all
+    BUILD_MINIZIP=1
   fi
 done
 
@@ -379,6 +385,25 @@ if [ $BUILD_ALLEGRO -eq 1 ]; then
   cmake .. -DSHARED=OFF -DWANT_DEMO=OFF -DWANT_DOCS=OFF -DWANT_EXAMPLES=OFF -DWANT_NATIVE_IMAGE_LOADER=OFF -DWANT_TESTS=NO -DZLIB_INCLUDE_DIR=/mingw32/include -DZLIB_LIBRARY_RELEASE=/mingw32/lib/libz.a -DWANT_IMAGE_FREEIMAGE=NO -DWANT_OPENAL=NO -DFLAC_STATIC=YES -DCMAKE_INSTALL_PREFIX=/mingw32 -G "Unix Makefiles"
   make
   make install
+  cd ..
+  cd ..
+fi
+
+# minizip
+if [ $BUILD_MINIZIP -eq 1 ]; then
+  echo "Updating minizip..."
+  if [ ! -d "minizip" ];
+  then
+    git clone https://github.com/domoticz/minizip.git
+  fi
+  cd minizip
+  git pull
+  remake_dir _build
+  cd _build
+  cmake .. -DCMAKE_C_FLAGS="-include stdio.h" -DZLIB_INCLUDE_DIR=$INSTALL_PREFIX/include -DZLIB_LIBRARY_RELEASE=$INSTALL_PREFIX/lib/libz.a -G "Unix Makefiles"
+  make
+  cp -a ../minizip /mingw32/include
+  cp libminizip.a /mingw32/lib
   cd ..
   cd ..
 fi
