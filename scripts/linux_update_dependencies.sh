@@ -20,6 +20,7 @@ BUILD_LIBWEBP=1
 BUILD_FREETYPE=1
 BUILD_PHYSFS=1
 BUILD_ALLEGRO=1
+BUILD_MINIZIP=0
 OS_ID=unknown
 
 function detect_os() {
@@ -80,6 +81,7 @@ function disable_all() {
   BUILD_FREETYPE=0
   BUILD_PHYSFS=0
   BUILD_ALLEGRO=0
+  BUILD_MINIZIP=0
 }
 
 if [ "$#" -le 0 ]; then
@@ -161,6 +163,10 @@ do
   if [ $arg = --allegro_only ]; then
     disable_all
     BUILD_ALLEGRO=1
+  fi
+  if [ $arg = --minizip_only ]; then
+    disable_all
+    BUILD_MINIZIP=1
   fi
 done
 
@@ -448,6 +454,25 @@ if [ $BUILD_ALLEGRO -eq 1 ]; then
   cmake .. -DSHARED=OFF -DWANT_DEMO=OFF -DWANT_DOCS=OFF -DWANT_EXAMPLES=OFF -DWANT_NATIVE_IMAGE_LOADER=OFF -DWANT_TESTS=NO -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DWANT_IMAGE_FREEIMAGE=NO -DWANT_IMAGE_PNG=NO -DWANT_OPENAL=NO
   make
   sudo make install
+  cd ..
+  cd ..
+fi
+
+# minizip
+if [ $BUILD_MINIZIP -eq 1 ]; then
+  echo "Updating minizip..."
+  if [ ! -d "minizip" ];
+  then
+    git clone https://github.com/domoticz/minizip.git
+  fi
+  cd minizip
+  git pull
+  remake_dir _build
+  cd _build
+  cmake .. -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a
+  make
+  sudo cp -a ../minizip /usr/local/include
+  sudo cp libminizip.a /usr/local/lib
   cd ..
   cd ..
 fi
