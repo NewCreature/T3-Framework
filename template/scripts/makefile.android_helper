@@ -33,4 +33,4 @@ copy_libs:
 	cp -a $(ANDROID_LIBRARY_ROOT)/lib/allegro-release.aar ../android_temp/app.project/app/libs/allegro.aar
 
 create_native_lib: $(T3F_OBJECTS) $(APP_OBJECTS)
-	$(CC) --target=$(ANDROID_COMPILER_TARGET) $(LFLAGS_ARCH) -shared -Wl,-soname,libapp.so -o $(ANDROID_NATIVE_SHARED_OBJECT) $(T3F_OBJECTS) $(APP_OBJECTS) $(PLATFORM_LIBS) $(APP_LIBS) $(T3F_PLATFORM_LIBRARIES) $(DEPEND_LIBS) --sysroot=$(ANDROID_SYSROOT) -latomic -lm -Wl,--build-id=sha1
+	$(CC) --target=$(ANDROID_COMPILER_TARGET) $(LFLAGS_ARCH) -shared -Wl,-soname,libapp.so -o $(ANDROID_NATIVE_SHARED_OBJECT) $(T3F_OBJECTS) $(APP_OBJECTS) $(PLATFORM_LIBS) $(APP_LIBS) $(T3F_PLATFORM_LIBRARIES) $(ANDROID_DEPEND_LIBS) --sysroot=$(ANDROID_SYSROOT) -latomic -lm -Wl,--build-id=sha1

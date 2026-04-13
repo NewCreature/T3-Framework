@@ -1,13 +1,15 @@
 T3F_PLATFORM_NAME = android
-#DEL_COMMAND = rm -f
-#DEL_FOLDER_COMMAND = rm -rf
+DEL_COMMAND = rm -f
+DEL_FOLDER_COMMAND = rm -rf
+PATH_SEPARATOR = /
+PLATFORM_CLEAN = rm -rf $(ANDROID_PLATFORM_OBJECTS)
 
 include makefile.common
 
 prepare_platform:
 	@echo Ready to build...
 
-build_android_apk: build_android $(ANDROID_PLATFORM_TARGET)
+build_android_apk: source_only_package build_android $(ANDROID_PLATFORM_TARGET)
 ifdef ANDROID_SIGNING_SETTINGS
 	rm -f ../packages/$(APP_PACKAGE_NAME)-android-aligned.apk
 	$(ANDROID_SDK_ROOT)/build-tools/37.0.0-rc1/zipalign -v 4 ../packages/$(APP_PACKAGE_NAME)-android-unsigned.apk ../packages/$(APP_PACKAGE_NAME)-android-aligned.apk
@@ -70,6 +72,8 @@ edit_project:
 copy_resources:
 	@echo Copying data to Android project...
 	cp -a ../bin/data ../android_temp/app.project/app/src/main/assets
+	cp -a ../docs ../android_temp/app.project/app/src/main/assets
+	cp ../packages/$(APP_NAME)-$(APP_VERSION)-src.tar.gz ../android_temp/app.project/app/src/main/assets
 	mkdir -p ../android_temp/app.project/app/src/main/res/mipmap
 	cp ../icons/48.png ../android_temp/app.project/app/src/main/res/mipmap/ic_launcher.png
 	cp ../icons/48_padded.png ../android_temp/app.project/app/src/main/res/mipmap/ic_foreground.png
@@ -93,13 +97,13 @@ copy_libs:
 	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=x86_64 copy_libs
 
 create_native_libs:
-	make clean
+	make -f ../scripts/makefile.android -I ../scripts clean
 	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=armeabi-v7a ANDROID_COMPILER_TARGET=armv7-none-linux-androideabi21 ANDROID_C_ARCH="-march=armv7-a" CFLAGS_ARCH="-mfpu=vfpv3-d16 -mfloat-abi=softfp -mthumb" LFLAGS_ARCH=-"Wl,--fix-cortex-a8" create_native_lib
-	make clean
+	make -f ../scripts/makefile.android -I ../scripts clean
 	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=arm64-v8a ANDROID_COMPILER_TARGET=aarch64-none-linux-android21 ANDROID_C_ARCH="" CFLAGS_ARCH="" LFLAGS_ARCH="" create_native_lib
-	make clean
+	make -f ../scripts/makefile.android -I ../scripts clean
 	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=x86 ANDROID_COMPILER_TARGET=i686-none-linux-android21 ANDROID_C_ARCH="" CFLAGS_ARCH="" LFLAGS_ARCH="" create_native_lib
-	make clean
+	make -f ../scripts/makefile.android -I ../scripts clean
 	make -f ../scripts/makefile.android_helper -I ../scripts ANDROID_ARCHITECTURE=x86_64 ANDROID_COMPILER_TARGET=x86_64-none-linux-android21 ANDROID_C_ARCH="" CFLAGS_ARCH="" LFLAGS_ARCH="" create_native_lib
 
 create_android_temp:

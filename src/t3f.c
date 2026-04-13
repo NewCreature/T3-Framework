@@ -729,6 +729,7 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 	int dw, dh;
 	int ret = 1;
 	bool restore_pos = false;
+	ALLEGRO_MONITOR_INFO monitor_info;
 
 	bool fsw_supported = true;
 	#ifdef ALLEGRO_ANDROID
@@ -901,6 +902,17 @@ int t3f_set_gfx_mode(int w, int h, int flags)
 			dw = 800;
 			dh = 480;
 		#endif
+		/* ensure window is small enough for display */
+    al_get_monitor_info(0, &monitor_info);
+		if(dw > monitor_info.x2 - monitor_info.x1)
+		{
+			dw = monitor_info.x2 - monitor_info.x1;
+		}
+		if(dh > monitor_info.y2 - monitor_info.y1)
+		{
+			dh = monitor_info.y2 - monitor_info.y1;
+		}
+
 		cvalue = al_get_config_value(t3f_config, "T3F", "save_window_pos");
 		if(cvalue)
 		{
