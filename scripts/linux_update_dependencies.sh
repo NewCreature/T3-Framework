@@ -286,8 +286,8 @@ if [ $BUILD_LIBICONV -eq 1 ]; then
   fi
   cd libiconv
   wget https://ftp.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz
-  tar xzf libiconv-1.17.tar.gz
-  cd libiconv-1.17
+  tar xzf libiconv-1.18.tar.gz
+  cd libiconv-1.18
   ./configure --enable-static=yes --enable-shared=no
   make
   sudo make install
