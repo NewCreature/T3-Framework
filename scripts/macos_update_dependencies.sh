@@ -397,8 +397,8 @@ if [ $BUILD_LIBPNG -eq 1 ]; then
   cd _build_arm
   cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DPNG_TOOLS=OFF -DPNG_SHARED=OFF -DPNG_FRAMEWORK=OFF -DPNG_TESTS=OFF -DPNG_ARM_NEON=off -DZLIB_ROOT=/usr/local
   make
-  merge_libs ./ ../_build_i386 libpng16.a
-  merge_libs ./ ../_build_x86_64 libpng16.a
+  merge_libs ./ ../_build_i386 libpng18.a
+  merge_libs ./ ../_build_x86_64 libpng18.a
   sudo make install
   cd ..
   cd ..
@@ -448,13 +448,13 @@ if [ $BUILD_LIBWEBP -eq 1 ]; then
   git pull
   remake_dir _build_x86
   cd _build_x86
-  cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DWEBP_BUILD_CWEBP=OFF -DWEBP_BUILD_DWEBP=OFF
+  cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=i386\;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DWEBP_BUILD_CWEBP=OFF -DWEBP_BUILD_DWEBP=OFF -DWEBP_BUILD_GIF2WEBP=OFF -DWEBP_BUILD_IMG2WEBP=OFF -DWEBP_BUILD_EXTRAS=OFF
   make
   cd ..
   SDK_PATH=/Library/Developer/CommandLineTools/SDKs/$ARM_SDK
   remake_dir _build_arm
   cd _build_arm
-  cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DWEBP_BUILD_CWEBP=OFF -DWEBP_BUILD_DWEBP=OFF
+  cmake .. -DCMAKE_OSX_SYSROOT=$SDK_PATH -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DZLIB_INCLUDE_DIR=/usr/local/include -DZLIB_LIBRARY_RELEASE=/usr/local/lib/libz.a -DWEBP_BUILD_CWEBP=OFF -DWEBP_BUILD_DWEBP=OFF -DWEBP_BUILD_GIF2WEBP=OFF -DWEBP_BUILD_IMG2WEBP=OFF -DWEBP_BUILD_EXTRAS=OFF
   make
   merge_libs ./ ../_build_x86 libwebp.a
   merge_libs ./ ../_build_x86 libsharpyuv.a
