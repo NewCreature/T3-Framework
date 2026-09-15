@@ -864,6 +864,26 @@ void frame_logic(void)
 			animation->data->frame[current_frame]->flags = 0;
 			t3f_use_key_press(ALLEGRO_KEY_F);
 		}
+		if(t3f_key_pressed(ALLEGRO_KEY_W))
+		{
+			animation->data->frame[current_frame]->y -= 1.0;
+			t3f_use_key_press(ALLEGRO_KEY_W);
+		}
+		if(t3f_key_pressed(ALLEGRO_KEY_S))
+		{
+			animation->data->frame[current_frame]->y += 1.0;
+			t3f_use_key_press(ALLEGRO_KEY_S);
+		}
+		if(t3f_key_pressed(ALLEGRO_KEY_A))
+		{
+			animation->data->frame[current_frame]->x -= 1.0;
+			t3f_use_key_press(ALLEGRO_KEY_A);
+		}
+		if(t3f_key_pressed(ALLEGRO_KEY_D))
+		{
+			animation->data->frame[current_frame]->x += 1.0;
+			t3f_use_key_press(ALLEGRO_KEY_D);
+		}
 
 		if(t3f_mouse_button_pressed(0))
 		{
